@@ -7,6 +7,7 @@ import (
 	"github.com/vesicash/auth-ms/utility"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	lg "gorm.io/gorm/logger"
 )
 
 type Databases struct {
@@ -45,30 +46,50 @@ func ConnectToDatabases() Databases {
 
 	utility.LogAndPrint("connected to databases")
 
-	fmt.Println("connected to db")
+	utility.LogAndPrint("connected to db")
+	// migrations
+
 	DB = databases
 	return DB
 }
 
 func connectToDb(host, user, password, dbname, port, sslmode, timezone string, logger *utility.Logger) *gorm.DB {
 	dsn := fmt.Sprintf("host=%v user=%v password=%v dbname=%v port=%v sslmode=%v TimeZone=%v", host, user, password, dbname, port, sslmode, timezone)
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		Logger: lg.Default.LogMode(lg.Error),
+	})
 	if err != nil {
 		utility.LogAndPrint(fmt.Sprintf("connection to %v db failed with: %v", dbname, err))
 		panic(err)
 
 	}
+
 	utility.LogAndPrint(fmt.Sprintf("connected to %v db", dbname))
 	return db
 }
 
-// _ = db.AutoMigrate(MigrationModels()...)
-func MigrationModels(db *gorm.DB) []interface{} {
-	return []interface{}{
-		// model.User{},
+func ReturnDatabase(name string) *gorm.DB {
+	databases := DB
+	switch name {
+	case "admin":
+		return DB.Admin
+	case "auth":
+		return DB.Auth
+	case "notifications":
+		return DB.Notifications
+	case "payment":
+		return DB.Payment
+	case "reminder":
+		return DB.Reminder
+	case "subscription":
+		return DB.Subscription
+	case "transaction":
+		return DB.Transaction
+	case "verification":
+		return DB.Verification
+	case "cron":
+		return DB.Cron
+	default:
+		return databases.Auth
 	}
-}
-
-func MigrateModels(db *gorm.DB, models []interface{}) {
-	_ = db.AutoMigrate(models...)
 }

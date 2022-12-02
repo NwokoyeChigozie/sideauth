@@ -5,17 +5,17 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"github.com/vesicash/auth-ms/pkg/handler/health"
-	"github.com/vesicash/auth-ms/utility"
+	"github.com/vesicash/auth-ms/pkg/controller/health"
+	"github.com/vesicash/auth-ms/pkg/repository/storage/postgresql"
 )
 
-func Health(r *gin.Engine, validate *validator.Validate, ApiVersion string, logger *utility.Logger) *gin.Engine {
-	health := health.Controller{Validate: validate, Logger: logger}
+func Health(r *gin.Engine, ApiVersion string, validator *validator.Validate, db postgresql.Databases) *gin.Engine {
+	health := health.Controller{Db: db, Validator: validator}
 
-	authUrl := r.Group(fmt.Sprintf("/api/%v", ApiVersion))
+	healthUrl := r.Group(fmt.Sprintf("%v/auth", ApiVersion))
 	{
-		authUrl.POST("/health", health.Post)
-		authUrl.GET("/health", health.Get)
+		healthUrl.POST("/health", health.Post)
+		healthUrl.GET("/health", health.Get)
 	}
 	return r
 }

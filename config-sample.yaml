@@ -1,5 +1,5 @@
 server:
-  port: "9000"
+  port: "8005"
 Databases:
   DB_HOST: "localhost"
   DB_PORT: "5432"
@@ -17,3 +17,21 @@ Databases:
   TRANSACTIONS_DB: transaction
   VERIFICATION_DB: verification
   CRON_DB: cron
+Microservices:
+  Admin: localhost:4000/v1/admin
+  Auth: localhost:4000/v1/auth
+  Boilerplate: localhost:4000/v1/boilerplate
+  Cron: localhost:4000/v1/cron
+  Feedback: localhost:4000/v1/feedback
+  Internaldocs: localhost:4000/v1/internaldocs
+  Notification: localhost:4000/v1/notifications
+  Payment: localhost:4000/v1/payment
+  Productlink: localhost:4000/v1/productlink
+  Referral: localhost:4000/v1/referral
+  Reminders: localhost:4000/v1/reminders
+  Roles: localhost:4000/v1/roles
+  Subscription: localhost:4000/v1/subscription
+  Transactions: localhost:4000/v1/transactions
+  Upload: localhost:4000/v1/upload
+  Verification: localhost:4000/v1/verification
+  Widget: localhost:4000/v1/widget

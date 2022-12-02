@@ -6,13 +6,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
-	"github.com/vesicash/auth-ms/utility"
 )
 
 func Logger() gin.HandlerFunc {
 
 	// instantiation
-	loger := utility.NewLogger()
 	logger := logrus.New()
 
 	//Set output
@@ -48,13 +46,6 @@ func Logger() gin.HandlerFunc {
 		// request IP
 		clientIP := c.ClientIP()
 
-		loger.Info(map[string]interface{}{
-			"status_code":  statusCode,
-			"latency_time": latencyTime,
-			"client_ip":    clientIP,
-			"req_method":   reqMethod,
-			"req_uri":      reqUri,
-		})
 		//Log format
 		logger.WithFields(logrus.Fields{
 			"status_code":  statusCode,

@@ -8,8 +8,9 @@ import (
 )
 
 type Configuration struct {
-	Server    ServerConfiguration
-	Databases Databases
+	Server        ServerConfiguration
+	Databases     Databases
+	Microservices Microservices
 }
 
 // Setup initialize configuration
