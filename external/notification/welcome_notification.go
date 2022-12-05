@@ -57,7 +57,7 @@ func SendWelcomeSmsNotification(authDb *gorm.DB, accountID int) error {
 		"v-public-key":  accessToken.PublicKey,
 	}
 	data := external_models.AccountIDModel{AccountId: accountID}
-	logger.Info("welcome email", data)
+	logger.Info("welcome sms", data)
 	err = external.SendRequest(logger, "service", "welcome_sms_notification", headers, data, &outBoundResponse)
 	if err != nil {
 		logger.Info("welcome sms", outBoundResponse, err)

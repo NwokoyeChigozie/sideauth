@@ -29,18 +29,15 @@ var (
 )
 
 func ValidateRequest(V interface{}) error {
-	fmt.Println("checking")
 
 	var err []ValidationError
 	if reflect.ValueOf(V).Kind() == reflect.Struct {
 		t := reflect.TypeOf(V)
 		v := reflect.ValueOf(V)
-		fmt.Println("fields1", t, v)
 
 		for i := 0; i < t.NumField(); i++ {
 			FieldT := t.Field(i)
 			FieldV := v.Field(i)
-			fmt.Println("fields2", FieldT, "cc", FieldV, "tt", FieldV.Type())
 			// reflect.ValueOf(V).Field(i).Type()
 
 			validateFields := FieldT.Tag.Get("pgvalidate")
@@ -49,10 +46,8 @@ func ValidateRequest(V interface{}) error {
 				continue
 			}
 
-			fmt.Println("1", validateFields, splitFields)
 			for j := 0; j < len(splitFields); j++ {
 				splitFieldsStr := strings.ToLower(splitFields[j])
-				fmt.Println("2", splitFieldsStr)
 				if strings.Contains(splitFieldsStr, "notexists") {
 					value, status := ValidateNext(FieldV)
 					if status {
@@ -75,10 +70,8 @@ func ValidateRequest(V interface{}) error {
 						}
 					}
 				} else if strings.Contains(splitFieldsStr, "exists") {
-					fmt.Println("vv1", splitFieldsStr, FieldV.String())
 					value, status := ValidateNext(FieldV)
 					if status {
-						fmt.Println("vv2", splitFieldsStr, value)
 						firstSplit := strings.Split(splitFieldsStr, "=")
 						if len(firstSplit) == 2 {
 							secondSplit := strings.Split(firstSplit[1], "$")
@@ -119,7 +112,6 @@ func ValidateRequest(V interface{}) error {
 			errString += v.Field + ": " + v.Error + " ;"
 		}
 	}
-	fmt.Println(errString)
 	return fmt.Errorf(errString)
 }
 

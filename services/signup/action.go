@@ -164,6 +164,22 @@ func SignupService(req models.CreateUserRequestModel, db postgresql.Databases) (
 	return &user, http.StatusCreated, nil
 }
 
+func BulkSignupService(req []models.CreateUserRequestModel, db postgresql.Databases) ([]*models.User, int, error) {
+	logger := utility.NewLogger()
+	newUsers := []*models.User{}
+	for _, sData := range req {
+		newUser, _, err := SignupService(sData, db)
+		if err != nil {
+			logger.Error("bulk signup", err)
+		} else {
+			newUsers = append(newUsers, newUser)
+		}
+
+	}
+	return newUsers, http.StatusOK, nil
+
+}
+
 func GetAccountID(db *gorm.DB) (int, error) {
 	randNum := utility.GetRandomNumbersInRange(1000000000, 9999999999)
 	user := models.User{AccountID: uint(randNum)}
