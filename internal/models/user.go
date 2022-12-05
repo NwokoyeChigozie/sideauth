@@ -50,6 +50,10 @@ type CreateUserRequestModel struct {
 	BusinessAddress string `json:"business_address"`
 }
 
+type BulkCreateUserRequestModel struct {
+	Bulk []CreateUserRequestModel `json:"bulk" validate:"required"`
+}
+
 func (u *User) CreateUser(db *gorm.DB) error {
 	err := postgresql.CreateOneRecord(db, &u)
 	if err != nil {

@@ -24,11 +24,10 @@ func SendRequest(logger *utility.Logger, reqType, name string, headers map[strin
 	} else {
 		return fmt.Errorf("not implemented")
 	}
-
 	buf := new(bytes.Buffer)
 	err = json.NewEncoder(buf).Encode(data)
 	if err != nil {
-		logger.Info("encoding error", name, err.Error())
+		logger.Error("encoding error", name, err.Error())
 	}
 
 	logger.Info(name, reqObject.Path, data, buf)
@@ -36,7 +35,8 @@ func SendRequest(logger *utility.Logger, reqType, name string, headers map[strin
 	client := &http.Client{}
 	req, err := http.NewRequest(reqObject.Method, reqObject.Path, buf)
 	if err != nil {
-		fmt.Println(err)
+		logger.Error("request creation error", name, err.Error())
+		fmt.Println(name, "4", err)
 		return err
 	}
 
@@ -52,12 +52,13 @@ func SendRequest(logger *utility.Logger, reqType, name string, headers map[strin
 
 	err = json.NewDecoder(res.Body).Decode(response)
 	if err != nil {
+		logger.Error("decoding error", name, err.Error())
 		return err
 	}
 
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		fmt.Println(err)
+		logger.Error("readin body error", name, err.Error())
 		return err
 	}
 
