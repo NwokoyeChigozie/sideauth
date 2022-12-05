@@ -1,6 +1,7 @@
 package utility
 
 import (
+	"net/http"
 	"reflect"
 
 	"github.com/go-playground/locales/en"
@@ -46,6 +47,11 @@ func ResponseMessage(code int, status string, name string, message string, err i
 		Data:    data,
 		Extra:   extra,
 	}
+	return res
+}
+
+func UnauthorisedResponse(code int, status string, name string, message string) Response {
+	res := ResponseMessage(http.StatusUnauthorized, status, name, message, nil, nil, nil, nil)
 	return res
 }
 

@@ -35,6 +35,14 @@ func FindMicroserviceRequest(name string, headers map[string]string, data interf
 			SuccessCode: 200,
 			RequestData: data,
 		}, nil
+	case "send_otp_notification":
+		return RequestObj{
+			Path:        fmt.Sprintf("%v/send_otp", config.Microservices.Notification),
+			Method:      "POST",
+			Headers:     headers,
+			SuccessCode: 200,
+			RequestData: data,
+		}, nil
 	case "welcome_password_reset_notification":
 		return RequestObj{
 			Path:        fmt.Sprintf("%v/email/send/welcome_password", config.Microservices.Notification),
