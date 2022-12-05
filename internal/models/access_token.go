@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/vesicash/auth-ms/pkg/repository/storage/postgresql"
@@ -25,4 +26,16 @@ func (a *AccessToken) GetAccessTokens(db *gorm.DB) error {
 		return fmt.Errorf("token selection failed: %v", err.Error())
 	}
 	return nil
+}
+
+func (a *AccessToken) LiveTokensWithPublicOrPrivateKey(db *gorm.DB) (int, error) {
+	err, nilErr := postgresql.SelectOneFromDb(db, &a, "(public_key = ? or private_key = ?) and is_live = ?", a.PublicKey, a.PrivateKey, a.IsLive)
+	if nilErr != nil {
+		return http.StatusBadRequest, nilErr
+	}
+
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+	return http.StatusOK, nil
 }

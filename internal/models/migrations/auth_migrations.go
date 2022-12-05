@@ -16,5 +16,6 @@ func AuthMigrationModels() []interface{} {
 		models.PasswordResetToken{},
 		models.ReferralPromo{},
 		models.UsersCredential{},
+		models.OtpVerification{},
 	}
 }

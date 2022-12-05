@@ -17,6 +17,7 @@ Databases:
   TRANSACTIONS_DB: transaction
   VERIFICATION_DB: verification
   CRON_DB: cron
+  Migrate: true
 Microservices:
   Admin: localhost:4000/v1/admin
   Auth: localhost:4000/v1/auth

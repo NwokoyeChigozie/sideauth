@@ -24,7 +24,11 @@ func main() {
 	getConfig := config.GetConfig()
 	validatorRef := validator.New()
 	db := postgresql.Connection()
-	migrations.RunAllMigrations(db)
+
+	if getConfig.Databases.Migrate {
+		migrations.RunAllMigrations(db)
+	}
+
 	r := router.Setup(validatorRef, db)
 
 	utility.LogAndPrint("Server is starting at 127.0.0.1:%s", getConfig.Server.Port)
