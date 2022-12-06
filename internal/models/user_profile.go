@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/vesicash/auth-ms/pkg/repository/storage/postgresql"
@@ -33,4 +34,16 @@ func (u *UserProfile) CreateUserProfile(db *gorm.DB) error {
 		return fmt.Errorf("user Profile creation failed: %v", err.Error())
 	}
 	return nil
+}
+
+func (u *UserProfile) GetByAccountID(db *gorm.DB) (int, error) {
+	err, nilErr := postgresql.SelectOneFromDb(db, &u, "account_id = ? ", u.AccountID)
+	if nilErr != nil {
+		return http.StatusBadRequest, nilErr
+	}
+
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+	return http.StatusOK, nil
 }

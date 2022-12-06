@@ -3,9 +3,11 @@ package models
 import (
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/vesicash/auth-ms/pkg/repository/storage/postgresql"
+	"github.com/vesicash/auth-ms/utility"
 	"gorm.io/gorm"
 )
 
@@ -50,6 +52,13 @@ type CreateUserRequestModel struct {
 	BusinessAddress string `json:"business_address"`
 }
 
+type LoginUserRequestModel struct {
+	Username     string `json:"username"`
+	EmailAddress string `json:"email_address"`
+	Password     string `json:"password" validate:"required"`
+	PhoneNumber  string `json:"phone_number"`
+}
+
 type BulkCreateUserRequestModel struct {
 	Bulk []CreateUserRequestModel `json:"bulk" validate:"required"`
 }
@@ -72,4 +81,44 @@ func (u *User) GetUserByAccountID(db *gorm.DB) (int, error) {
 		return http.StatusInternalServerError, err
 	}
 	return http.StatusOK, nil
+}
+
+func (u *User) Update(db *gorm.DB) error {
+	_, err := postgresql.SaveAllFields(db, &u)
+	return err
+}
+
+func (u *User) GetUserByUsernameEmailOrPhone(db *gorm.DB) (int, error) {
+	var (
+		err, nilErr error
+	)
+	if u.Username != "" {
+		err, nilErr = postgresql.SelectOneFromDb(db, &u, "LOWER(username) = ? ", strings.ToLower(u.Username))
+		if nilErr != nil {
+			nilErr = fmt.Errorf("username not found")
+		}
+	} else if u.EmailAddress != "" {
+		err, nilErr = postgresql.SelectOneFromDb(db, &u, "LOWER(email_address) = ?", strings.ToLower(u.EmailAddress))
+		if nilErr != nil {
+			nilErr = fmt.Errorf("email address not found")
+		}
+	} else if u.PhoneNumber != "" {
+		phone, _ := utility.PhoneValid(u.PhoneNumber)
+		err, nilErr = postgresql.SelectOneFromDb(db, &u, "phone_number = ? or phone_number = ? ", u.PhoneNumber, phone)
+		if nilErr != nil {
+			nilErr = fmt.Errorf("phone number not found")
+		}
+	} else {
+		err = fmt.Errorf("no values for GetUserByUsernameEmailOrPhone")
+	}
+
+	if nilErr != nil {
+		return http.StatusBadRequest, nilErr
+	}
+
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+	return http.StatusOK, nil
+
 }

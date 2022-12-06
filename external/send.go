@@ -8,22 +8,27 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/elliotchance/phpserialize"
 	"github.com/vesicash/auth-ms/utility"
 )
 
-func SendRequest(logger *utility.Logger, reqType, name string, headers map[string]string, data interface{}, response interface{}) error {
+func SendRequest(logger *utility.Logger, reqType, name string, headers map[string]string, data interface{}, response interface{}, urlPrefix ...string) error {
 	var (
 		reqObject = RequestObj{}
 		err       error
 	)
 	if reqType == "service" {
 		reqObject, err = FindMicroserviceRequest(name, headers, data)
-		if err != nil {
-			return err
-		}
+	} else if reqType == "third_party" {
+		reqObject, err = FindThirdPartyRequest(name, headers, data)
 	} else {
-		return fmt.Errorf("not implemented")
+		err = fmt.Errorf("not implemented")
 	}
+
+	if err != nil {
+		return err
+	}
+
 	buf := new(bytes.Buffer)
 	err = json.NewEncoder(buf).Encode(data)
 	if err != nil {
@@ -31,6 +36,9 @@ func SendRequest(logger *utility.Logger, reqType, name string, headers map[strin
 	}
 
 	logger.Info(name, reqObject.Path, data, buf)
+	if len(urlPrefix) > 0 {
+		reqObject.Path += urlPrefix[0]
+	}
 
 	client := &http.Client{}
 	req, err := http.NewRequest(reqObject.Method, reqObject.Path, buf)
@@ -50,10 +58,12 @@ func SendRequest(logger *utility.Logger, reqType, name string, headers map[strin
 		return err
 	}
 
-	err = json.NewDecoder(res.Body).Decode(response)
-	if err != nil {
-		logger.Error("decoding error", name, err.Error())
-		return err
+	if reqObject.DecodeMethod != PhpSerializerMethod {
+		err = json.NewDecoder(res.Body).Decode(response)
+		if err != nil {
+			logger.Error("json decoding error", name, err.Error())
+			return err
+		}
 	}
 
 	body, err := ioutil.ReadAll(res.Body)
@@ -62,7 +72,15 @@ func SendRequest(logger *utility.Logger, reqType, name string, headers map[strin
 		return err
 	}
 
-	logger.Info("response body", name, reqObject.Path, body)
+	logger.Info("response body", name, reqObject.Path, string(body))
+
+	if reqObject.DecodeMethod == PhpSerializerMethod {
+		err := phpserialize.Unmarshal(body, response)
+		if err != nil {
+			logger.Error("php serializer decoding error", name, err.Error())
+			return err
+		}
+	}
 
 	defer res.Body.Close()
 

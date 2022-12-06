@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/vesicash/auth-ms/pkg/repository/storage/postgresql"
@@ -55,4 +56,16 @@ func (b *BusinessProfile) CreateBusinessProfile(db *gorm.DB) error {
 		return fmt.Errorf("business Profile failed: %v", err.Error())
 	}
 	return nil
+}
+
+func (b *BusinessProfile) GetByAccountID(db *gorm.DB) (int, error) {
+	err, nilErr := postgresql.SelectOneFromDb(db, &b, "account_id = ? ", b.AccountID)
+	if nilErr != nil {
+		return http.StatusBadRequest, nilErr
+	}
+
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+	return http.StatusOK, nil
 }

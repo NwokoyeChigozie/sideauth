@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/vesicash/auth-ms/external/notification"
+	"github.com/vesicash/auth-ms/external/microservice/notification"
 	"github.com/vesicash/auth-ms/internal/models"
 	"github.com/vesicash/auth-ms/pkg/repository/storage/postgresql"
 	"github.com/vesicash/auth-ms/utility"
