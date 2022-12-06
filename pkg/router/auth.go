@@ -17,6 +17,7 @@ func Auth(r *gin.Engine, ApiVersion string, validator *validator.Validate, db po
 	{
 		authUrl.POST("/signup", auth.Signup)
 		authUrl.POST("/signup/bulk", auth.BulkSignup)
+		authUrl.POST("/login", auth.Login)
 
 	}
 

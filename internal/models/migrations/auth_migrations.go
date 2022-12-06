@@ -17,5 +17,9 @@ func AuthMigrationModels() []interface{} {
 		models.ReferralPromo{},
 		models.UsersCredential{},
 		models.OtpVerification{},
+		models.BannedAccount{},
+		models.UserTracking{},
+		models.BankDetail{},
+		models.EscrowCharge{},
 	}
 }

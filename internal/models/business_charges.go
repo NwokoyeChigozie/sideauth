@@ -80,3 +80,12 @@ func (b *BusinessCharge) August(db *gorm.DB) (int, error) {
 
 	return http.StatusOK, nil
 }
+
+func (b *BusinessCharge) GetAllByBusinessID(db *gorm.DB) ([]BusinessCharge, error) {
+	charges := []BusinessCharge{}
+	err := postgresql.SelectAllFromDb(db, "asc", &charges, "business_id = ? ", b.BusinessId)
+	if err != nil {
+		return charges, err
+	}
+	return charges, nil
+}

@@ -7,6 +7,14 @@ import (
 	"gorm.io/gorm"
 )
 
+func SelectAllFromDb(db *gorm.DB, order string, receiver interface{}, query interface{}, args ...interface{}) error {
+	if order == "" {
+		order = "desc"
+	}
+	tx := db.Where(query, args...).Find(receiver)
+	return tx.Error
+}
+
 func SelectOneFromDb(db *gorm.DB, receiver interface{}, query interface{}, args ...interface{}) (error, error) {
 
 	tx := db.Where(query, args...).First(receiver)

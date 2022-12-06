@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/vesicash/auth-ms/internal/models"
 	"github.com/vesicash/auth-ms/pkg/repository/storage/postgresql"
-	"github.com/vesicash/auth-ms/services/signup"
+	"github.com/vesicash/auth-ms/services/auth"
 	"github.com/vesicash/auth-ms/utility"
 )
 
@@ -37,14 +37,14 @@ func (base *Controller) Signup(c *gin.Context) {
 		return
 	}
 
-	reqData, err := signup.ValidateSignupRequest(req, base.Db)
+	reqData, err := auth.ValidateSignupRequest(req, base.Db)
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", err.Error(), err, nil)
 		c.JSON(http.StatusBadRequest, rd)
 		return
 	}
 
-	data, code, err := signup.SignupService(reqData, base.Db)
+	data, code, err := auth.SignupService(reqData, base.Db)
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", err.Error(), err, nil)
 		c.JSON(code, rd)
@@ -79,14 +79,14 @@ func (base *Controller) BulkSignup(c *gin.Context) {
 	reqData := []models.CreateUserRequestModel{}
 
 	for i, d := range req.Bulk {
-		vData, err := signup.ValidateSignupRequest(d, base.Db)
+		vData, err := auth.ValidateSignupRequest(d, base.Db)
 		if err != nil {
 			vErrs += " user " + strconv.Itoa(i+1) + "errors {" + err.Error() + "}"
 		}
 		reqData = append(reqData, vData)
 	}
 
-	data, code, err := signup.BulkSignupService(reqData, base.Db)
+	data, code, err := auth.BulkSignupService(reqData, base.Db)
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", err.Error(), err, nil)
 		c.JSON(code, rd)

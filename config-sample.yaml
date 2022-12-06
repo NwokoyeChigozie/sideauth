@@ -1,5 +1,8 @@
 server:
   port: "8005"
+  secret: "mySecretKey"
+  accessTokenExpireDuration: 2
+  refreshTokenExpireDuration: 2
 Databases:
   DB_HOST: "localhost"
   DB_PORT: "5432"
