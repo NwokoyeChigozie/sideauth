@@ -51,7 +51,7 @@ func (base *Controller) Signup(c *gin.Context) {
 		return
 	}
 
-	rd := utility.BuildSuccessResponse(http.StatusOK, "signup successful", data)
+	rd := utility.BuildSuccessResponse(http.StatusCreated, "signup successful", data)
 	c.JSON(http.StatusOK, rd)
 
 }
@@ -93,7 +93,7 @@ func (base *Controller) BulkSignup(c *gin.Context) {
 		return
 	}
 
-	rd := utility.BuildSuccessResponse(http.StatusOK, "users signup successful", data)
+	rd := utility.BuildSuccessResponse(http.StatusCreated, "users signup successful", data)
 	c.JSON(http.StatusOK, rd)
 
 }

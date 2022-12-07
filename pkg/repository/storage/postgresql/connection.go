@@ -2,6 +2,9 @@ package postgresql
 
 import (
 	"fmt"
+	"os"
+
+	"log"
 
 	"github.com/vesicash/auth-ms/internal/config"
 	"github.com/vesicash/auth-ms/utility"
@@ -29,9 +32,9 @@ func Connection() Databases {
 	return DB
 }
 
-func ConnectToDatabases() Databases {
+func ConnectToDatabases(configDatabases config.Databases) Databases {
 	logger := utility.NewLogger()
-	dbsCV := config.GetConfig().Databases
+	dbsCV := configDatabases
 	databases := Databases{}
 	utility.LogAndPrint("connecting to databases")
 	// databases.Admin = connectToDb(dbsCV.DB_HOST, dbsCV.USERNAME, dbsCV.PASSWORD, dbsCV.ADMIN_DB, dbsCV.DB_PORT, dbsCV.SSLMODE, dbsCV.TIMEZONE, logger)
@@ -55,8 +58,17 @@ func ConnectToDatabases() Databases {
 
 func connectToDb(host, user, password, dbname, port, sslmode, timezone string, logger *utility.Logger) *gorm.DB {
 	dsn := fmt.Sprintf("host=%v user=%v password=%v dbname=%v port=%v sslmode=%v TimeZone=%v", host, user, password, dbname, port, sslmode, timezone)
+
+	newLogger := lg.New(
+		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
+		lg.Config{
+			LogLevel:                  lg.Error, // Log level
+			IgnoreRecordNotFoundError: true,     // Ignore ErrRecordNotFound error for logger
+			Colorful:                  true,
+		},
+	)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
-		Logger: lg.Default.LogMode(lg.Error),
+		Logger: newLogger,
 	})
 	if err != nil {
 		utility.LogAndPrint(fmt.Sprintf("connection to %v db failed with: %v", dbname, err))

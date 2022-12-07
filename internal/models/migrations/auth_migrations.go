@@ -10,6 +10,7 @@ func AuthMigrationModels() []interface{} {
 		models.User{},
 		models.Country{},
 		models.UserProfile{},
+		models.UsersCredential{},
 		models.AccessToken{},
 		models.BusinessProfile{},
 		models.BusinessCharge{},

@@ -32,6 +32,15 @@ func SelectLatestFromDb(db *gorm.DB, receiver interface{}, query interface{}, ar
 	return tx.Error, nil
 }
 
+func SelectRandomFromDb(db *gorm.DB, receiver interface{}, query interface{}, args ...interface{}) (error, error) {
+
+	tx := db.Order("rand()").Where(query, args...).First(receiver)
+	if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
+		return tx.Error, tx.Error
+	}
+	return tx.Error, nil
+}
+
 func SelectFirstFromDb(db *gorm.DB, receiver interface{}) error {
 	tx := db.First(receiver)
 	return tx.Error

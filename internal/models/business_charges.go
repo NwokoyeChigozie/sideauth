@@ -11,7 +11,7 @@ import (
 
 type BusinessCharge struct {
 	ID                  uint      `gorm:"column:id; type:uint; not null; primaryKey; unique; autoIncrement" json:"id"`
-	BusinessId          int       `gorm:"column:business_id; type:int; not null; comment:'same as account_id'" json:"account_id"`
+	BusinessId          int       `gorm:"column:business_id; type:int; not null; comment:same as account_id" json:"account_id"`
 	Country             string    `gorm:"column:country; type:varchar(250)" json:"country"`
 	Currency            string    `gorm:"column:currency; type:varchar(250)" json:"currency"`
 	BusinessCharge      string    `gorm:"column:business_charge; type:varchar(250); not null; default:'0'" json:"business_charge"`

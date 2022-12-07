@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 
-	"github.com/vesicash/auth-ms/external/microservice/verification"
 	"github.com/vesicash/auth-ms/internal/config"
 	"github.com/vesicash/auth-ms/internal/models/migrations"
 	"github.com/vesicash/auth-ms/pkg/repository/storage/postgresql"
@@ -15,8 +14,8 @@ import (
 )
 
 func init() {
-	config.Setup()
-	postgresql.ConnectToDatabases()
+	config := config.Setup("./config")
+	postgresql.ConnectToDatabases(config.Databases)
 
 }
 
@@ -29,8 +28,6 @@ func main() {
 	if getConfig.Databases.Migrate {
 		migrations.RunAllMigrations(db)
 	}
-
-	verification.GetVerifications(db.Auth, 3245681126)
 
 	r := router.Setup(validatorRef, db)
 
