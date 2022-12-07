@@ -15,7 +15,7 @@ func (OtpVerification) TableName() string {
 
 type OtpVerification struct {
 	ID        uint      `gorm:"column:id; type:uint; not null; primaryKey; unique; autoIncrement" json:"id"`
-	AccountID int       `gorm:"column:account_id; type:int; not null; comment:'account id of the user'" json:"account_id"`
+	AccountID int       `gorm:"column:account_id; type:int; not null; comment: account id of the user" json:"account_id"`
 	OtpToken  string    `gorm:"column:otp_token; type:varchar(250); not null" json:"otp_token"`
 	ExpiresAt time.Time `gorm:"column:expires_at; type:varchar(250)" json:"expires_at"`
 	CreatedAt time.Time `gorm:"column:created_at; autoCreateTime" json:"created_at"`

@@ -21,6 +21,24 @@ Databases:
   VERIFICATION_DB: verification
   CRON_DB: cron
   Migrate: true
+TestDatabases:
+  DB_HOST: "localhost"
+  DB_PORT: "5432"
+  DB_CONNECTION: pgsql
+  TIMEZONE: Africa/Lagos
+  SSLMODE: disable
+  USERNAME: postgres
+  PASSWORD: "password"
+  ADMIN_DB: admin
+  AUTH_DB: auth
+  NOTIFICATIONS_DB: notifications
+  PAYMENT_DB: payment
+  REMINDERS_DB: reminder
+  SUBSCRIPTIONS_DB: subscription
+  TRANSACTIONS_DB: transaction
+  VERIFICATION_DB: verification
+  CRON_DB: cron
+  Migrate: true
 Microservices:
   Admin: localhost:4000/v1/admin
   Auth: localhost:4000/v1/auth

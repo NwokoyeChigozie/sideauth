@@ -10,6 +10,7 @@ import (
 type Configuration struct {
 	Server        ServerConfiguration
 	Databases     Databases
+	TestDatabases Databases
 	Microservices Microservices
 }
 
@@ -20,11 +21,11 @@ var (
 )
 
 // Params = getConfig.Params
-func Setup() {
+func Setup(name string) *Configuration {
 	var configuration *Configuration
 	logger := utility.NewLogger()
 
-	viper.SetConfigName("config")
+	viper.SetConfigName(name)
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(".")
 
@@ -40,6 +41,7 @@ func Setup() {
 	// Params = configuration.Params
 	Config = configuration
 	logger.Info("configurations loading successfully")
+	return configuration
 }
 
 // GetConfig helps you to get configuration data

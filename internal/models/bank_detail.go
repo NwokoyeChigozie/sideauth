@@ -37,3 +37,12 @@ func (b *BankDetail) GetByAccountID(db *gorm.DB) (int, error) {
 	}
 	return http.StatusOK, nil
 }
+
+func (b *BankDetail) GetAllByAccountID(db *gorm.DB) ([]BankDetail, error) {
+	details := []BankDetail{}
+	err := postgresql.SelectAllFromDb(db, "asc", &details, "account_id = ? ", b.AccountID)
+	if err != nil {
+		return details, err
+	}
+	return details, nil
+}

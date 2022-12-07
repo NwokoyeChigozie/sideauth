@@ -88,9 +88,9 @@ func LoginService(c *gin.Context, req models.LoginUserRequestModel, db postgresq
 		return responseData, code, fmt.Errorf("error getting business profile: " + err.Error())
 	}
 
-	bankDetails := models.BankDetail{AccountID: int(user.AccountID)}
-	code, err = bankDetails.GetByAccountID(db.Auth)
-	if code == http.StatusInternalServerError {
+	bankDetail := models.BankDetail{AccountID: int(user.AccountID)}
+	bankDetails, err := bankDetail.GetAllByAccountID(db.Auth)
+	if err != nil {
 		return responseData, code, fmt.Errorf("error getting bank details: " + err.Error())
 	}
 

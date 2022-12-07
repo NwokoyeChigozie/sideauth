@@ -1,6 +1,8 @@
 package models
 
 import (
+	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -28,4 +30,34 @@ func (c *Country) FindWithNameOrCode(db *gorm.DB) (int, error) {
 		return http.StatusInternalServerError, err
 	}
 	return http.StatusOK, nil
+}
+
+func (c *Country) CreateCountry(db *gorm.DB) error {
+	err := postgresql.CreateOneRecord(db, &c)
+	if err != nil {
+		return fmt.Errorf("country creation failed: %v", err.Error())
+	}
+	return nil
+}
+
+func AddCountriesIfNotExist(db *gorm.DB) error {
+	countries := []Country{
+		{
+			Name:         "nigeria",
+			CountryCode:  "NG",
+			CurrencyCode: "NGN",
+		}, {
+			Name:         "united states of america",
+			CountryCode:  "USA",
+			CurrencyCode: "USD",
+		},
+	}
+
+	for _, v := range countries {
+		_, err := v.FindWithNameOrCode(db)
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			v.CreateCountry(db)
+		}
+	}
+	return nil
 }

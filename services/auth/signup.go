@@ -209,7 +209,7 @@ func BulkSignupService(req []models.CreateUserRequestModel, db postgresql.Databa
 		}
 
 	}
-	return newUsers, http.StatusOK, nil
+	return newUsers, http.StatusCreated, nil
 
 }
 
