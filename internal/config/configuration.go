@@ -12,6 +12,7 @@ type Configuration struct {
 	Databases     Databases
 	TestDatabases Databases
 	Microservices Microservices
+	App           App
 }
 
 // Setup initialize configuration

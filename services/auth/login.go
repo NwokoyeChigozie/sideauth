@@ -20,7 +20,7 @@ func LoginService(c *gin.Context, req models.LoginUserRequestModel, db postgresq
 		responseData = gin.H{}
 	)
 
-	if req.EmailAddress == "" && req.PhoneNumber == "" && req.Username != "" {
+	if req.EmailAddress == "" && req.PhoneNumber == "" && req.Username == "" {
 		return responseData, http.StatusBadRequest, fmt.Errorf("provide either username, email_address, or phone_number")
 	}
 	user := models.User{Username: req.Username, EmailAddress: req.EmailAddress, PhoneNumber: req.PhoneNumber}
@@ -46,15 +46,9 @@ func LoginService(c *gin.Context, req models.LoginUserRequestModel, db postgresq
 		return responseData, http.StatusBadRequest, fmt.Errorf("invalid login details")
 	}
 
-	err = TrackUserLogin(c, db, int(user.AccountID))
-	if err != nil {
-		return responseData, http.StatusInternalServerError, err
-	}
+	TrackUserLogin(c, db, int(user.AccountID))
 
-	verifications, err := verification.GetVerifications(db.Auth, int(user.AccountID))
-	if err != nil {
-		return responseData, http.StatusInternalServerError, fmt.Errorf("error gettin verifications: " + err.Error())
-	}
+	verifications, _ := verification.GetVerifications(db.Auth, int(user.AccountID))
 
 	token, err := middleware.CreateToken(user, false)
 	if err != nil {

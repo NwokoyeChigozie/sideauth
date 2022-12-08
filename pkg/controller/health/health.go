@@ -45,7 +45,7 @@ func (base *Controller) Post(c *gin.Context) {
 
 	logger.Info("ping successfull")
 
-	rd := utility.BuildSuccessResponse(http.StatusOK, "ping successfull", req.Message)
+	rd := utility.BuildSuccessResponse(http.StatusOK, "ping successful", req.Message)
 	c.JSON(http.StatusOK, rd)
 
 }
@@ -58,7 +58,7 @@ func (base *Controller) Get(c *gin.Context) {
 		return
 	}
 	logger.Info("ping successfull")
-	rd := utility.BuildSuccessResponse(http.StatusOK, "ping successfull", gin.H{"user": "user object"})
+	rd := utility.BuildSuccessResponse(http.StatusOK, "ping successful", gin.H{"user": "user object"})
 	c.JSON(http.StatusOK, rd)
 
 }
