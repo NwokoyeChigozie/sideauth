@@ -12,6 +12,11 @@ import (
 	log "github.com/jeanphorn/log4go"
 )
 
+var (
+	AppDir    string
+	AppDirErr error
+)
+
 // Logger application logger
 type Logger struct {
 	logger *log.Filter
@@ -42,15 +47,26 @@ type AuditLog struct {
 // NewLogger constructs a logger object
 func NewLogger() *Logger {
 	folder := "./logs"
-	logSettingsPath := "log.json"
-	appDir, err := os.Getwd()
+	logSettingsPath := "./log.json"
+	// appDir, err := os.Getwd()
+	// if err != nil {
+	// 	fmt.Printf("Could not load log location >> ", err)
+	// }
+	_, err := log.ReadFile(logSettingsPath)
 	if err != nil {
-		fmt.Printf("Could not load log location >> ", err)
+		logSettingsPath = "../log.json"
+		_, err := log.ReadFile(logSettingsPath)
+		if err != nil {
+			return &Logger{}
+		} else {
+			folder = "../logs"
+		}
 	}
 
 	_ = os.Mkdir(folder, os.ModePerm)
 
-	log.LoadConfiguration(appDir + string(os.PathSeparator) + logSettingsPath)
+	// log.LoadConfiguration(appDir + string(os.PathSeparator) + logSettingsPath)
+	log.LoadConfiguration(logSettingsPath)
 
 	return &Logger{
 		logger: log.LOGGER("fileLogs"),

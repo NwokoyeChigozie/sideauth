@@ -3,6 +3,8 @@ server:
   secret: "mySecretKey"
   accessTokenExpireDuration: 2
   refreshTokenExpireDuration: 2
+App:
+  Name: sandbox
 Databases:
   DB_HOST: "localhost"
   DB_PORT: "5432"

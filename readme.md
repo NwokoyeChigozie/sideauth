@@ -46,11 +46,11 @@ $ go test -v  ./tests/<file name> -timeout 99999s
 To run all tests:
 
 ```bash
-$ go test -v  ./tests/<file name> -timeout 99999s
+$ go test -v  ./tests/<folder name>/<file name> -timeout 99999s
 ```
 
 ```bash
-$ go test -v  ./... -timeout 99999s
+$ go test -v  ./tests/... -timeout 99999s
 ```
 
 NB: Always add timeout tag to prevent early timeout

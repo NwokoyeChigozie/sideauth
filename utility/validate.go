@@ -2,6 +2,7 @@ package utility
 
 import (
 	"net/mail"
+	"os"
 	"regexp"
 	"strings"
 )
@@ -24,4 +25,12 @@ func PhoneValid(phone string) (string, bool) {
 	}
 
 	return phone, re.MatchString(phone)
+}
+
+func fileExists(filename string) bool {
+	info, err := os.Stat(filename)
+	if os.IsNotExist(err) {
+		return false
+	}
+	return !info.IsDir()
 }

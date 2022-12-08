@@ -5,7 +5,9 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/vesicash/auth-ms/internal/config"
 	"github.com/vesicash/auth-ms/pkg/repository/storage/postgresql"
+	"github.com/vesicash/auth-ms/utility"
 	"gorm.io/gorm"
 )
 
@@ -24,6 +26,21 @@ func (a *AccessToken) GetAccessTokens(db *gorm.DB) error {
 	err := postgresql.SelectFirstFromDb(db, &a)
 	if err != nil {
 		return fmt.Errorf("token selection failed: %v", err.Error())
+	}
+	return nil
+}
+
+func (a *AccessToken) CreateAccessToken(db *gorm.DB) error {
+	app := config.GetConfig().App
+	if a.AccountID == 0 {
+		return fmt.Errorf("account id not provided to create access token")
+	}
+	a.IsLive = true
+	a.PrivateKey = "v_" + app.Name + "_" + utility.RandomString(50)
+	a.PublicKey = "v_" + app.Name + "_" + utility.RandomString(50)
+	err := postgresql.CreateOneRecord(db, &a)
+	if err != nil {
+		return fmt.Errorf("user creation failed: %v", err.Error())
 	}
 	return nil
 }

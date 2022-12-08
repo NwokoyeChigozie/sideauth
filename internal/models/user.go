@@ -11,6 +11,15 @@ import (
 	"gorm.io/gorm"
 )
 
+type UserIdentity struct {
+	AccountID int    `json:"account_id"`
+	Type      string `json:"type"`
+}
+
+var (
+	MyIdentity *UserIdentity
+)
+
 type User struct {
 	ID                        uint      `gorm:"column:id; type:uint; not null; primaryKey; unique; autoIncrement" json:"id"`
 	AccountID                 uint      `gorm:"column:account_id; type:int; not null" json:"account_id"`

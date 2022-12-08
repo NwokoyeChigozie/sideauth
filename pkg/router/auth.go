@@ -21,9 +21,14 @@ func Auth(r *gin.Engine, ApiVersion string, validator *validator.Validate, db po
 
 	}
 
-	authUrl1 := r.Group(fmt.Sprintf("%v/auth", ApiVersion), middleware.Authorize(db, middleware.ApiType))
+	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", ApiVersion), middleware.Authorize(db, middleware.AuthType))
 	{
-		authUrl1.POST("/send_otp", auth.SendOTP)
+		authTypeUrl.POST("/send_otp", auth.SendOTP)
+
+	}
+	authApiUrl := r.Group(fmt.Sprintf("%v/auth/api", ApiVersion), middleware.Authorize(db, middleware.ApiType))
+	{
+		authApiUrl.POST("/send_otp", auth.SendOTPAPI)
 
 	}
 	return r

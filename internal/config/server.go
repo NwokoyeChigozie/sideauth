@@ -6,6 +6,9 @@ type ServerConfiguration struct {
 	AccessTokenExpireDuration  int
 	RefreshTokenExpireDuration int
 }
+type App struct {
+	Name string
+}
 
 type Microservices struct {
 	Admin        string

@@ -1,4 +1,4 @@
-package tests
+package signup
 
 import (
 	"bytes"
@@ -12,43 +12,15 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofrs/uuid"
-	"github.com/vesicash/auth-ms/internal/config"
 	"github.com/vesicash/auth-ms/internal/models"
-	"github.com/vesicash/auth-ms/internal/models/migrations"
 	"github.com/vesicash/auth-ms/pkg/controller/auth"
 	"github.com/vesicash/auth-ms/pkg/repository/storage/postgresql"
+	tst "github.com/vesicash/auth-ms/tests"
 	"github.com/vesicash/auth-ms/utility"
 )
 
-func Setup() {
-	config := config.Setup("../config")
-	db := postgresql.ConnectToDatabases(config.TestDatabases)
-	if config.TestDatabases.Migrate {
-		migrations.RunAllMigrations(db)
-	}
-}
-
-func parseResponse(w *httptest.ResponseRecorder) map[string]interface{} {
-	res := make(map[string]interface{})
-	json.NewDecoder(w.Body).Decode(&res)
-	fmt.Println(res)
-	return res
-}
-
-func assertStatusCode(t *testing.T, got, expected int) {
-	if got != expected {
-		t.Errorf("handler returned wrong status code: got status %d expected status %d", got, expected)
-	}
-}
-
-func assertResponseMessage(t *testing.T, got, expected string) {
-	if got != expected {
-		t.Errorf("handler returned wrong message: got message: %q expected: %q", got, expected)
-	}
-}
-
 func TestSignup(t *testing.T) {
-	Setup()
+	tst.Setup()
 	gin.SetMode(gin.TestMode)
 	// getConfig := config.GetConfig()
 	validatorRef := validator.New()
@@ -182,19 +154,17 @@ func TestSignup(t *testing.T) {
 			rr := httptest.NewRecorder()
 			r.ServeHTTP(rr, req)
 
-			data := parseResponse(rr)
+			data := tst.ParseResponse(rr)
 
 			code := int(data["code"].(float64))
-			assertStatusCode(t, code, test.ExpectedCode)
-			fmt.Println("code", code)
+			tst.AssertStatusCode(t, code, test.ExpectedCode)
 
 			if test.Message != "" {
 				message := data["message"]
-				fmt.Println(message)
 				if message != nil {
-					assertResponseMessage(t, message.(string), test.Message)
+					tst.AssertResponseMessage(t, message.(string), test.Message)
 				} else {
-					assertResponseMessage(t, "", test.Message)
+					tst.AssertResponseMessage(t, "", test.Message)
 				}
 
 			}

@@ -12,6 +12,23 @@ import (
 
 func (base *Controller) SendOTP(c *gin.Context) {
 	var (
+		req = models.SendOtpTokenReq{AccountID: models.MyIdentity.AccountID}
+	)
+
+	code, err := otp.SendOtpService(req, base.Db)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", err.Error(), err, nil)
+		c.JSON(code, rd)
+		return
+	}
+
+	rd := utility.BuildSuccessResponse(http.StatusOK, "OTP Generated", nil)
+	c.JSON(http.StatusOK, rd)
+
+}
+
+func (base *Controller) SendOTPAPI(c *gin.Context) {
+	var (
 		req = models.SendOtpTokenReq{}
 	)
 
