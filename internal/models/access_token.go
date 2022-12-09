@@ -30,6 +30,18 @@ func (a *AccessToken) GetAccessTokens(db *gorm.DB) error {
 	return nil
 }
 
+func (a *AccessToken) GetByAccountID(db *gorm.DB) (int, error) {
+	err, nilErr := postgresql.SelectOneFromDb(db, &a, "account_id = ? ", a.AccountID)
+	if nilErr != nil {
+		return http.StatusBadRequest, nilErr
+	}
+
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+	return http.StatusOK, nil
+}
+
 func (a *AccessToken) CreateAccessToken(db *gorm.DB) error {
 	app := config.GetConfig().App
 	if a.AccountID == 0 {

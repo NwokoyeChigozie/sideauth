@@ -11,7 +11,6 @@ import (
 	"github.com/vesicash/auth-ms/internal/models"
 	"github.com/vesicash/auth-ms/pkg/middleware"
 	"github.com/vesicash/auth-ms/pkg/repository/storage/postgresql"
-	"github.com/vesicash/auth-ms/services/otp"
 	"github.com/vesicash/auth-ms/utility"
 )
 
@@ -48,6 +47,83 @@ func LoginService(c *gin.Context, req models.LoginUserRequestModel, db postgresq
 
 	TrackUserLogin(c, db, int(user.AccountID))
 
+	return LoginResponse(user, db, req)
+}
+
+func PhoneOtpLogin(c *gin.Context, phoneNumber string, db postgresql.Databases) (int, int, error) {
+	var (
+		accountID int
+	)
+
+	user := models.User{PhoneNumber: phoneNumber}
+	code, err := user.GetUserByUsernameEmailOrPhone(db.Auth)
+	if err != nil {
+		if code == http.StatusBadRequest {
+			return accountID, code, fmt.Errorf("user with phone number not found")
+		}
+		return accountID, code, err
+	}
+	accountID = int(user.AccountID)
+
+	bannedAccount := models.BannedAccount{AccountID: int(user.AccountID)}
+	status, err := bannedAccount.CheckByAccountID(db.Auth)
+	if err != nil {
+		return accountID, http.StatusInternalServerError, err
+	}
+
+	if status {
+		return accountID, http.StatusBadRequest, fmt.Errorf("this account has been banned")
+	}
+
+	otpReq := models.SendOtpTokenReq{AccountID: int(user.AccountID)}
+	SendOtpService(otpReq, db)
+
+	TrackUserLogin(c, db, int(user.AccountID))
+	return accountID, http.StatusOK, nil
+}
+
+func TrackUserLogin(c *gin.Context, db postgresql.Databases, accountID int) error {
+	var (
+		ipAddress    = c.ClientIP()
+		browser      = c.Request.UserAgent()
+		geo_location = ""
+	)
+
+	data, err := thirdparty.GetIpInfo(ipAddress)
+	if err != nil {
+		return err
+	}
+	// outBoundResponse["geoplugin_regionName"], outBoundResponse["geoplugin_countryName"]
+	if data["geoplugin_regionName"] != nil {
+		geo_location = data["geoplugin_regionName"].(string)
+	}
+
+	if data["geoplugin_countryName"] != nil {
+		if geo_location != "" {
+			geo_location += ", " + data["geoplugin_countryName"].(string)
+		} else {
+			geo_location = data["geoplugin_countryName"].(string)
+		}
+	}
+
+	userTracking := models.UserTracking{
+		AccountID: accountID,
+		IpAddress: ipAddress,
+		Browser:   browser,
+		Location:  geo_location,
+	}
+	err = userTracking.CreateUserTracking(db.Auth)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func LoginResponse(user models.User, db postgresql.Databases, req models.LoginUserRequestModel) (map[string]interface{}, int, error) {
+	var (
+		responseData = gin.H{}
+	)
+
 	verifications, _ := verification.GetVerifications(db.Auth, int(user.AccountID))
 
 	token, err := middleware.CreateToken(user, false)
@@ -61,7 +137,6 @@ func LoginService(c *gin.Context, req models.LoginUserRequestModel, db postgresq
 	if err != nil {
 		return responseData, http.StatusInternalServerError, fmt.Errorf("error saving token: " + err.Error())
 	}
-
 	tracking := models.UserTracking{AccountID: int(user.AccountID)}
 	trackings, err := tracking.GetAllByAccountID(db.Auth)
 	if err != nil {
@@ -71,7 +146,7 @@ func LoginService(c *gin.Context, req models.LoginUserRequestModel, db postgresq
 	trackingCount := len(trackings)
 
 	userProfile := models.UserProfile{AccountID: int(user.AccountID)}
-	code, err = userProfile.GetByAccountID(db.Auth)
+	code, err := userProfile.GetByAccountID(db.Auth)
 	if code == http.StatusInternalServerError {
 		return responseData, code, fmt.Errorf("error getting user profile: " + err.Error())
 	}
@@ -102,7 +177,7 @@ func LoginService(c *gin.Context, req models.LoginUserRequestModel, db postgresq
 
 	if req.PhoneNumber != "" {
 		otpReq := models.SendOtpTokenReq{AccountID: int(user.AccountID)}
-		otp.SendOtpService(otpReq, db)
+		SendOtpService(otpReq, db)
 	}
 
 	return gin.H{
@@ -120,41 +195,4 @@ func LoginService(c *gin.Context, req models.LoginUserRequestModel, db postgresq
 			"verifications":    verifications,
 		},
 	}, http.StatusOK, nil
-}
-
-func TrackUserLogin(c *gin.Context, db postgresql.Databases, accountID int) error {
-	var (
-		ipAddress    = c.ClientIP()
-		browser      = c.Request.UserAgent()
-		geo_location = ""
-	)
-
-	data, err := thirdparty.GetIpInfo(ipAddress)
-	if err != nil {
-		return err
-	}
-	// outBoundResponse["geoplugin_regionName"], outBoundResponse["geoplugin_countryName"]
-	if data["geoplugin_regionName"] != nil {
-		geo_location = data["geoplugin_regionName"].(string)
-	}
-
-	if data["geoplugin_countryName"] != nil {
-		if geo_location != "" {
-			geo_location += ", " + data["geoplugin_countryName"].(string)
-		} else {
-			geo_location = data["geoplugin_countryName"].(string)
-		}
-	}
-
-	userTraking := models.UserTracking{
-		AccountID: accountID,
-		IpAddress: ipAddress,
-		Browser:   browser,
-		Location:  geo_location,
-	}
-	err = userTraking.CreateUserTracking(db.Auth)
-	if err != nil {
-		return err
-	}
-	return nil
 }

@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -9,21 +10,21 @@ import (
 )
 
 type BankDetail struct {
-	ID                    uint      `gorm:"column:id; type:uint; not null; primaryKey; unique; autoIncrement" json:"id"`
-	AccountID             int       `gorm:"column:account_id; type:int; not null" json:"account_id"`
-	BankID                int       `gorm:"column:bank_id; type:int; not null" json:"bank_id"`
-	AccountName           string    `gorm:"column:account_name; type:varchar(250); not null" json:"account_name"`
-	AccountNo             string    `gorm:"column:account_no; type:varchar(250); not null" json:"account_no"`
-	Mobile_money_operator string    `gorm:"column:mobile_money_operator; type:varchar(250)" json:"mobile_money_operator"`
-	SwiftCode             string    `gorm:"column:swift_code; type:varchar(250)" json:"swift_code"`
-	SortCode              string    `gorm:"column:sort_code; type:varchar(250)" json:"sort_code"`
-	BankAddress           string    `gorm:"column:bank_address; type:varchar(250)" json:"bank_address"`
-	BankName              string    `gorm:"column:bank_name; type:varchar(250)" json:"bank_name"`
-	MobileMoneyNumber     string    `gorm:"column:mobile_money_number; type:varchar(250)" json:"mobile_money_number"`
-	Country               string    `gorm:"column:country; type:varchar(250); not null; default:'NG'" json:"country"`
-	Currency              string    `gorm:"column:currency; type:varchar(250); not null; default:'NGN'" json:"currency"`
-	CreatedAt             time.Time `gorm:"column:created_at; autoCreateTime" json:"created_at"`
-	UpdatedAt             time.Time `gorm:"column:updated_at; autoUpdateTime" json:"updated_at"`
+	ID                  uint      `gorm:"column:id; type:uint; not null; primaryKey; unique; autoIncrement" json:"id"`
+	AccountID           int       `gorm:"column:account_id; type:int; not null" json:"account_id"`
+	BankID              int       `gorm:"column:bank_id; type:int; not null" json:"bank_id"`
+	AccountName         string    `gorm:"column:account_name; type:varchar(250); not null" json:"account_name"`
+	AccountNo           string    `gorm:"column:account_no; type:varchar(250); not null" json:"account_no"`
+	MobileMoneyOperator string    `gorm:"column:mobile_money_operator; type:varchar(250)" json:"mobile_money_operator"`
+	SwiftCode           string    `gorm:"column:swift_code; type:varchar(250)" json:"swift_code"`
+	SortCode            string    `gorm:"column:sort_code; type:varchar(250)" json:"sort_code"`
+	BankAddress         string    `gorm:"column:bank_address; type:varchar(250)" json:"bank_address"`
+	BankName            string    `gorm:"column:bank_name; type:varchar(250)" json:"bank_name"`
+	MobileMoneyNumber   string    `gorm:"column:mobile_money_number; type:varchar(250)" json:"mobile_money_number"`
+	Country             string    `gorm:"column:country; type:varchar(250); not null; default:'NG'" json:"country"`
+	Currency            string    `gorm:"column:currency; type:varchar(250); not null; default:'NGN'" json:"currency"`
+	CreatedAt           time.Time `gorm:"column:created_at; autoCreateTime" json:"created_at"`
+	UpdatedAt           time.Time `gorm:"column:updated_at; autoUpdateTime" json:"updated_at"`
 }
 
 func (b *BankDetail) GetByAccountID(db *gorm.DB) (int, error) {
@@ -45,4 +46,40 @@ func (b *BankDetail) GetAllByAccountID(db *gorm.DB) ([]BankDetail, error) {
 		return details, err
 	}
 	return details, nil
+}
+
+type CreateBankRequest struct {
+	AccountID           int    `json:"account_id" validate:"required" pgvalidate:"exists=auth$users$account_id"`
+	BankID              int    `json:"bank_id" validate:"required"`
+	AccountName         string `json:"account_name" validate:"required"`
+	AccountNo           string `json:"account_no" validate:"required"`
+	MobileMoneyOperator string `json:"mobile_money_operator"`
+	SwiftCode           string `json:"swift_code"`
+	SortCode            string `json:"sort_code"`
+	BankAddress         string `json:"bank_address"`
+	BankName            string `json:"bank_name"`
+	MobileMoneyNumber   string `json:"mobile_money_number"`
+	Country             string `json:"country"`
+	Currency            string `json:"currency"`
+}
+
+func (b *BankDetail) CreateBankDetail(db *gorm.DB) (int, error) {
+	if b.AccountID == 0 {
+		return http.StatusBadRequest, fmt.Errorf("account id not provided")
+	}
+	if b.Country != "" && b.Currency != "" {
+		country := Country{CountryCode: b.Country, CurrencyCode: b.Currency}
+		code, err := country.FindWithCurrencyAndCode(db)
+		if err != nil {
+			return code, err
+		}
+		b.Country, b.Currency = country.CountryCode, country.CurrencyCode
+	} else {
+		b.Country, b.Currency = "NG", "NGN"
+	}
+	err := postgresql.CreateOneRecord(db, &b)
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("user creation failed: %v", err.Error())
+	}
+	return http.StatusOK, nil
 }

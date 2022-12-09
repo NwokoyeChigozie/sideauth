@@ -74,7 +74,7 @@ func SendWelcomePasswordReset(authDb *gorm.DB, accountID, token int) error {
 		accessToken = models.AccessToken{}
 		resetTokens = models.PasswordResetToken{
 			AccountID: accountID,
-			Token:     token,
+			Token:     strconv.Itoa(token),
 			ExpiresAt: strconv.Itoa(int(time.Now().Add(48 * time.Hour).Unix())),
 		}
 		outBoundResponse map[string]interface{}
@@ -96,7 +96,8 @@ func SendWelcomePasswordReset(authDb *gorm.DB, accountID, token int) error {
 		"v-private-key": accessToken.PrivateKey,
 		"v-public-key":  accessToken.PublicKey,
 	}
-	data := external_models.PhoneEmailVerificationModel{AccountId: resetTokens.AccountID, Token: resetTokens.Token}
+	rToken, _ := strconv.Atoi(resetTokens.Token)
+	data := external_models.PhoneEmailVerificationModel{AccountId: resetTokens.AccountID, Token: rToken}
 	logger.Info("welcome email", data)
 	err = external.SendRequest(logger, "service", "welcome_password_reset_notification", headers, data, &outBoundResponse)
 	if err != nil {

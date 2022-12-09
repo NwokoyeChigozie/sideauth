@@ -17,7 +17,7 @@ type OtpVerification struct {
 	ID        uint      `gorm:"column:id; type:uint; not null; primaryKey; unique; autoIncrement" json:"id"`
 	AccountID int       `gorm:"column:account_id; type:int; not null; comment: account id of the user" json:"account_id"`
 	OtpToken  string    `gorm:"column:otp_token; type:varchar(250); not null" json:"otp_token"`
-	ExpiresAt string    `gorm:"column:expires_at; type:varchar(250)" json:"expires_at"`
+	ExpiresAt time.Time `gorm:"column:expires_at;" json:"expires_at"`
 	CreatedAt time.Time `gorm:"column:created_at; autoCreateTime" json:"created_at"`
 	UpdatedAt time.Time `gorm:"column:updated_at; autoUpdateTime" json:"updated_at"`
 }
@@ -39,7 +39,9 @@ func (o *OtpVerification) GetLatestByAccountID(db *gorm.DB) (int, error) {
 }
 
 func (u *OtpVerification) Create(db *gorm.DB) error {
-	u.ExpiresAt = time.Now().Add(30 * time.Minute).String()
+	expiry := time.Now().Add(30 * time.Minute)
+	expiry.Format("2006-01-02 15:04:05")
+	u.ExpiresAt = expiry
 	err := postgresql.CreateOneRecord(db, &u)
 	if err != nil {
 		return fmt.Errorf("otp creation failed: %v", err.Error())

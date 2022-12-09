@@ -65,6 +65,42 @@ func FindMicroserviceRequest(name string, headers map[string]string, data interf
 			RequestData:  data,
 			DecodeMethod: JsonDecodeMethod,
 		}, nil
+	case "email_password_reset_notification":
+		return RequestObj{
+			Path:         fmt.Sprintf("%v/email/send/reset_password", config.Microservices.Notification),
+			Method:       "POST",
+			Headers:      headers,
+			SuccessCode:  200,
+			RequestData:  data,
+			DecodeMethod: JsonDecodeMethod,
+		}, nil
+	case "phone_password_reset_notification":
+		return RequestObj{
+			Path:         fmt.Sprintf("%v/phone/send/reset_password", config.Microservices.Notification),
+			Method:       "POST",
+			Headers:      headers,
+			SuccessCode:  200,
+			RequestData:  data,
+			DecodeMethod: JsonDecodeMethod,
+		}, nil
+	case "email_password_reset_done_notification":
+		return RequestObj{
+			Path:         fmt.Sprintf("%v/email/send/reset_password/done", config.Microservices.Notification),
+			Method:       "POST",
+			Headers:      headers,
+			SuccessCode:  200,
+			RequestData:  data,
+			DecodeMethod: JsonDecodeMethod,
+		}, nil
+	case "phone_password_reset_done_notification":
+		return RequestObj{
+			Path:         fmt.Sprintf("%v/phone/send/reset_password/done", config.Microservices.Notification),
+			Method:       "POST",
+			Headers:      headers,
+			SuccessCode:  200,
+			RequestData:  data,
+			DecodeMethod: JsonDecodeMethod,
+		}, nil
 	case "verification_email":
 		return RequestObj{
 			Path:         fmt.Sprintf("%v/email", config.Microservices.Verification),
