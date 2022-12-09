@@ -41,3 +41,50 @@ func (base *Controller) Login(c *gin.Context) {
 	c.JSON(http.StatusOK, rd)
 
 }
+
+func (base *Controller) PhoneOtpLogin(c *gin.Context) {
+	var (
+		req struct {
+			PhoneNumber string `json:"phone_number" validate:"required"`
+		}
+	)
+
+	err := c.ShouldBind(&req)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Failed to parse request body", err, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	err = base.Validator.Struct(&req)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Validation failed", utility.ValidationResponse(err, base.Validator), nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	accountID, code, err := auth.PhoneOtpLogin(c, req.PhoneNumber, base.Db)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", err.Error(), err, nil)
+		c.JSON(code, rd)
+		return
+	}
+
+	rd := utility.BuildSuccessResponse(http.StatusOK, "login successful", gin.H{"account_id": accountID})
+	c.JSON(http.StatusOK, rd)
+
+}
+
+func (base *Controller) GetAccessToken(c *gin.Context) {
+
+	accessToken, code, err := auth.IssueAccessTokenService(base.Db, models.MyIdentity.AccountID)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", err.Error(), err, nil)
+		c.JSON(code, rd)
+		return
+	}
+
+	rd := utility.BuildSuccessResponse(http.StatusOK, "login successful", accessToken)
+	c.JSON(http.StatusOK, rd)
+
+}

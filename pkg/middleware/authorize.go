@@ -4,7 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
@@ -110,6 +112,33 @@ func (at AuthorizationType) ValidateAuthType(c *gin.Context, db postgresql.Datab
 	myIdentity := models.UserIdentity{
 		AccountID: int(activeUserAccountID),
 		Type:      activeUserType,
+	}
+
+	user := models.User{AccountID: uint(myIdentity.AccountID)}
+	code, err := user.GetUserByAccountID(db.Auth)
+	if err != nil {
+		if code == http.StatusInternalServerError {
+			return err.Error(), false
+		}
+		return "user does not exist", false
+	}
+
+	if user.LoginAccessToken != bearerToken {
+		return invalidToken, false
+	}
+
+	if user.LoginAccessTokenExpiresIn == "" {
+		return invalidToken, false
+	}
+
+	parseInt, err := strconv.Atoi(user.LoginAccessTokenExpiresIn)
+	if err != nil {
+		return invalidToken, false
+	}
+
+	unixTimeUTC := time.Unix(int64(parseInt), 0)
+	if time.Now().After(unixTimeUTC) {
+		return "expired token", false
 	}
 
 	models.MyIdentity = &myIdentity

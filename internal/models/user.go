@@ -34,8 +34,8 @@ type User struct {
 	DeletedAt                 time.Time `gorm:"column:deleted_at" json:"deleted_at"`
 	CreatedAt                 time.Time `gorm:"column:created_at; autoCreateTime" json:"created_at"`
 	UpdatedAt                 time.Time `gorm:"column:updated_at; autoUpdateTime" json:"updated_at"`
-	LoginAccessToken          string    `gorm:"column:login_access_token; type:text" json:"login_access_token"`
-	LoginAccessTokenExpiresIn string    `gorm:"column:login_access_token_expires_in; type:varchar(250)" json:"login_access_token_expires_in"`
+	LoginAccessToken          string    `gorm:"column:login_access_token; type:text" json:"-"`
+	LoginAccessTokenExpiresIn string    `gorm:"column:login_access_token_expires_in; type:varchar(250)" json:"-"`
 	BusinessId                int       `gorm:"column:business_id; type:int" json:"business_id"`
 	Middlename                string    `gorm:"column:middlename; type:varchar(250)" json:"middlename"`
 	AuthorizationRequired     bool      `gorm:"column:authorization_required; type:bool; default:false;not null" json:"authorization_required"`
@@ -44,8 +44,7 @@ type User struct {
 }
 
 type CreateUserRequestModel struct {
-	BusinessID int `json:"business_id" pgvalidate:"exists=auth$users$account_id"`
-	// BusinessID      int    `json:"business_id" `
+	BusinessID      int    `json:"business_id" pgvalidate:"exists=auth$users$account_id"`
 	EmailAddress    string `json:"email_address" validate:"" pgvalidate:"notexists=auth$users$email_address, email"`
 	PhoneNumber     string `json:"phone_number" pgvalidate:"notexists=auth$users$phone_number"`
 	AccountType     string `json:"account_type" validate:"oneof=business individual others"`

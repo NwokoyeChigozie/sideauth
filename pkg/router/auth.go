@@ -17,13 +17,26 @@ func Auth(r *gin.Engine, ApiVersion string, validator *validator.Validate, db po
 	{
 		authUrl.POST("/signup", auth.Signup)
 		authUrl.POST("/signup/bulk", auth.BulkSignup)
+
 		authUrl.POST("/login", auth.Login)
+		authUrl.POST("/login-phone", auth.PhoneOtpLogin)
+
+		authUrl.POST("/otp/send_otp", auth.SendOTPAPI)
+		authUrl.POST("/is_otp_valid", auth.ValidateOtp)
+
+		authUrl.POST("/reset-password", auth.RequestPasswordReset)
+		authUrl.POST("/reset-password/change-password", auth.UpdatePasswordWithToken)
 
 	}
 
 	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", ApiVersion), middleware.Authorize(db, middleware.AuthType))
 	{
 		authTypeUrl.POST("/send_otp", auth.SendOTP)
+
+		authTypeUrl.POST("/user/bank_details", auth.AddBankDetails)
+
+		authTypeUrl.POST("/user/security/update_password", auth.UpdatePassword)
+		authTypeUrl.GET("/user/security/get_access_token", auth.GetAccessToken)
 
 	}
 	authApiUrl := r.Group(fmt.Sprintf("%v/auth/api", ApiVersion), middleware.Authorize(db, middleware.ApiType))

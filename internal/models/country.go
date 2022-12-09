@@ -32,6 +32,18 @@ func (c *Country) FindWithNameOrCode(db *gorm.DB) (int, error) {
 	return http.StatusOK, nil
 }
 
+func (c *Country) FindWithCurrencyAndCode(db *gorm.DB) (int, error) {
+	err, nilErr := postgresql.SelectOneFromDb(db, &c, "LOWER(currency_code) = ? and LOWER(country_code) = ?", strings.ToLower(c.CurrencyCode), strings.ToLower(c.CountryCode))
+	if nilErr != nil {
+		return http.StatusBadRequest, nilErr
+	}
+
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+	return http.StatusOK, nil
+}
+
 func (c *Country) CreateCountry(db *gorm.DB) error {
 	err := postgresql.CreateOneRecord(db, &c)
 	if err != nil {
