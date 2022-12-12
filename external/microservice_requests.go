@@ -137,6 +137,15 @@ func FindMicroserviceRequest(name string, headers map[string]string, data interf
 			RequestData:  data,
 			DecodeMethod: JsonDecodeMethod,
 		}, nil
+	case "get_disbursements":
+		return RequestObj{
+			Path:         fmt.Sprintf("%v/disbursement/user", config.Microservices.Payment),
+			Method:       "POST",
+			Headers:      headers,
+			SuccessCode:  200,
+			RequestData:  data,
+			DecodeMethod: JsonDecodeMethod,
+		}, nil
 	default:
 		return RequestObj{}, fmt.Errorf("request not found")
 	}

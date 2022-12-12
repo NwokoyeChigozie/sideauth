@@ -130,3 +130,12 @@ func (u *User) GetUserByUsernameEmailOrPhone(db *gorm.DB) (int, error) {
 	return http.StatusOK, nil
 
 }
+
+func (u *User) SelectByBusinessID(db *gorm.DB) ([]User, error) {
+	users := []User{}
+	err := postgresql.SelectAllFromDb(db, "asc", &users, "business_id = ? ", u.BusinessId)
+	if err != nil {
+		return users, err
+	}
+	return users, nil
+}
