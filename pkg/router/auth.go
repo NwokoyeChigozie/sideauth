@@ -37,6 +37,7 @@ func Auth(r *gin.Engine, ApiVersion string, validator *validator.Validate, db po
 
 		authTypeUrl.GET("/user/restrictions", auth.GetUserRestrictions)
 		authTypeUrl.POST("/user/upgrade_tier", auth.UpgradeUserTier)
+		authTypeUrl.POST("/user/upgrade/account", auth.UpgradeAccount)
 
 		authTypeUrl.POST("/user/security/update_password", auth.UpdatePassword)
 		authTypeUrl.GET("/user/security/get_access_token", auth.GetAccessToken)

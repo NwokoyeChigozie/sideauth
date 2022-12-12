@@ -9,10 +9,12 @@ import (
 	"github.com/vesicash/auth-ms/utility"
 )
 
-func (base *Controller) UpgradeUserTier(c *gin.Context) {
+func (base *Controller) UpgradeAccount(c *gin.Context) {
 	var (
 		req struct {
-			Tier int `json:"tier" validate:"required,oneof=1 2"`
+			BusinessType string `json:"business_type" validate:"required,oneof=ecommerce social_commerce marketplace"`
+			BusinessName string `json:"business_name" validate:"required"`
+			WebhookUri   string `json:"webhook_uri"`
 		}
 	)
 
@@ -30,28 +32,14 @@ func (base *Controller) UpgradeUserTier(c *gin.Context) {
 		return
 	}
 
-	code, err := auth.UpgradeUserTierService(base.Db, req.Tier, models.MyIdentity.AccountID)
+	user, code, err := auth.UpgradeAccountService(base.Db, models.MyIdentity.AccountID, req.BusinessType, req.BusinessName, req.WebhookUri)
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", err.Error(), err, nil)
 		c.JSON(code, rd)
 		return
 	}
 
-	rd := utility.BuildSuccessResponse(http.StatusOK, "Upgraded", nil)
-	c.JSON(http.StatusOK, rd)
-
-}
-
-func (base *Controller) GetUserRestrictions(c *gin.Context) {
-
-	data, code, err := auth.GetUserRestrictionsService(base.Db, models.MyIdentity.AccountID)
-	if err != nil {
-		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", err.Error(), err, nil)
-		c.JSON(code, rd)
-		return
-	}
-
-	rd := utility.BuildSuccessResponse(http.StatusOK, "success", data)
+	rd := utility.BuildSuccessResponse(http.StatusOK, "Upgraded", gin.H{"user": user})
 	c.JSON(http.StatusOK, rd)
 
 }
