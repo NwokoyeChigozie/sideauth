@@ -1,6 +1,8 @@
-package verification
+package payment
 
 import (
+	"strconv"
+
 	"github.com/vesicash/auth-ms/external"
 	"github.com/vesicash/auth-ms/external/external_models"
 	"github.com/vesicash/auth-ms/internal/models"
@@ -8,15 +10,15 @@ import (
 	"gorm.io/gorm"
 )
 
-func GetVerifications(authDb *gorm.DB, accountID int) ([]external_models.Verifications, error) {
+func GetDisbursement(authDb *gorm.DB, accountID int) ([]external_models.Disbursements, error) {
 	logger := utility.NewLogger()
 	var (
 		accessToken      = models.AccessToken{}
-		outBoundResponse external_models.GetVerifications
+		outBoundResponse external_models.GetDisbursement
 	)
 	err := accessToken.GetAccessTokens(authDb)
 	if err != nil {
-		logger.Info("get verifications", outBoundResponse, err)
+		logger.Info("get disbursements", outBoundResponse, err)
 		return outBoundResponse.Data, err
 	}
 
@@ -26,13 +28,13 @@ func GetVerifications(authDb *gorm.DB, accountID int) ([]external_models.Verific
 		"v-public-key":  accessToken.PublicKey,
 	}
 	data := external_models.AccountIDModel{AccountId: accountID}
-	logger.Info("get verifications", data)
-	err = external.SendRequest(logger, "service", "get_verifications", headers, data, &outBoundResponse)
+	logger.Info("get disbursements", data)
+	err = external.SendRequest(logger, "service", "get_disbursements", headers, data, &outBoundResponse, "/"+strconv.Itoa(accountID))
 	if err != nil {
-		logger.Info("get verifications", outBoundResponse, err)
+		logger.Info("get disbursements", outBoundResponse, err)
 		return outBoundResponse.Data, err
 	}
-	logger.Info("get verifications", outBoundResponse)
+	logger.Info("get disbursements", outBoundResponse)
 
 	return outBoundResponse.Data, nil
 }
