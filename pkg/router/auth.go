@@ -46,6 +46,8 @@ func Auth(r *gin.Engine, ApiVersion string, validator *validator.Validate, db po
 
 		authTypeUrl.GET("/business/customers/bank_details", auth.GetBusinessCustomersBankDetails)
 
+		authTypeUrl.POST("/logout", auth.Logout)
+
 	}
 	authApiUrl := r.Group(fmt.Sprintf("%v/auth/api", ApiVersion), middleware.Authorize(db, middleware.ApiType))
 	{
