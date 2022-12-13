@@ -32,7 +32,7 @@ func (base *Controller) Login(c *gin.Context) {
 
 	data, code, err := auth.LoginService(c, req, base.Db)
 	if err != nil {
-		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", err.Error(), err, nil)
+		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
 		c.JSON(code, rd)
 		return
 	}
@@ -61,6 +61,11 @@ func (base *Controller) Logout(c *gin.Context) {
 	}
 
 	rd := utility.BuildSuccessResponse(http.StatusOK, "logout successful", nil)
+	c.JSON(http.StatusOK, rd)
+}
+
+func (base *Controller) ValidateToken(c *gin.Context) {
+	rd := utility.BuildSuccessResponse(http.StatusOK, "token valid", nil)
 	c.JSON(http.StatusOK, rd)
 }
 
@@ -101,12 +106,12 @@ func (base *Controller) GetAccessToken(c *gin.Context) {
 
 	accessToken, code, err := auth.IssueAccessTokenService(base.Db, models.MyIdentity.AccountID)
 	if err != nil {
-		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", err.Error(), err, nil)
+		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
 		c.JSON(code, rd)
 		return
 	}
 
-	rd := utility.BuildSuccessResponse(http.StatusOK, "login successful", accessToken)
+	rd := utility.BuildSuccessResponse(http.StatusOK, "success", accessToken)
 	c.JSON(http.StatusOK, rd)
 
 }

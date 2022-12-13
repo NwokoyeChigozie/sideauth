@@ -34,7 +34,7 @@ func (base *Controller) UpgradeAccount(c *gin.Context) {
 
 	user, code, err := auth.UpgradeAccountService(base.Db, models.MyIdentity.AccountID, req.BusinessType, req.BusinessName, req.WebhookUri)
 	if err != nil {
-		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", err.Error(), err, nil)
+		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
 		c.JSON(code, rd)
 		return
 	}

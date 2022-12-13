@@ -46,6 +46,7 @@ func Auth(r *gin.Engine, ApiVersion string, validator *validator.Validate, db po
 
 		authTypeUrl.GET("/business/customers/bank_details", auth.GetBusinessCustomersBankDetails)
 
+		authTypeUrl.POST("/validate-token", auth.ValidateToken)
 		authTypeUrl.POST("/logout", auth.Logout)
 
 	}

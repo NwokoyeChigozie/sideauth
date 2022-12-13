@@ -46,13 +46,13 @@ func (base *Controller) Signup(c *gin.Context) {
 
 	data, code, err := auth.SignupService(reqData, base.Db)
 	if err != nil {
-		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", err.Error(), err, nil)
+		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
 		c.JSON(code, rd)
 		return
 	}
 
 	rd := utility.BuildSuccessResponse(http.StatusCreated, "signup successful", data)
-	c.JSON(http.StatusOK, rd)
+	c.JSON(http.StatusCreated, rd)
 
 }
 
@@ -86,14 +86,20 @@ func (base *Controller) BulkSignup(c *gin.Context) {
 		reqData = append(reqData, vData)
 	}
 
+	if vErrs != "" {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", err.Error(), err, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
 	data, code, err := auth.BulkSignupService(reqData, base.Db)
 	if err != nil {
-		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", err.Error(), err, nil)
+		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
 		c.JSON(code, rd)
 		return
 	}
 
 	rd := utility.BuildSuccessResponse(http.StatusCreated, "users signup successful", data)
-	c.JSON(http.StatusOK, rd)
+	c.JSON(http.StatusCreated, rd)
 
 }

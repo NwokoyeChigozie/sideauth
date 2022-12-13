@@ -38,6 +38,18 @@ func (p *PasswordResetToken) GetLatestByAccountIDAndToken(db *gorm.DB) (int, err
 	return http.StatusOK, nil
 }
 
+func (p *PasswordResetToken) GetLatestByAccountID(db *gorm.DB) (int, error) {
+	err, nilErr := postgresql.SelectLatestFromDb(db, &p, "account_id = ?", p.AccountID)
+	if nilErr != nil {
+		return http.StatusBadRequest, nilErr
+	}
+
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+	return http.StatusOK, nil
+}
+
 func (p *PasswordResetToken) DeletePasswordResetToken(db *gorm.DB) error {
 	err := postgresql.DeleteRecordFromDb(db, &p)
 	if err != nil {
