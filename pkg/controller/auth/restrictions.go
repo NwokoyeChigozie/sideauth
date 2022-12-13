@@ -32,7 +32,7 @@ func (base *Controller) UpgradeUserTier(c *gin.Context) {
 
 	code, err := auth.UpgradeUserTierService(base.Db, req.Tier, models.MyIdentity.AccountID)
 	if err != nil {
-		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", err.Error(), err, nil)
+		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
 		c.JSON(code, rd)
 		return
 	}
@@ -46,7 +46,7 @@ func (base *Controller) GetUserRestrictions(c *gin.Context) {
 
 	data, code, err := auth.GetUserRestrictionsService(base.Db, models.MyIdentity.AccountID)
 	if err != nil {
-		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", err.Error(), err, nil)
+		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
 		c.JSON(code, rd)
 		return
 	}

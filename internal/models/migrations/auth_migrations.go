@@ -7,20 +7,20 @@ import (
 // _ = db.AutoMigrate(MigrationModels()...)
 func AuthMigrationModels() []interface{} {
 	return []interface{}{
-		models.User{},
-		models.Country{},
-		models.UserProfile{},
-		models.UsersCredential{},
 		models.AccessToken{},
-		models.BusinessProfile{},
+		models.BankDetail{},
+		models.BannedAccount{},
 		models.BusinessCharge{},
+		models.BusinessProfile{},
+		models.Country{},
+		models.EscrowCharge{},
+		models.OtpVerification{},
 		models.PasswordResetToken{},
 		models.ReferralPromo{},
-		models.UsersCredential{},
-		models.OtpVerification{},
-		models.BannedAccount{},
+		models.UserAccountUpgrade{},
+		models.UserProfile{},
 		models.UserTracking{},
-		models.BankDetail{},
-		models.EscrowCharge{},
+		models.User{},
+		models.UsersCredential{},
 	}
 }

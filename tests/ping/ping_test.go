@@ -59,6 +59,8 @@ func TestGetPing(t *testing.T) {
 			rr := httptest.NewRecorder()
 			r.ServeHTTP(rr, req)
 
+			tst.AssertStatusCode(t, rr.Code, test.ExpectedCode)
+
 			data := tst.ParseResponse(rr)
 
 			code := int(data["code"].(float64))
@@ -123,6 +125,8 @@ func TestPostPing(t *testing.T) {
 			r.ServeHTTP(rr, req)
 
 			data := tst.ParseResponse(rr)
+
+			tst.AssertStatusCode(t, rr.Code, test.ExpectedCode)
 
 			code := int(data["code"].(float64))
 			tst.AssertStatusCode(t, code, test.ExpectedCode)

@@ -33,7 +33,7 @@ func (base *Controller) AddBankDetails(c *gin.Context) {
 	if models.MyIdentity.AccountID != req.AccountID {
 		err := fmt.Errorf("not authorized to create bank detail for this user")
 		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "error", err.Error(), err, nil)
-		c.JSON(http.StatusBadRequest, rd)
+		c.JSON(http.StatusUnauthorized, rd)
 		return
 	}
 
@@ -46,20 +46,20 @@ func (base *Controller) AddBankDetails(c *gin.Context) {
 
 	bankDetail, code, err := auth.CreateBankDetailService(req, base.Db)
 	if err != nil {
-		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", err.Error(), err, nil)
+		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
 		c.JSON(code, rd)
 		return
 	}
 
-	rd := utility.BuildSuccessResponse(http.StatusOK, "Password Updated", bankDetail)
-	c.JSON(http.StatusOK, rd)
+	rd := utility.BuildSuccessResponse(http.StatusCreated, "bank details added", bankDetail)
+	c.JSON(http.StatusCreated, rd)
 
 }
 
 func (base *Controller) GetBusinessCustomersBankDetails(c *gin.Context) {
 	data, code, err := auth.GetBusinessCustomersBankDetailsService(base.Db, models.MyIdentity.AccountID)
 	if err != nil {
-		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", err.Error(), err, nil)
+		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
 		c.JSON(code, rd)
 		return
 	}

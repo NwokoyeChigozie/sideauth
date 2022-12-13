@@ -8,11 +8,11 @@ import (
 
 func RunAllMigrations(db postgresql.Databases) {
 
-	// add countries
-	models.AddCountriesIfNotExist(db.Auth)
-
 	// auth migration
 	MigrateModels(db.Auth, AuthMigrationModels())
+
+	// add countries
+	models.AddCountriesIfNotExist(db.Auth)
 
 }
 

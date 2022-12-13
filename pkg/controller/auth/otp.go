@@ -17,7 +17,7 @@ func (base *Controller) SendOTP(c *gin.Context) {
 
 	code, err := auth.SendOtpService(req, base.Db)
 	if err != nil {
-		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", err.Error(), err, nil)
+		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
 		c.JSON(code, rd)
 		return
 	}
@@ -96,7 +96,7 @@ func (base *Controller) ValidateOtp(c *gin.Context) {
 
 	data, code, err := auth.ValidateOtpService(c, req.OtpToken, req.AccountID, base.Db)
 	if err != nil {
-		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", err.Error(), err, nil)
+		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
 		c.JSON(code, rd)
 		return
 	}

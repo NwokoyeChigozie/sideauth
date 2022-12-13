@@ -20,7 +20,7 @@ import (
 	"github.com/vesicash/auth-ms/utility"
 )
 
-func TestOTP(t *testing.T) {
+func TestSendOTP(t *testing.T) {
 	tst.Setup()
 	gin.SetMode(gin.TestMode)
 	validatorRef := validator.New()
@@ -88,6 +88,23 @@ func TestOTP(t *testing.T) {
 				"v-public-key":  accessToken.PublicKey,
 			},
 		}, {
+			Name:         "OK otp without access token",
+			RequestBody:  models.SendOtpTokenReq{AccountID: accountID},
+			ExpectedCode: http.StatusOK,
+			Message:      "OTP Generated",
+			Path:         "/v2/auth/otp/send_otp",
+			Headers: map[string]string{
+				"Content-Type": "application/json",
+			},
+		}, {
+			Name:         "no account_id for otp without access token",
+			RequestBody:  models.SendOtpTokenReq{},
+			ExpectedCode: http.StatusBadRequest,
+			Path:         "/v2/auth/otp/send_otp",
+			Headers: map[string]string{
+				"Content-Type": "application/json",
+			},
+		}, {
 			Name:         "otp without access token",
 			RequestBody:  models.SendOtpTokenReq{AccountID: accountID},
 			ExpectedCode: http.StatusUnauthorized,
@@ -106,6 +123,12 @@ func TestOTP(t *testing.T) {
 				"v-public-key":  accessToken.PublicKey,
 			},
 		},
+	}
+
+	authUrl := r.Group(fmt.Sprintf("%v/auth", "v2"))
+	{
+		authUrl.POST("/otp/send_otp", auth.SendOTPAPI)
+
 	}
 
 	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AuthType))
@@ -136,6 +159,8 @@ func TestOTP(t *testing.T) {
 
 			rr := httptest.NewRecorder()
 			r.ServeHTTP(rr, req)
+
+			tst.AssertStatusCode(t, rr.Code, test.ExpectedCode)
 
 			data := tst.ParseResponse(rr)
 
