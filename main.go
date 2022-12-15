@@ -14,7 +14,7 @@ import (
 )
 
 func init() {
-	config := config.Setup("./config")
+	config := config.Setup("./app")
 	postgresql.ConnectToDatabases(config.Databases)
 
 }
