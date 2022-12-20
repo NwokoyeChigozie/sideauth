@@ -23,21 +23,25 @@ var (
 
 // Params = getConfig.Params
 func Setup(name string) *Configuration {
-	var configuration *Configuration
+	var baseConfiguration *BaseConfig
 	logger := utility.NewLogger()
 
 	viper.SetConfigName(name)
-	viper.SetConfigType("yaml")
+	viper.SetConfigType("env")
 	viper.AddConfigPath(".")
 
 	if err := viper.ReadInConfig(); err != nil {
 		log.Fatalf("Error reading config file, %s", err)
 	}
 
-	err := viper.Unmarshal(&configuration)
+	viper.AutomaticEnv()
+
+	err := viper.Unmarshal(&baseConfiguration)
 	if err != nil {
 		log.Fatalf("Unable to decode into struct, %v", err)
 	}
+
+	configuration := baseConfiguration.SetupConfigurationn()
 
 	// Params = configuration.Params
 	Config = configuration

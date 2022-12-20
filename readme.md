@@ -8,7 +8,7 @@
 ### Run Project from Root
 
 1. Ensure you postgres instances are running
-2. Create and populate a `config.yaml` file on the project root with its keys and corresponding values as listed in `config-sample.yaml`
+2. Create and populate a `app.env` file on the project root with its keys and corresponding values as listed in `app-sample.env`
 3. Run from project root directory
 
 ```bash
@@ -18,7 +18,7 @@ $ go run main.go
 ### Run Project as Docker container
 
 1. Ensure you postgres instances are running
-2. Create and populate a `config.yaml` file on the project root with its keys and corresponding values as listed in `config-sample.yaml`
+2. Create and populate a `app.env` file on the project root with its keys and corresponding values as listed in `app-sample.env`
 3. Build Docker Image by running this command on the project root
 
 ```bash

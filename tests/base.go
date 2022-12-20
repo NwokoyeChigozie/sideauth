@@ -18,7 +18,7 @@ import (
 )
 
 func Setup() {
-	config := config.Setup("../../config")
+	config := config.Setup("../../app")
 	db := postgresql.ConnectToDatabases(config.TestDatabases)
 	if config.TestDatabases.Migrate {
 		migrations.RunAllMigrations(db)
