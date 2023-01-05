@@ -27,6 +27,8 @@ func Auth(r *gin.Engine, ApiVersion string, validator *validator.Validate, db po
 		authUrl.POST("/reset-password", auth.RequestPasswordReset)
 		authUrl.POST("/reset-password/change-password", auth.UpdatePasswordWithToken)
 
+		authUrl.POST("/contact-us", auth.ContactUs)
+
 	}
 
 	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", ApiVersion), middleware.Authorize(db, middleware.AuthType))
@@ -34,6 +36,7 @@ func Auth(r *gin.Engine, ApiVersion string, validator *validator.Validate, db po
 		authTypeUrl.POST("/send_otp", auth.SendOTP)
 
 		authTypeUrl.POST("/user/bank_details", auth.AddBankDetails)
+		authTypeUrl.POST("/user/update_tour_status", auth.UpdateTourStatus)
 
 		authTypeUrl.GET("/user/restrictions", auth.GetUserRestrictions)
 		authTypeUrl.POST("/user/upgrade_tier", auth.UpgradeUserTier)

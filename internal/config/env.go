@@ -6,6 +6,7 @@ type BaseConfig struct {
 	SERVER_ACCESSTOKENEXPIREDURATION int    `mapstructure:"SERVER_ACCESSTOKENEXPIREDURATION"`
 
 	APP_NAME string `mapstructure:"APP_NAME"`
+	APP_KEY  string `mapstructure:"APP_KEY"`
 
 	DB_HOST          string `mapstructure:"DB_HOST"`
 	DB_PORT          string `mapstructure:"DB_PORT"`
@@ -68,6 +69,10 @@ func (config *BaseConfig) SetupConfigurationn() *Configuration {
 			Port:                      config.SERVER_PORT,
 			Secret:                    config.SERVER_SECRET,
 			AccessTokenExpireDuration: config.SERVER_ACCESSTOKENEXPIREDURATION,
+		},
+		App: App{
+			Name: config.APP_NAME,
+			Key:  config.APP_KEY,
 		},
 		Databases: Databases{
 			DB_HOST:          config.DB_HOST,

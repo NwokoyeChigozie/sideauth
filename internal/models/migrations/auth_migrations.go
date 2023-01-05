@@ -12,6 +12,7 @@ func AuthMigrationModels() []interface{} {
 		models.BannedAccount{},
 		models.BusinessCharge{},
 		models.BusinessProfile{},
+		models.ContactUs{},
 		models.Country{},
 		models.EscrowCharge{},
 		models.OtpVerification{},

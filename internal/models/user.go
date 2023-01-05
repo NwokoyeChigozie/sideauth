@@ -38,6 +38,7 @@ type User struct {
 	LoginAccessTokenExpiresIn string    `gorm:"column:login_access_token_expires_in; type:varchar(250)" json:"-"`
 	BusinessId                int       `gorm:"column:business_id; type:int" json:"business_id"`
 	Middlename                string    `gorm:"column:middlename; type:varchar(250)" json:"middlename"`
+	HasSeenTour               bool      `gorm:"column:has_seen_tour; type:bool; default:false;not null" json:"has_seen_tour"`
 	AuthorizationRequired     bool      `gorm:"column:authorization_required; type:bool; default:false;not null" json:"authorization_required"`
 	Meta                      string    `gorm:"column:meta; type:text" json:"meta"`
 	ThePeerReference          string    `gorm:"column:the_peer_reference; type:varchar(250)" json:"the_peer_reference"`
@@ -67,6 +68,14 @@ type LoginUserRequestModel struct {
 	PhoneNumber  string `json:"phone_number"`
 }
 
+type GetUserModel struct {
+	ID           uint   `json:"id"`
+	AccountID    uint   `json:"account_id"`
+	EmailAddress string `json:"email_address"`
+	PhoneNumber  string `json:"phone_number"`
+	Username     string `json:"username"`
+}
+
 type BulkCreateUserRequestModel struct {
 	Bulk []CreateUserRequestModel `json:"bulk" validate:"required"`
 }
@@ -81,6 +90,18 @@ func (u *User) CreateUser(db *gorm.DB) error {
 
 func (u *User) GetUserByAccountID(db *gorm.DB) (int, error) {
 	err, nilErr := postgresql.SelectOneFromDb(db, &u, "account_id = ? ", u.AccountID)
+	if nilErr != nil {
+		return http.StatusBadRequest, nilErr
+	}
+
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+	return http.StatusOK, nil
+}
+
+func (u *User) GetUserByID(db *gorm.DB) (int, error) {
+	err, nilErr := postgresql.SelectOneFromDb(db, &u, "id = ? ", u.ID)
 	if nilErr != nil {
 		return http.StatusBadRequest, nilErr
 	}
