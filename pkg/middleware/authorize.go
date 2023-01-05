@@ -10,6 +10,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
+	"github.com/vesicash/auth-ms/internal/config"
 	"github.com/vesicash/auth-ms/internal/models"
 	"github.com/vesicash/auth-ms/pkg/repository/storage/postgresql"
 	"github.com/vesicash/auth-ms/utility"
@@ -18,6 +19,7 @@ import (
 
 const (
 	ApiType       AuthorizationType = "api"
+	AppType       AuthorizationType = "app"
 	AuthType      AuthorizationType = "auth"
 	BusinessAdmin AuthorizationType = "business_admin"
 	Business      AuthorizationType = "business"
@@ -58,6 +60,8 @@ func (at AuthorizationType) in(authTypes AuthorizationTypes) bool {
 func (at AuthorizationType) ValidateAuthorizationRequest(c *gin.Context, db postgresql.Databases) (string, bool) {
 	if at == ApiType {
 		return at.ValidateApiType(c, db)
+	} else if at == AppType {
+		return at.ValidateAppType(c, db)
 	} else if at == AuthType {
 		return at.ValidateAuthType(c, db)
 	} else if at == BusinessAdmin {
@@ -148,6 +152,20 @@ func (at AuthorizationType) ValidateAuthType(c *gin.Context, db postgresql.Datab
 func (at AuthorizationType) ValidateBusinessType(c *gin.Context, db postgresql.Databases) (string, bool) {
 	_, msg, status := at.CheckAccessTokens(c, db)
 	return msg, status
+}
+
+func (at AuthorizationType) ValidateAppType(c *gin.Context, db postgresql.Databases) (string, bool) {
+	config := config.GetConfig().App
+	appKey := GetHeader(c, "v-app")
+	if appKey == "" {
+		return "missing app key", false
+	}
+
+	if appKey != config.Key {
+		return "invalid app key", false
+	}
+
+	return "authorized", true
 }
 
 func (at AuthorizationType) ValidateBusinessAdminType(c *gin.Context, db postgresql.Databases) (string, bool) {

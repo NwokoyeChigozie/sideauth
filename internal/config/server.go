@@ -7,6 +7,7 @@ type ServerConfiguration struct {
 }
 type App struct {
 	Name string
+	Key  string
 }
 
 type Microservices struct {
