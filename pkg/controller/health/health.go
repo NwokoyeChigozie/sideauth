@@ -15,12 +15,12 @@ import (
 type Controller struct {
 	Db        postgresql.Databases
 	Validator *validator.Validate
+	Logger    *utility.Logger
 }
 
 func (base *Controller) Post(c *gin.Context) {
 	var (
-		req    = models.Ping{}
-		logger = utility.NewLogger()
+		req = models.Ping{}
 	)
 
 	err := c.ShouldBind(&req)
@@ -43,7 +43,7 @@ func (base *Controller) Post(c *gin.Context) {
 		return
 	}
 
-	logger.Info("ping successfull")
+	base.Logger.Info("ping successfull")
 
 	rd := utility.BuildSuccessResponse(http.StatusOK, "ping successful", req.Message)
 	c.JSON(http.StatusOK, rd)
@@ -51,13 +51,12 @@ func (base *Controller) Post(c *gin.Context) {
 }
 
 func (base *Controller) Get(c *gin.Context) {
-	logger := utility.NewLogger()
 	if !ping.ReturnTrue() {
 		rd := utility.BuildErrorResponse(http.StatusInternalServerError, "error", "ping failed", fmt.Errorf("ping failed"), nil)
 		c.JSON(http.StatusBadRequest, rd)
 		return
 	}
-	logger.Info("ping successfull")
+	base.Logger.Info("ping successfull")
 	rd := utility.BuildSuccessResponse(http.StatusOK, "ping successful", gin.H{"user": "user object"})
 	c.JSON(http.StatusOK, rd)
 

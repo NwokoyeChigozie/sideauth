@@ -5,8 +5,7 @@ import (
 	"github.com/vesicash/auth-ms/utility"
 )
 
-func GetIpInfo(ip4IpAddress string) (map[interface{}]interface{}, error) {
-	logger := utility.NewLogger()
+func GetIpInfo(logger *utility.Logger, ip4IpAddress string) (map[interface{}]interface{}, error) {
 	var (
 		outBoundResponse map[interface{}]interface{}
 		headers          = map[string]string{

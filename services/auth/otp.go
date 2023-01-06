@@ -13,7 +13,7 @@ import (
 	"github.com/vesicash/auth-ms/utility"
 )
 
-func SendOtpService(req models.SendOtpTokenReq, db postgresql.Databases) (int, error) {
+func SendOtpService(logger *utility.Logger, req models.SendOtpTokenReq, db postgresql.Databases) (int, error) {
 	user := models.User{AccountID: uint(req.AccountID)}
 	code, err := user.GetUserByAccountID(db.Auth)
 	if err != nil {
@@ -43,12 +43,12 @@ func SendOtpService(req models.SendOtpTokenReq, db postgresql.Databases) (int, e
 		return http.StatusInternalServerError, err
 	}
 
-	notification.SendOtp(db.Auth, req.AccountID, token)
+	notification.SendOtp(logger, db.Auth, req.AccountID, token)
 
 	return http.StatusOK, nil
 }
 
-func ValidateOtpService(c *gin.Context, otp string, accountID int, db postgresql.Databases) (interface{}, int, error) {
+func ValidateOtpService(c *gin.Context, logger *utility.Logger, otp string, accountID int, db postgresql.Databases) (interface{}, int, error) {
 	var response interface{}
 	otpVerification := models.OtpVerification{AccountID: accountID}
 	code, err := otpVerification.GetLatestByAccountID(db.Auth)
@@ -77,7 +77,7 @@ func ValidateOtpService(c *gin.Context, otp string, accountID int, db postgresql
 		return response, http.StatusBadRequest, fmt.Errorf("this account has been banned")
 	}
 
-	TrackUserLogin(c, db, accountID)
+	TrackUserLogin(c, logger, db, accountID)
 
 	user := models.User{AccountID: uint(accountID)}
 	code, err = user.GetUserByAccountID(db.Auth)
@@ -85,5 +85,5 @@ func ValidateOtpService(c *gin.Context, otp string, accountID int, db postgresql
 		return response, code, err
 	}
 
-	return LoginResponse(user, db, models.LoginUserRequestModel{})
+	return LoginResponse(logger, user, db, models.LoginUserRequestModel{})
 }

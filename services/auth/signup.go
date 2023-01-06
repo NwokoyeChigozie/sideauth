@@ -49,7 +49,7 @@ func ValidateSignupRequest(req models.CreateUserRequestModel, dbs postgresql.Dat
 	return req, nil
 }
 
-func SignupService(req models.CreateUserRequestModel, db postgresql.Databases) (*models.User, int, error) {
+func SignupService(logger *utility.Logger, req models.CreateUserRequestModel, db postgresql.Databases) (*models.User, int, error) {
 	var (
 		countryName         = strings.ToLower(req.Country)
 		accountType         = req.AccountType
@@ -166,17 +166,17 @@ func SignupService(req models.CreateUserRequestModel, db postgresql.Databases) (
 	}
 
 	if req.EmailAddress != "" {
-		notification.SendWelcomeNotification(db.Auth, int(user.AccountID))
+		notification.SendWelcomeNotification(logger, db.Auth, int(user.AccountID))
 
 		if req.Password == "" {
-			notification.SendWelcomePasswordReset(db.Auth, int(user.AccountID), utility.GetRandomNumbersInRange(100000000, 999999999))
+			notification.SendWelcomePasswordReset(logger, db.Auth, int(user.AccountID), utility.GetRandomNumbersInRange(100000000, 999999999))
 		}
 
-		verification.SendVerificationEmail(db.Auth, int(user.AccountID))
+		verification.SendVerificationEmail(logger, db.Auth, int(user.AccountID))
 	}
 
 	if req.ReferralCode != "" {
-		_, err := referral.CreateReferralRequest(db.Auth, accountID, req.ReferralCode)
+		_, err := referral.CreateReferralRequest(logger, db.Auth, accountID, req.ReferralCode)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -190,18 +190,17 @@ func SignupService(req models.CreateUserRequestModel, db postgresql.Databases) (
 	}
 
 	if req.PhoneNumber != "" {
-		notification.SendWelcomeSmsNotification(db.Auth, int(user.AccountID))
-		verification.SendVerificationSms(db.Auth, int(user.AccountID))
+		notification.SendWelcomeSmsNotification(logger, db.Auth, int(user.AccountID))
+		verification.SendVerificationSms(logger, db.Auth, int(user.AccountID))
 	}
 
 	return &user, http.StatusCreated, nil
 }
 
-func BulkSignupService(req []models.CreateUserRequestModel, db postgresql.Databases) ([]*models.User, int, error) {
-	logger := utility.NewLogger()
+func BulkSignupService(logger *utility.Logger, req []models.CreateUserRequestModel, db postgresql.Databases) ([]*models.User, int, error) {
 	newUsers := []*models.User{}
 	for _, sData := range req {
-		newUser, _, err := SignupService(sData, db)
+		newUser, _, err := SignupService(logger, sData, db)
 		if err != nil {
 			logger.Error("bulk signup", err)
 		} else {

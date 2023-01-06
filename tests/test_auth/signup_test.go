@@ -20,7 +20,7 @@ import (
 )
 
 func TestSignup(t *testing.T) {
-	tst.Setup()
+	logger := tst.Setup()
 	gin.SetMode(gin.TestMode)
 	// getConfig := config.GetConfig()
 	validatorRef := validator.New()
@@ -133,7 +133,7 @@ func TestSignup(t *testing.T) {
 		},
 	}
 
-	auth := auth.Controller{Db: db, Validator: validatorRef}
+	auth := auth.Controller{Db: db, Validator: validatorRef, Logger: logger}
 
 	for _, test := range tests {
 		r := gin.Default()
@@ -178,7 +178,7 @@ func TestSignup(t *testing.T) {
 }
 
 func TestBulkSignup(t *testing.T) {
-	tst.Setup()
+	logger := tst.Setup()
 	gin.SetMode(gin.TestMode)
 	// getConfig := config.GetConfig()
 	validatorRef := validator.New()
@@ -284,7 +284,7 @@ func TestBulkSignup(t *testing.T) {
 		},
 	}
 
-	auth := auth.Controller{Db: db, Validator: validatorRef}
+	auth := auth.Controller{Db: db, Validator: validatorRef, Logger: logger}
 
 	for _, test := range tests {
 		r := gin.Default()

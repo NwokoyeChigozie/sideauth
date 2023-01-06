@@ -21,7 +21,7 @@ import (
 )
 
 func TestAddBankDetails(t *testing.T) {
-	tst.Setup()
+	logger := tst.Setup()
 	gin.SetMode(gin.TestMode)
 	validatorRef := validator.New()
 	db := postgresql.Connection()
@@ -45,7 +45,7 @@ func TestAddBankDetails(t *testing.T) {
 		}
 	)
 
-	auth := auth.Controller{Db: db, Validator: validatorRef}
+	auth := auth.Controller{Db: db, Validator: validatorRef, Logger: logger}
 	r := gin.Default()
 	tst.SignupUser(t, r, auth, userSignUpData)
 	token, accountID := tst.GetLoginTokenAndAccountID(t, r, auth, loginData)
@@ -183,7 +183,7 @@ func TestAddBankDetails(t *testing.T) {
 }
 
 func TestAddGetBusinessCustomersBankDetails(t *testing.T) {
-	tst.Setup()
+	logger := tst.Setup()
 	gin.SetMode(gin.TestMode)
 	validatorRef := validator.New()
 	db := postgresql.Connection()
@@ -207,7 +207,7 @@ func TestAddGetBusinessCustomersBankDetails(t *testing.T) {
 		}
 	)
 
-	auth := auth.Controller{Db: db, Validator: validatorRef}
+	auth := auth.Controller{Db: db, Validator: validatorRef, Logger: logger}
 	r := gin.Default()
 	tst.SignupUser(t, r, auth, userSignUpData)
 	token, accountID := tst.GetLoginTokenAndAccountID(t, r, auth, loginData)

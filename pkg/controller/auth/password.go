@@ -39,7 +39,7 @@ func (base *Controller) RequestPasswordReset(c *gin.Context) {
 		return
 	}
 
-	accountID, code, err := auth.RequestPasswordResetService(base.Db, req.EmailAddress, req.PhoneNumber)
+	accountID, code, err := auth.RequestPasswordResetService(base.Logger, base.Db, req.EmailAddress, req.PhoneNumber)
 	if err != nil {
 		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
 		c.JSON(code, rd)
@@ -81,7 +81,7 @@ func (base *Controller) UpdatePasswordWithToken(c *gin.Context) {
 		return
 	}
 
-	code, err := auth.UpdatePasswordWithTokenService(base.Db, req.AccountID, req.Token, req.Password)
+	code, err := auth.UpdatePasswordWithTokenService(base.Logger, base.Db, req.AccountID, req.Token, req.Password)
 	if err != nil {
 		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
 		c.JSON(code, rd)

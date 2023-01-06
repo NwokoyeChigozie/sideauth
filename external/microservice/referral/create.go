@@ -8,8 +8,8 @@ import (
 	"gorm.io/gorm"
 )
 
-func CreateReferralRequest(authDb *gorm.DB, accountID int, code string) (interface{}, error) {
-	logger := utility.NewLogger()
+func CreateReferralRequest(logger *utility.Logger, authDb *gorm.DB, accountID int, code string) (interface{}, error) {
+
 	var (
 		accessToken      = models.AccessToken{}
 		outBoundResponse map[string]interface{}

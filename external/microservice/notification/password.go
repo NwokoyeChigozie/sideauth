@@ -8,8 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func SendEmailPasswordReset(authDb *gorm.DB, accountID, token int) error {
-	logger := utility.NewLogger()
+func SendEmailPasswordReset(logger *utility.Logger, authDb *gorm.DB, accountID, token int) error {
 	var (
 		accessToken      = models.AccessToken{}
 		outBoundResponse map[string]interface{}
@@ -37,8 +36,7 @@ func SendEmailPasswordReset(authDb *gorm.DB, accountID, token int) error {
 
 	return nil
 }
-func SendPhonePasswordReset(authDb *gorm.DB, accountID, token int) error {
-	logger := utility.NewLogger()
+func SendPhonePasswordReset(logger *utility.Logger, authDb *gorm.DB, accountID, token int) error {
 	var (
 		accessToken      = models.AccessToken{}
 		outBoundResponse map[string]interface{}
@@ -67,8 +65,7 @@ func SendPhonePasswordReset(authDb *gorm.DB, accountID, token int) error {
 	return nil
 }
 
-func SendEmailPasswordDoneReset(authDb *gorm.DB, accountID int) error {
-	logger := utility.NewLogger()
+func SendEmailPasswordDoneReset(logger *utility.Logger, authDb *gorm.DB, accountID int) error {
 	var (
 		accessToken      = models.AccessToken{}
 		outBoundResponse map[string]interface{}
@@ -97,8 +94,7 @@ func SendEmailPasswordDoneReset(authDb *gorm.DB, accountID int) error {
 	return nil
 }
 
-func SendPhonePasswordDoneReset(authDb *gorm.DB, accountID int) error {
-	logger := utility.NewLogger()
+func SendPhonePasswordDoneReset(logger *utility.Logger, authDb *gorm.DB, accountID int) error {
 	var (
 		accessToken      = models.AccessToken{}
 		outBoundResponse map[string]interface{}

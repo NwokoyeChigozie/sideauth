@@ -15,7 +15,7 @@ func (base *Controller) SendOTP(c *gin.Context) {
 		req = models.SendOtpTokenReq{AccountID: models.MyIdentity.AccountID}
 	)
 
-	code, err := auth.SendOtpService(req, base.Db)
+	code, err := auth.SendOtpService(base.Logger, req, base.Db)
 	if err != nil {
 		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
 		c.JSON(code, rd)
@@ -53,7 +53,7 @@ func (base *Controller) SendOTPAPI(c *gin.Context) {
 		return
 	}
 
-	code, err := auth.SendOtpService(req, base.Db)
+	code, err := auth.SendOtpService(base.Logger, req, base.Db)
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", err.Error(), err, nil)
 		c.JSON(code, rd)
@@ -94,7 +94,7 @@ func (base *Controller) ValidateOtp(c *gin.Context) {
 		return
 	}
 
-	data, code, err := auth.ValidateOtpService(c, req.OtpToken, req.AccountID, base.Db)
+	data, code, err := auth.ValidateOtpService(c, base.Logger, req.OtpToken, req.AccountID, base.Db)
 	if err != nil {
 		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
 		c.JSON(code, rd)

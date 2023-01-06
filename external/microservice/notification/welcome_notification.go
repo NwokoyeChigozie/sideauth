@@ -11,8 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func SendWelcomeNotification(authDb *gorm.DB, accountID int) error {
-	logger := utility.NewLogger()
+func SendWelcomeNotification(logger *utility.Logger, authDb *gorm.DB, accountID int) error {
 	var (
 		accessToken      = models.AccessToken{}
 		outBoundResponse map[string]interface{}
@@ -39,8 +38,7 @@ func SendWelcomeNotification(authDb *gorm.DB, accountID int) error {
 
 	return nil
 }
-func SendWelcomeSmsNotification(authDb *gorm.DB, accountID int) error {
-	logger := utility.NewLogger()
+func SendWelcomeSmsNotification(logger *utility.Logger, authDb *gorm.DB, accountID int) error {
 	var (
 		accessToken      = models.AccessToken{}
 		outBoundResponse map[string]interface{}
@@ -68,8 +66,8 @@ func SendWelcomeSmsNotification(authDb *gorm.DB, accountID int) error {
 	return nil
 }
 
-func SendWelcomePasswordReset(authDb *gorm.DB, accountID, token int) error {
-	logger := utility.NewLogger()
+func SendWelcomePasswordReset(logger *utility.Logger, authDb *gorm.DB, accountID, token int) error {
+
 	var (
 		accessToken = models.AccessToken{}
 		resetTokens = models.PasswordResetToken{

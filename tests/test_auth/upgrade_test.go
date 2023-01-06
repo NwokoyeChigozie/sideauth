@@ -21,7 +21,7 @@ import (
 )
 
 func TestUpgradeTier(t *testing.T) {
-	tst.Setup()
+	logger := tst.Setup()
 	gin.SetMode(gin.TestMode)
 	validatorRef := validator.New()
 	db := postgresql.Connection()
@@ -45,7 +45,7 @@ func TestUpgradeTier(t *testing.T) {
 		}
 	)
 
-	auth := auth.Controller{Db: db, Validator: validatorRef}
+	auth := auth.Controller{Db: db, Validator: validatorRef, Logger: logger}
 	r := gin.Default()
 	tst.SignupUser(t, r, auth, userSignUpData)
 	token, _ := tst.GetLoginTokenAndAccountID(t, r, auth, loginData)
@@ -155,7 +155,7 @@ func TestUpgradeTier(t *testing.T) {
 }
 
 func TestGetUserRestrictions(t *testing.T) {
-	tst.Setup()
+	logger := tst.Setup()
 	gin.SetMode(gin.TestMode)
 	validatorRef := validator.New()
 	db := postgresql.Connection()
@@ -179,7 +179,7 @@ func TestGetUserRestrictions(t *testing.T) {
 		}
 	)
 
-	auth := auth.Controller{Db: db, Validator: validatorRef}
+	auth := auth.Controller{Db: db, Validator: validatorRef, Logger: logger}
 	r := gin.Default()
 	tst.SignupUser(t, r, auth, userSignUpData)
 	token, _ := tst.GetLoginTokenAndAccountID(t, r, auth, loginData)
@@ -295,7 +295,7 @@ func TestGetUserRestrictions(t *testing.T) {
 }
 
 func TestUpgradeAccount(t *testing.T) {
-	tst.Setup()
+	logger := tst.Setup()
 	gin.SetMode(gin.TestMode)
 	validatorRef := validator.New()
 	db := postgresql.Connection()
@@ -319,7 +319,7 @@ func TestUpgradeAccount(t *testing.T) {
 		}
 	)
 
-	auth := auth.Controller{Db: db, Validator: validatorRef}
+	auth := auth.Controller{Db: db, Validator: validatorRef, Logger: logger}
 	r := gin.Default()
 	tst.SignupUser(t, r, auth, userSignUpData)
 	token, _ := tst.GetLoginTokenAndAccountID(t, r, auth, loginData)

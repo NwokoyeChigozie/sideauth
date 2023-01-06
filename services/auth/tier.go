@@ -8,6 +8,7 @@ import (
 	"github.com/vesicash/auth-ms/external/microservice/verification"
 	"github.com/vesicash/auth-ms/internal/models"
 	"github.com/vesicash/auth-ms/pkg/repository/storage/postgresql"
+	"github.com/vesicash/auth-ms/utility"
 )
 
 func UpgradeUserTierService(db postgresql.Databases, tier int, accountID int) (int, error) {
@@ -26,7 +27,7 @@ func UpgradeUserTierService(db postgresql.Databases, tier int, accountID int) (i
 	return http.StatusOK, nil
 }
 
-func GetUserRestrictionsService(db postgresql.Databases, accountID int) (map[string]interface{}, int, error) {
+func GetUserRestrictionsService(logger *utility.Logger, db postgresql.Databases, accountID int) (map[string]interface{}, int, error) {
 	var (
 		tier         = 0
 		empty_fields = []string{}
@@ -43,7 +44,7 @@ func GetUserRestrictionsService(db postgresql.Databases, accountID int) (map[str
 		return restrictions, code, err
 	}
 	tier = user.TierType
-	dataSlice, code, err := TierChecks(tier, int(user.AccountID), db)
+	dataSlice, code, err := TierChecks(logger, tier, int(user.AccountID), db)
 	if err != nil {
 		return restrictions, code, err
 	}
@@ -59,7 +60,7 @@ func GetUserRestrictionsService(db postgresql.Databases, accountID int) (map[str
 	}, http.StatusOK, nil
 }
 
-func TierChecks(tierType, accountID int, db postgresql.Databases) ([]string, int, error) {
+func TierChecks(logger *utility.Logger, tierType, accountID int, db postgresql.Databases) ([]string, int, error) {
 	response := []string{}
 	user := models.User{AccountID: uint(accountID)}
 	code, err := user.GetUserByAccountID(db.Auth)
@@ -88,7 +89,7 @@ func TierChecks(tierType, accountID int, db postgresql.Databases) ([]string, int
 	} else if tierType == 2 {
 		fieldsMap := map[string]int{}
 		fields := []string{"national_id", "bvn"}
-		verifications, _ := verification.GetVerifications(db.Auth, int(user.AccountID))
+		verifications, _ := verification.GetVerifications(logger, db.Auth, int(user.AccountID))
 		for _, v := range verifications {
 			if v.IsVerified != nil {
 				if *v.IsVerified {

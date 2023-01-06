@@ -13,24 +13,21 @@ import (
 	"github.com/vesicash/auth-ms/pkg/router"
 )
 
-func init() {
-	config := config.Setup("./app")
-	postgresql.ConnectToDatabases(config.Databases)
-
-}
-
 func main() {
-	//Load config
-	getConfig := config.GetConfig()
+	logger := utility.NewLogger() //Warning !!!!! Do not recreate this action anywhere on the app
+
+	configuration := config.Setup(logger, "./app")
+
+	postgresql.ConnectToDatabases(logger, configuration.Databases)
 	validatorRef := validator.New()
 	db := postgresql.Connection()
 
-	if getConfig.Databases.Migrate {
+	if configuration.Databases.Migrate {
 		migrations.RunAllMigrations(db)
 	}
 
-	r := router.Setup(validatorRef, db)
+	r := router.Setup(logger, validatorRef, db)
 
-	utility.LogAndPrint("Server is starting at 127.0.0.1:%s", getConfig.Server.Port)
-	log.Fatal(r.Run(":" + getConfig.Server.Port))
+	utility.LogAndPrint(logger, "Server is starting at 127.0.0.1:%s", configuration.Server.Port)
+	log.Fatal(r.Run(":" + configuration.Server.Port))
 }
