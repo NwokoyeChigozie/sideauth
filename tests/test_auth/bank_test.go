@@ -1,4 +1,4 @@
-package bank
+package test_auth
 
 import (
 	"bytes"

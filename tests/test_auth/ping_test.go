@@ -1,4 +1,4 @@
-package ping
+package test_auth
 
 import (
 	"bytes"

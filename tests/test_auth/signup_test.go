@@ -1,4 +1,4 @@
-package signup
+package test_auth
 
 import (
 	"bytes"

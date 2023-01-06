@@ -1,4 +1,4 @@
-package disbursements
+package test_auth
 
 import (
 	"bytes"
@@ -20,7 +20,7 @@ import (
 	"github.com/vesicash/auth-ms/utility"
 )
 
-func TestGetDisbursements(t *testing.T) {
+func TestTourStatusUpdate(t *testing.T) {
 	tst.Setup()
 	gin.SetMode(gin.TestMode)
 	validatorRef := validator.New()
@@ -50,18 +50,34 @@ func TestGetDisbursements(t *testing.T) {
 	tst.SignupUser(t, r, auth, userSignUpData)
 	token, _ := tst.GetLoginTokenAndAccountID(t, r, auth, loginData)
 
+	type requestBody struct {
+		Status bool `json:"status"`
+	}
+
 	tests := []struct {
 		Name         string
-		RequestBody  interface{}
+		RequestBody  requestBody
 		ExpectedCode int
 		Headers      map[string]string
 		Message      string
 	}{
 		{
-			Name:         "OK get disbursements",
-			RequestBody:  nil,
+			Name: "OK update tour status",
+			RequestBody: requestBody{
+				Status: true,
+			},
 			ExpectedCode: http.StatusOK,
-			Message:      "success",
+			Message:      "tour status updated",
+			Headers: map[string]string{
+				"Content-Type":  "application/json",
+				"Authorization": "Bearer " + token,
+			},
+		},
+		{
+			Name:         "OK update tour status 2",
+			RequestBody:  requestBody{},
+			ExpectedCode: http.StatusOK,
+			Message:      "tour status updated",
 			Headers: map[string]string{
 				"Content-Type":  "application/json",
 				"Authorization": "Bearer " + token,
@@ -71,7 +87,7 @@ func TestGetDisbursements(t *testing.T) {
 
 	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AuthType))
 	{
-		authTypeUrl.POST("/user/disbursements", auth.GetDisbursements)
+		authTypeUrl.POST("/user/update_tour_status", auth.UpdateTourStatus)
 
 	}
 
@@ -79,7 +95,7 @@ func TestGetDisbursements(t *testing.T) {
 		t.Run(test.Name, func(t *testing.T) {
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/auth/user/disbursements"}
+			URI := url.URL{Path: "/v2/auth/user/update_tour_status"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {

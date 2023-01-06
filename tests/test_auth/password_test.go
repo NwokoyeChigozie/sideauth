@@ -1,4 +1,4 @@
-package upgrade
+package test_auth
 
 import (
 	"bytes"
@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strconv"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -20,7 +21,7 @@ import (
 	"github.com/vesicash/auth-ms/utility"
 )
 
-func TestUpgradeTier(t *testing.T) {
+func TestRequestPasswordReset(t *testing.T) {
 	tst.Setup()
 	gin.SetMode(gin.TestMode)
 	validatorRef := validator.New()
@@ -37,22 +38,16 @@ func TestUpgradeTier(t *testing.T) {
 			Country:      "nigeria",
 			Username:     fmt.Sprintf("test_username%v", muuid.String()),
 		}
-		loginData = models.LoginUserRequestModel{
-			Username:     userSignUpData.Username,
-			EmailAddress: userSignUpData.EmailAddress,
-			PhoneNumber:  userSignUpData.PhoneNumber,
-			Password:     userSignUpData.Password,
-		}
 	)
+
+	type requestBody struct {
+		EmailAddress string `json:"email_address"`
+		PhoneNumber  string `json:"phone_number"`
+	}
 
 	auth := auth.Controller{Db: db, Validator: validatorRef}
 	r := gin.Default()
 	tst.SignupUser(t, r, auth, userSignUpData)
-	token, _ := tst.GetLoginTokenAndAccountID(t, r, auth, loginData)
-
-	type requestBody struct {
-		Tier int `json:"tier"`
-	}
 
 	tests := []struct {
 		Name         string
@@ -62,54 +57,52 @@ func TestUpgradeTier(t *testing.T) {
 		Message      string
 	}{
 		{
-			Name: "OK tier 1",
+			Name: "OK with email and phone",
 			RequestBody: requestBody{
-				Tier: 1,
+				PhoneNumber:  userSignUpData.PhoneNumber,
+				EmailAddress: userSignUpData.EmailAddress,
 			},
 			ExpectedCode: http.StatusOK,
-			Message:      "Upgraded",
+			Message:      "Request Sent",
 			Headers: map[string]string{
-				"Content-Type":  "application/json",
-				"Authorization": "Bearer " + token,
+				"Content-Type": "application/json",
 			},
 		},
 		{
-			Name: "OK tier 2",
+			Name: "OK with phone",
 			RequestBody: requestBody{
-				Tier: 2,
+				PhoneNumber: userSignUpData.PhoneNumber,
 			},
 			ExpectedCode: http.StatusOK,
-			Message:      "Upgraded",
+			Message:      "Request Sent",
 			Headers: map[string]string{
-				"Content-Type":  "application/json",
-				"Authorization": "Bearer " + token,
+				"Content-Type": "application/json",
 			},
 		},
 		{
-			Name:         "no tier specified",
+			Name: "OK with email",
+			RequestBody: requestBody{
+				EmailAddress: userSignUpData.EmailAddress,
+			},
+			ExpectedCode: http.StatusOK,
+			Message:      "Request Sent",
+			Headers: map[string]string{
+				"Content-Type": "application/json",
+			},
+		},
+		{
+			Name:         "no email or phone",
 			RequestBody:  requestBody{},
 			ExpectedCode: http.StatusBadRequest,
 			Headers: map[string]string{
-				"Content-Type":  "application/json",
-				"Authorization": "Bearer " + token,
-			},
-		},
-		{
-			Name: "incorrect tier",
-			RequestBody: requestBody{
-				Tier: 6,
-			},
-			ExpectedCode: http.StatusBadRequest,
-			Headers: map[string]string{
-				"Content-Type":  "application/json",
-				"Authorization": "Bearer " + token,
+				"Content-Type": "application/json",
 			},
 		},
 	}
 
-	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AuthType))
+	authUrl := r.Group(fmt.Sprintf("%v/auth", "v2"))
 	{
-		authTypeUrl.POST("/user/upgrade_tier", auth.UpgradeUserTier)
+		authUrl.POST("/reset-password", auth.RequestPasswordReset)
 
 	}
 
@@ -117,7 +110,7 @@ func TestUpgradeTier(t *testing.T) {
 		t.Run(test.Name, func(t *testing.T) {
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/auth/user/upgrade_tier"}
+			URI := url.URL{Path: "/v2/auth/reset-password"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {
@@ -154,7 +147,7 @@ func TestUpgradeTier(t *testing.T) {
 
 }
 
-func TestGetUserRestrictions(t *testing.T) {
+func TestUpdatePasswordWithToken(t *testing.T) {
 	tst.Setup()
 	gin.SetMode(gin.TestMode)
 	validatorRef := validator.New()
@@ -177,89 +170,122 @@ func TestGetUserRestrictions(t *testing.T) {
 			PhoneNumber:  userSignUpData.PhoneNumber,
 			Password:     userSignUpData.Password,
 		}
+		resetReq = struct {
+			EmailAddress string `json:"email_address"`
+			PhoneNumber  string `json:"phone_number"`
+		}{
+			PhoneNumber:  userSignUpData.PhoneNumber,
+			EmailAddress: userSignUpData.EmailAddress,
+		}
 	)
+
+	type requestBody struct {
+		AccountID int    `json:"account_id"`
+		Token     int    `json:"token"`
+		Password  string `json:"password"`
+	}
 
 	auth := auth.Controller{Db: db, Validator: validatorRef}
 	r := gin.Default()
 	tst.SignupUser(t, r, auth, userSignUpData)
-	token, _ := tst.GetLoginTokenAndAccountID(t, r, auth, loginData)
+	_, accountID := tst.GetLoginTokenAndAccountID(t, r, auth, loginData)
 
 	tests := []struct {
 		Name         string
-		RequestBody  interface{}
+		RequestBody  requestBody
 		ExpectedCode int
-		Tier         int
 		Headers      map[string]string
 		Message      string
 	}{
 		{
-			Name:         "OK get restrictions tier 0",
-			RequestBody:  nil,
+			Name: "OK password update",
+			RequestBody: requestBody{
+				AccountID: accountID,
+				Password:  "new_password",
+			},
 			ExpectedCode: http.StatusOK,
-			Message:      "success",
-			Tier:         0,
+			Message:      "Password Updated",
 			Headers: map[string]string{
-				"Content-Type":  "application/json",
-				"Authorization": "Bearer " + token,
+				"Content-Type": "application/json",
 			},
 		},
 		{
-			Name:         "OK get restrictions tier 1",
-			RequestBody:  nil,
-			ExpectedCode: http.StatusOK,
-			Message:      "success",
-			Tier:         1,
+			Name: "incorrect account id",
+			RequestBody: requestBody{
+				AccountID: utility.GetRandomNumbersInRange(700, 9099),
+				Password:  "new_password",
+			},
+			ExpectedCode: http.StatusBadRequest,
 			Headers: map[string]string{
-				"Content-Type":  "application/json",
-				"Authorization": "Bearer " + token,
+				"Content-Type": "application/json",
 			},
 		},
 		{
-			Name:         "OK get restrictions tier 2",
-			RequestBody:  nil,
-			ExpectedCode: http.StatusOK,
-			Message:      "success",
-			Tier:         2,
+			Name: "incorrect no password",
+			RequestBody: requestBody{
+				AccountID: accountID,
+			},
+			ExpectedCode: http.StatusBadRequest,
 			Headers: map[string]string{
-				"Content-Type":  "application/json",
-				"Authorization": "Bearer " + token,
+				"Content-Type": "application/json",
+			},
+		},
+		{
+			Name: "incorrect token",
+			RequestBody: requestBody{
+				AccountID: accountID,
+				Password:  "new_password",
+			},
+			ExpectedCode: http.StatusBadRequest,
+			Headers: map[string]string{
+				"Content-Type": "application/json",
+			},
+		},
+		{
+			Name:         "no request body",
+			RequestBody:  requestBody{},
+			ExpectedCode: http.StatusBadRequest,
+			Headers: map[string]string{
+				"Content-Type": "application/json",
 			},
 		},
 	}
 
-	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AuthType))
+	authUrl := r.Group(fmt.Sprintf("%v/auth", "v2"))
 	{
-		authTypeUrl.GET("/user/restrictions", auth.GetUserRestrictions)
-		authTypeUrl.POST("/user/upgrade_tier", auth.UpgradeUserTier)
+		authUrl.POST("/reset-password", auth.RequestPasswordReset)
+		authUrl.POST("/reset-password/change-password", auth.UpdatePasswordWithToken)
+
 	}
 
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
-			if test.Tier != 0 {
-				type requestBody struct {
-					Tier int `json:"tier"`
-				}
-				upgradeReq := requestBody{Tier: test.Tier}
-
-				requestResetURI := url.URL{Path: "/v2/auth/user/upgrade_tier"}
-				var f bytes.Buffer
-				json.NewEncoder(&f).Encode(upgradeReq)
-				fReq, err := http.NewRequest(http.MethodPost, requestResetURI.String(), &f)
+			token := 0
+			if test.Name != "incorrect token" && test.Name != "no request body" {
+				requestResetURI := url.URL{Path: "/v2/auth/reset-password"}
+				var b bytes.Buffer
+				json.NewEncoder(&b).Encode(resetReq)
+				req, err := http.NewRequest(http.MethodPost, requestResetURI.String(), &b)
 				if err != nil {
 					t.Fatal(err)
 				}
-				fReq.Header.Set("Content-Type", "application/json")
-				fReq.Header.Set("Authorization", "Bearer "+token)
+				req.Header.Set("Content-Type", "application/json")
 
-				frr := httptest.NewRecorder()
-				r.ServeHTTP(frr, fReq)
+				rr := httptest.NewRecorder()
+				r.ServeHTTP(rr, req)
+				prToken := models.PasswordResetToken{AccountID: accountID}
+				prToken.GetLatestByAccountID(db.Auth)
+				tokenInt, _ := strconv.Atoi(prToken.Token)
+				token = tokenInt
+
 			}
-
+			requestB := test.RequestBody
+			requestB.Token = token
 			var b bytes.Buffer
-			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/auth/user/restrictions"}
+			json.NewEncoder(&b).Encode(requestB)
+			URI := url.URL{Path: "/v2/auth/reset-password/change-password"}
 
-			req, err := http.NewRequest(http.MethodGet, URI.String(), &b)
+			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -294,7 +320,7 @@ func TestGetUserRestrictions(t *testing.T) {
 
 }
 
-func TestUpgradeAccount(t *testing.T) {
+func TestUpdatePassword(t *testing.T) {
 	tst.Setup()
 	gin.SetMode(gin.TestMode)
 	validatorRef := validator.New()
@@ -319,16 +345,15 @@ func TestUpgradeAccount(t *testing.T) {
 		}
 	)
 
+	type requestBody struct {
+		OldPassword string `json:"old_password" validate:"required"`
+		NewPassword string `json:"new_password" validate:"required"`
+	}
+
 	auth := auth.Controller{Db: db, Validator: validatorRef}
 	r := gin.Default()
 	tst.SignupUser(t, r, auth, userSignUpData)
 	token, _ := tst.GetLoginTokenAndAccountID(t, r, auth, loginData)
-
-	type requestBody struct {
-		BusinessType string `json:"business_type" validate:"required,oneof=ecommerce social_commerce marketplace"`
-		BusinessName string `json:"business_name" validate:"required"`
-		WebhookUri   string `json:"webhook_uri"`
-	}
 
 	tests := []struct {
 		Name         string
@@ -338,53 +363,23 @@ func TestUpgradeAccount(t *testing.T) {
 		Message      string
 	}{
 		{
-			Name: "OK upgrade account ecommerce",
+			Name: "OK password update",
 			RequestBody: requestBody{
-				BusinessType: "ecommerce",
-				BusinessName: "yy",
-				WebhookUri:   "http://link_to_webhook_uri",
+				OldPassword: userSignUpData.Password,
+				NewPassword: "new_password",
 			},
 			ExpectedCode: http.StatusOK,
-			Message:      "Upgraded",
+			Message:      "Password Updated",
 			Headers: map[string]string{
 				"Content-Type":  "application/json",
 				"Authorization": "Bearer " + token,
 			},
 		},
 		{
-			Name: "OK upgrade account social_commerce",
+			Name: "incorrect password",
 			RequestBody: requestBody{
-				BusinessType: "social_commerce",
-				BusinessName: "yy",
-				WebhookUri:   "http://link_to_webhook_uri",
-			},
-			ExpectedCode: http.StatusOK,
-			Message:      "Upgraded",
-			Headers: map[string]string{
-				"Content-Type":  "application/json",
-				"Authorization": "Bearer " + token,
-			},
-		},
-		{
-			Name: "OK upgrade account marketplace",
-			RequestBody: requestBody{
-				BusinessType: "marketplace",
-				BusinessName: "yy",
-				WebhookUri:   "http://link_to_webhook_uri",
-			},
-			ExpectedCode: http.StatusOK,
-			Message:      "Upgraded",
-			Headers: map[string]string{
-				"Content-Type":  "application/json",
-				"Authorization": "Bearer " + token,
-			},
-		},
-		{
-			Name: "incorrect business type",
-			RequestBody: requestBody{
-				BusinessType: "business",
-				BusinessName: "yy",
-				WebhookUri:   "http://link_to_webhook_uri",
+				OldPassword: "old_password",
+				NewPassword: "new_password",
 			},
 			ExpectedCode: http.StatusBadRequest,
 			Headers: map[string]string{
@@ -393,10 +388,18 @@ func TestUpgradeAccount(t *testing.T) {
 			},
 		},
 		{
-			Name: "no business type",
+			Name:         "no input provided",
+			RequestBody:  requestBody{},
+			ExpectedCode: http.StatusBadRequest,
+			Headers: map[string]string{
+				"Content-Type":  "application/json",
+				"Authorization": "Bearer " + token,
+			},
+		},
+		{
+			Name: "new password not provided",
 			RequestBody: requestBody{
-				BusinessName: "yy",
-				WebhookUri:   "http://link_to_webhook_uri",
+				OldPassword: "old_password",
 			},
 			ExpectedCode: http.StatusBadRequest,
 			Headers: map[string]string{
@@ -405,19 +408,10 @@ func TestUpgradeAccount(t *testing.T) {
 			},
 		},
 		{
-			Name: "no business name",
+			Name: "old password not provided",
 			RequestBody: requestBody{
-				BusinessType: "marketplace",
-				WebhookUri:   "http://link_to_webhook_uri",
+				NewPassword: "new_password",
 			},
-			ExpectedCode: http.StatusBadRequest,
-			Headers: map[string]string{
-				"Content-Type":  "application/json",
-				"Authorization": "Bearer " + token,
-			},
-		},
-		{
-			Name:         "no request body",
 			ExpectedCode: http.StatusBadRequest,
 			Headers: map[string]string{
 				"Content-Type":  "application/json",
@@ -426,9 +420,9 @@ func TestUpgradeAccount(t *testing.T) {
 		},
 	}
 
-	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AuthType))
+	authUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AuthType))
 	{
-		authTypeUrl.POST("/user/upgrade/account", auth.UpgradeAccount)
+		authUrl.POST("/user/security/update_password", auth.UpdatePassword)
 
 	}
 
@@ -436,7 +430,7 @@ func TestUpgradeAccount(t *testing.T) {
 		t.Run(test.Name, func(t *testing.T) {
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/auth/user/upgrade/account"}
+			URI := url.URL{Path: "/v2/auth/user/security/update_password"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {

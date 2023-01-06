@@ -195,7 +195,7 @@ func (at AuthorizationType) ValidateApiType(c *gin.Context, db postgresql.Databa
 }
 
 func (at AuthorizationType) CheckAccessTokens(c *gin.Context, db postgresql.Databases) (models.AccessToken, string, bool) {
-	privateKey := GetHeader(c, "v-public-key")
+	privateKey := GetHeader(c, "v-private-key")
 	publicKey := GetHeader(c, "v-public-key")
 
 	if privateKey == "" && publicKey == "" {

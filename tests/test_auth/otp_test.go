@@ -1,4 +1,4 @@
-package otp
+package test_auth
 
 import (
 	"bytes"
