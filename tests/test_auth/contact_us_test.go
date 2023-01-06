@@ -18,12 +18,12 @@ import (
 )
 
 func TestContactUs(t *testing.T) {
-	tst.Setup()
+	logger := tst.Setup()
 	gin.SetMode(gin.TestMode)
 	validatorRef := validator.New()
 	db := postgresql.Connection()
 
-	auth := auth.Controller{Db: db, Validator: validatorRef}
+	auth := auth.Controller{Db: db, Validator: validatorRef, Logger: logger}
 	r := gin.Default()
 
 	tests := []struct {

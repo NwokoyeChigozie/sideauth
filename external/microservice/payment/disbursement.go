@@ -10,8 +10,8 @@ import (
 	"gorm.io/gorm"
 )
 
-func GetDisbursement(authDb *gorm.DB, accountID int) ([]external_models.Disbursements, error) {
-	logger := utility.NewLogger()
+func GetDisbursement(logger *utility.Logger, authDb *gorm.DB, accountID int) ([]external_models.Disbursements, error) {
+
 	var (
 		accessToken      = models.AccessToken{}
 		outBoundResponse external_models.GetDisbursement

@@ -8,10 +8,11 @@ import (
 	"github.com/vesicash/auth-ms/pkg/controller/auth"
 	"github.com/vesicash/auth-ms/pkg/middleware"
 	"github.com/vesicash/auth-ms/pkg/repository/storage/postgresql"
+	"github.com/vesicash/auth-ms/utility"
 )
 
-func Auth(r *gin.Engine, ApiVersion string, validator *validator.Validate, db postgresql.Databases) *gin.Engine {
-	auth := auth.Controller{Db: db, Validator: validator}
+func Auth(r *gin.Engine, ApiVersion string, validator *validator.Validate, db postgresql.Databases, logger *utility.Logger) *gin.Engine {
+	auth := auth.Controller{Db: db, Validator: validator, Logger: logger}
 
 	authUrl := r.Group(fmt.Sprintf("%v/auth", ApiVersion))
 	{

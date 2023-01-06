@@ -8,8 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func GetVerifications(authDb *gorm.DB, accountID int) ([]external_models.Verifications, error) {
-	logger := utility.NewLogger()
+func GetVerifications(logger *utility.Logger, authDb *gorm.DB, accountID int) ([]external_models.Verifications, error) {
 	var (
 		accessToken      = models.AccessToken{}
 		outBoundResponse external_models.GetVerifications

@@ -8,8 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func SendOtp(authDb *gorm.DB, accountID, token int) error {
-	logger := utility.NewLogger()
+func SendOtp(logger *utility.Logger, authDb *gorm.DB, accountID, token int) error {
 	var (
 		accessToken      = models.AccessToken{}
 		outBoundResponse map[string]interface{}

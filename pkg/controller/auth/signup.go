@@ -44,7 +44,7 @@ func (base *Controller) Signup(c *gin.Context) {
 		return
 	}
 
-	data, code, err := auth.SignupService(reqData, base.Db)
+	data, code, err := auth.SignupService(base.Logger, reqData, base.Db)
 	if err != nil {
 		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
 		c.JSON(code, rd)
@@ -92,7 +92,7 @@ func (base *Controller) BulkSignup(c *gin.Context) {
 		return
 	}
 
-	data, code, err := auth.BulkSignupService(reqData, base.Db)
+	data, code, err := auth.BulkSignupService(base.Logger, reqData, base.Db)
 	if err != nil {
 		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
 		c.JSON(code, rd)

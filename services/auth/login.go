@@ -14,7 +14,7 @@ import (
 	"github.com/vesicash/auth-ms/utility"
 )
 
-func LoginService(c *gin.Context, req models.LoginUserRequestModel, db postgresql.Databases) (map[string]interface{}, int, error) {
+func LoginService(c *gin.Context, logger *utility.Logger, req models.LoginUserRequestModel, db postgresql.Databases) (map[string]interface{}, int, error) {
 	var (
 		responseData = gin.H{}
 	)
@@ -45,12 +45,12 @@ func LoginService(c *gin.Context, req models.LoginUserRequestModel, db postgresq
 		return responseData, http.StatusBadRequest, fmt.Errorf("invalid login details")
 	}
 
-	TrackUserLogin(c, db, int(user.AccountID))
+	TrackUserLogin(c, logger, db, int(user.AccountID))
 
-	return LoginResponse(user, db, req)
+	return LoginResponse(logger, user, db, req)
 }
 
-func PhoneOtpLogin(c *gin.Context, phoneNumber string, db postgresql.Databases) (int, int, error) {
+func PhoneOtpLogin(c *gin.Context, logger *utility.Logger, phoneNumber string, db postgresql.Databases) (int, int, error) {
 	var (
 		accountID int
 	)
@@ -76,20 +76,20 @@ func PhoneOtpLogin(c *gin.Context, phoneNumber string, db postgresql.Databases) 
 	}
 
 	otpReq := models.SendOtpTokenReq{AccountID: int(user.AccountID)}
-	SendOtpService(otpReq, db)
+	SendOtpService(logger, otpReq, db)
 
-	TrackUserLogin(c, db, int(user.AccountID))
+	TrackUserLogin(c, logger, db, int(user.AccountID))
 	return accountID, http.StatusOK, nil
 }
 
-func TrackUserLogin(c *gin.Context, db postgresql.Databases, accountID int) error {
+func TrackUserLogin(c *gin.Context, logger *utility.Logger, db postgresql.Databases, accountID int) error {
 	var (
 		ipAddress    = c.ClientIP()
 		browser      = c.Request.UserAgent()
 		geo_location = ""
 	)
 
-	data, err := thirdparty.GetIpInfo(ipAddress)
+	data, err := thirdparty.GetIpInfo(logger, ipAddress)
 	if err != nil {
 		return err
 	}
@@ -119,12 +119,12 @@ func TrackUserLogin(c *gin.Context, db postgresql.Databases, accountID int) erro
 	return nil
 }
 
-func LoginResponse(user models.User, db postgresql.Databases, req models.LoginUserRequestModel) (map[string]interface{}, int, error) {
+func LoginResponse(logger *utility.Logger, user models.User, db postgresql.Databases, req models.LoginUserRequestModel) (map[string]interface{}, int, error) {
 	var (
 		responseData = gin.H{}
 	)
 
-	verifications, _ := verification.GetVerifications(db.Auth, int(user.AccountID))
+	verifications, _ := verification.GetVerifications(logger, db.Auth, int(user.AccountID))
 
 	token, err := middleware.CreateToken(user, false)
 	if err != nil {
@@ -177,7 +177,7 @@ func LoginResponse(user models.User, db postgresql.Databases, req models.LoginUs
 
 	if req.PhoneNumber != "" {
 		otpReq := models.SendOtpTokenReq{AccountID: int(user.AccountID)}
-		SendOtpService(otpReq, db)
+		SendOtpService(logger, otpReq, db)
 	}
 
 	return gin.H{

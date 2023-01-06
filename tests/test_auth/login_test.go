@@ -21,7 +21,7 @@ import (
 )
 
 func TestLogin(t *testing.T) {
-	tst.Setup()
+	logger := tst.Setup()
 	gin.SetMode(gin.TestMode)
 	validatorRef := validator.New()
 	db := postgresql.Connection()
@@ -113,7 +113,7 @@ func TestLogin(t *testing.T) {
 		},
 	}
 
-	auth := auth.Controller{Db: db, Validator: validatorRef}
+	auth := auth.Controller{Db: db, Validator: validatorRef, Logger: logger}
 	r := gin.Default()
 	r.POST(loginPath, auth.Login)
 
@@ -158,7 +158,7 @@ func TestLogin(t *testing.T) {
 }
 
 func TestLoginPhone(t *testing.T) {
-	tst.Setup()
+	logger := tst.Setup()
 	gin.SetMode(gin.TestMode)
 	validatorRef := validator.New()
 	db := postgresql.Connection()
@@ -208,7 +208,7 @@ func TestLoginPhone(t *testing.T) {
 		},
 	}
 
-	auth := auth.Controller{Db: db, Validator: validatorRef}
+	auth := auth.Controller{Db: db, Validator: validatorRef, Logger: logger}
 	r := gin.Default()
 	r.POST(loginPath, auth.PhoneOtpLogin)
 
@@ -253,7 +253,7 @@ func TestLoginPhone(t *testing.T) {
 }
 
 func TestLogout(t *testing.T) {
-	tst.Setup()
+	logger := tst.Setup()
 	gin.SetMode(gin.TestMode)
 	validatorRef := validator.New()
 	db := postgresql.Connection()
@@ -277,7 +277,7 @@ func TestLogout(t *testing.T) {
 		}
 	)
 
-	auth := auth.Controller{Db: db, Validator: validatorRef}
+	auth := auth.Controller{Db: db, Validator: validatorRef, Logger: logger}
 	r := gin.Default()
 	tst.SignupUser(t, r, auth, userSignUpData)
 	token, _ := tst.GetLoginTokenAndAccountID(t, r, auth, loginData)
@@ -358,7 +358,7 @@ func TestLogout(t *testing.T) {
 }
 
 func TestValidateToken(t *testing.T) {
-	tst.Setup()
+	logger := tst.Setup()
 	gin.SetMode(gin.TestMode)
 	validatorRef := validator.New()
 	db := postgresql.Connection()
@@ -382,7 +382,7 @@ func TestValidateToken(t *testing.T) {
 		}
 	)
 
-	auth := auth.Controller{Db: db, Validator: validatorRef}
+	auth := auth.Controller{Db: db, Validator: validatorRef, Logger: logger}
 	r := gin.Default()
 	tst.SignupUser(t, r, auth, userSignUpData)
 	token, _ := tst.GetLoginTokenAndAccountID(t, r, auth, loginData)
@@ -454,7 +454,7 @@ func TestValidateToken(t *testing.T) {
 }
 
 func TestGetAccessToken(t *testing.T) {
-	tst.Setup()
+	logger := tst.Setup()
 	gin.SetMode(gin.TestMode)
 	validatorRef := validator.New()
 	db := postgresql.Connection()
@@ -478,7 +478,7 @@ func TestGetAccessToken(t *testing.T) {
 		}
 	)
 
-	auth := auth.Controller{Db: db, Validator: validatorRef}
+	auth := auth.Controller{Db: db, Validator: validatorRef, Logger: logger}
 	r := gin.Default()
 	tst.SignupUser(t, r, auth, userSignUpData)
 	token, _ := tst.GetLoginTokenAndAccountID(t, r, auth, loginData)

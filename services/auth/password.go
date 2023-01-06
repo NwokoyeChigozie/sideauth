@@ -37,7 +37,7 @@ func UpdatePassword(db postgresql.Databases, accountID int, oldPassword, newPass
 	return http.StatusOK, err
 }
 
-func RequestPasswordResetService(db postgresql.Databases, email, phoneNumber string) (int, int, error) {
+func RequestPasswordResetService(logger *utility.Logger, db postgresql.Databases, email, phoneNumber string) (int, int, error) {
 	if email == "" && phoneNumber == "" {
 		return 0, http.StatusBadRequest, fmt.Errorf("provide either email address or phone number")
 	}
@@ -60,18 +60,18 @@ func RequestPasswordResetService(db postgresql.Databases, email, phoneNumber str
 	}
 
 	if email != "" {
-		notification.SendEmailPasswordReset(db.Auth, int(user.AccountID), token)
+		notification.SendEmailPasswordReset(logger, db.Auth, int(user.AccountID), token)
 	}
 
 	if phoneNumber != "" {
-		notification.SendPhonePasswordReset(db.Auth, int(user.AccountID), token)
+		notification.SendPhonePasswordReset(logger, db.Auth, int(user.AccountID), token)
 	}
 
 	return int(user.AccountID), http.StatusOK, nil
 
 }
 
-func UpdatePasswordWithTokenService(db postgresql.Databases, accountID int, token int, password string) (int, error) {
+func UpdatePasswordWithTokenService(logger *utility.Logger, db postgresql.Databases, accountID int, token int, password string) (int, error) {
 	if password == "" {
 		return http.StatusBadRequest, fmt.Errorf("password is empty")
 	}
@@ -120,8 +120,8 @@ func UpdatePasswordWithTokenService(db postgresql.Databases, accountID int, toke
 		return http.StatusInternalServerError, err
 	}
 
-	notification.SendEmailPasswordDoneReset(db.Auth, int(user.AccountID))
-	notification.SendPhonePasswordDoneReset(db.Auth, int(user.AccountID))
+	notification.SendEmailPasswordDoneReset(logger, db.Auth, int(user.AccountID))
+	notification.SendPhonePasswordDoneReset(logger, db.Auth, int(user.AccountID))
 
 	err = resetToken.DeletePasswordResetToken(db.Auth)
 	if err != nil {

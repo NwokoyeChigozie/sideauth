@@ -22,9 +22,8 @@ var (
 )
 
 // Params = getConfig.Params
-func Setup(name string) *Configuration {
+func Setup(logger *utility.Logger, name string) *Configuration {
 	var baseConfiguration *BaseConfig
-	logger := utility.NewLogger()
 
 	viper.SetConfigName(name)
 	viper.SetConfigType("env")

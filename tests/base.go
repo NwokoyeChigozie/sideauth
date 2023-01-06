@@ -14,15 +14,18 @@ import (
 	"github.com/vesicash/auth-ms/internal/models/migrations"
 	"github.com/vesicash/auth-ms/pkg/controller/auth"
 	"github.com/vesicash/auth-ms/pkg/repository/storage/postgresql"
+	"github.com/vesicash/auth-ms/utility"
 	"gorm.io/gorm"
 )
 
-func Setup() {
-	config := config.Setup("../../app")
-	db := postgresql.ConnectToDatabases(config.TestDatabases)
+func Setup() *utility.Logger {
+	logger := utility.NewLogger()
+	config := config.Setup(logger, "../../app")
+	db := postgresql.ConnectToDatabases(logger, config.TestDatabases)
 	if config.TestDatabases.Migrate {
 		migrations.RunAllMigrations(db)
 	}
+	return logger
 }
 
 func ParseResponse(w *httptest.ResponseRecorder) map[string]interface{} {

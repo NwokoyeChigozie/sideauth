@@ -4,8 +4,7 @@ import (
 	"fmt"
 )
 
-func LogAndPrint(data interface{}, args ...interface{}) {
-	logger := NewLogger()
+func LogAndPrint(logger *Logger, data interface{}, args ...interface{}) {
 	fmt.Println(data, args)
 	logger.Info(data, args)
 }

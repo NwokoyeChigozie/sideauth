@@ -19,7 +19,7 @@ import (
 )
 
 func TestGetAccessToken(t *testing.T) {
-	tst.Setup()
+	logger := tst.Setup()
 	app := config.GetConfig().App
 	gin.SetMode(gin.TestMode)
 	validatorRef := validator.New()
@@ -44,7 +44,7 @@ func TestGetAccessToken(t *testing.T) {
 		},
 	}
 
-	auth_model := auth_model.Controller{Db: db, Validator: validatorRef}
+	auth_model := auth_model.Controller{Db: db, Validator: validatorRef, Logger: logger}
 
 	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AppType))
 	{

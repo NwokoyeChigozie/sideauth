@@ -22,7 +22,7 @@ import (
 )
 
 func TestRequestPasswordReset(t *testing.T) {
-	tst.Setup()
+	logger := tst.Setup()
 	gin.SetMode(gin.TestMode)
 	validatorRef := validator.New()
 	db := postgresql.Connection()
@@ -45,7 +45,7 @@ func TestRequestPasswordReset(t *testing.T) {
 		PhoneNumber  string `json:"phone_number"`
 	}
 
-	auth := auth.Controller{Db: db, Validator: validatorRef}
+	auth := auth.Controller{Db: db, Validator: validatorRef, Logger: logger}
 	r := gin.Default()
 	tst.SignupUser(t, r, auth, userSignUpData)
 
@@ -148,7 +148,7 @@ func TestRequestPasswordReset(t *testing.T) {
 }
 
 func TestUpdatePasswordWithToken(t *testing.T) {
-	tst.Setup()
+	logger := tst.Setup()
 	gin.SetMode(gin.TestMode)
 	validatorRef := validator.New()
 	db := postgresql.Connection()
@@ -185,7 +185,7 @@ func TestUpdatePasswordWithToken(t *testing.T) {
 		Password  string `json:"password"`
 	}
 
-	auth := auth.Controller{Db: db, Validator: validatorRef}
+	auth := auth.Controller{Db: db, Validator: validatorRef, Logger: logger}
 	r := gin.Default()
 	tst.SignupUser(t, r, auth, userSignUpData)
 	_, accountID := tst.GetLoginTokenAndAccountID(t, r, auth, loginData)
@@ -321,7 +321,7 @@ func TestUpdatePasswordWithToken(t *testing.T) {
 }
 
 func TestUpdatePassword(t *testing.T) {
-	tst.Setup()
+	logger := tst.Setup()
 	gin.SetMode(gin.TestMode)
 	validatorRef := validator.New()
 	db := postgresql.Connection()
@@ -350,7 +350,7 @@ func TestUpdatePassword(t *testing.T) {
 		NewPassword string `json:"new_password" validate:"required"`
 	}
 
-	auth := auth.Controller{Db: db, Validator: validatorRef}
+	auth := auth.Controller{Db: db, Validator: validatorRef, Logger: logger}
 	r := gin.Default()
 	tst.SignupUser(t, r, auth, userSignUpData)
 	token, _ := tst.GetLoginTokenAndAccountID(t, r, auth, loginData)

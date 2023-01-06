@@ -8,8 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func SendVerificationEmail(authDb *gorm.DB, accountID int) error {
-	logger := utility.NewLogger()
+func SendVerificationEmail(logger *utility.Logger, authDb *gorm.DB, accountID int) error {
 	var (
 		accessToken      = models.AccessToken{}
 		outBoundResponse map[string]interface{}
@@ -37,8 +36,7 @@ func SendVerificationEmail(authDb *gorm.DB, accountID int) error {
 	return nil
 }
 
-func SendVerificationSms(authDb *gorm.DB, accountID int) error {
-	logger := utility.NewLogger()
+func SendVerificationSms(logger *utility.Logger, authDb *gorm.DB, accountID int) error {
 	var (
 		accessToken      = models.AccessToken{}
 		outBoundResponse map[string]interface{}

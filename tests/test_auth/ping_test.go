@@ -17,7 +17,7 @@ import (
 )
 
 func TestGetPing(t *testing.T) {
-	tst.Setup()
+	logger := tst.Setup()
 	gin.SetMode(gin.TestMode)
 	// getConfig := config.GetConfig()
 	validatorRef := validator.New()
@@ -38,7 +38,7 @@ func TestGetPing(t *testing.T) {
 		},
 	}
 
-	auth := health.Controller{Db: db, Validator: validatorRef}
+	auth := health.Controller{Db: db, Validator: validatorRef, Logger: logger}
 
 	for _, test := range tests {
 		r := gin.Default()
@@ -82,7 +82,7 @@ func TestGetPing(t *testing.T) {
 
 }
 func TestPostPing(t *testing.T) {
-	tst.Setup()
+	logger := tst.Setup()
 	gin.SetMode(gin.TestMode)
 	// getConfig := config.GetConfig()
 	validatorRef := validator.New()
@@ -103,7 +103,7 @@ func TestPostPing(t *testing.T) {
 		},
 	}
 
-	auth := health.Controller{Db: db, Validator: validatorRef}
+	auth := health.Controller{Db: db, Validator: validatorRef, Logger: logger}
 
 	for _, test := range tests {
 		r := gin.Default()

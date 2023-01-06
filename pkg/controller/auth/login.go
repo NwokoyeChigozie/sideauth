@@ -30,7 +30,7 @@ func (base *Controller) Login(c *gin.Context) {
 		return
 	}
 
-	data, code, err := auth.LoginService(c, req, base.Db)
+	data, code, err := auth.LoginService(c, base.Logger, req, base.Db)
 	if err != nil {
 		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
 		c.JSON(code, rd)
@@ -90,7 +90,7 @@ func (base *Controller) PhoneOtpLogin(c *gin.Context) {
 		return
 	}
 
-	accountID, code, err := auth.PhoneOtpLogin(c, req.PhoneNumber, base.Db)
+	accountID, code, err := auth.PhoneOtpLogin(c, base.Logger, req.PhoneNumber, base.Db)
 	if err != nil {
 		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
 		c.JSON(code, rd)

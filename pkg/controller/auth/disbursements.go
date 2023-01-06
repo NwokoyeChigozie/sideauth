@@ -11,7 +11,7 @@ import (
 
 func (base *Controller) GetDisbursements(c *gin.Context) {
 
-	data, code, err := auth.GetDisbursementsService(base.Db, models.MyIdentity.AccountID)
+	data, code, err := auth.GetDisbursementsService(base.Logger, base.Db, models.MyIdentity.AccountID)
 	if err != nil {
 		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
 		c.JSON(code, rd)

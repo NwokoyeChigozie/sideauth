@@ -5,13 +5,14 @@ import (
 
 	"github.com/vesicash/auth-ms/external/microservice/payment"
 	"github.com/vesicash/auth-ms/pkg/repository/storage/postgresql"
+	"github.com/vesicash/auth-ms/utility"
 )
 
-func GetDisbursementsService(db postgresql.Databases, accountID int) ([]map[string]interface{}, int, error) {
+func GetDisbursementsService(logger *utility.Logger, db postgresql.Databases, accountID int) ([]map[string]interface{}, int, error) {
 	var (
 		data = []map[string]interface{}{}
 	)
-	disbursements, _ := payment.GetDisbursement(db.Auth, accountID)
+	disbursements, _ := payment.GetDisbursement(logger, db.Auth, accountID)
 
 	for _, v := range disbursements {
 		sData := map[string]interface{}{
