@@ -35,7 +35,7 @@ func (base *Controller) GetUser(c *gin.Context) {
 		return
 	}
 
-	rd := utility.BuildSuccessResponse(http.StatusOK, "login successful", gin.H{"user": user})
+	rd := utility.BuildSuccessResponse(http.StatusOK, "successful", gin.H{"user": user})
 	c.JSON(http.StatusOK, rd)
 
 }
