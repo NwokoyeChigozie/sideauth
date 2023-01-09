@@ -40,6 +40,12 @@ func AssertStatusCode(t *testing.T, got, expected int) {
 	}
 }
 
+func AssertBool(t *testing.T, got, expected bool) {
+	if got != expected {
+		t.Errorf("handler returned wrong boolean: got %d expected %d", got, expected)
+	}
+}
+
 func AssertResponseMessage(t *testing.T, got, expected string) {
 	if got != expected {
 		t.Errorf("handler returned wrong message: got message: %q expected: %q", got, expected)

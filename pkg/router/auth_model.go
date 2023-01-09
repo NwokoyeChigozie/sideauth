@@ -18,6 +18,7 @@ func Model(r *gin.Engine, ApiVersion string, validator *validator.Validate, db p
 	{
 		modelTypeUrl.POST("/get_user", auth_model.GetUser)
 		modelTypeUrl.GET("/get_access_token", auth_model.GetAccessToken)
+		modelTypeUrl.POST("/validate_on_db", auth_model.ValidateOnDB)
 
 	}
 
