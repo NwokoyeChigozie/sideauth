@@ -1,5 +1,12 @@
 package config
 
+type Configuration struct {
+	Server        ServerConfiguration
+	Databases     Databases
+	TestDatabases Databases
+	Microservices Microservices
+	App           App
+}
 type BaseConfig struct {
 	SERVER_PORT                      string `mapstructure:"SERVER_PORT"`
 	SERVER_SECRET                    string `mapstructure:"SERVER_SECRET"`
