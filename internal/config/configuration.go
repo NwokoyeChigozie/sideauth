@@ -7,14 +7,6 @@ import (
 	"github.com/vesicash/auth-ms/utility"
 )
 
-type Configuration struct {
-	Server        ServerConfiguration
-	Databases     Databases
-	TestDatabases Databases
-	Microservices Microservices
-	App           App
-}
-
 // Setup initialize configuration
 var (
 	// Params ParamsConfiguration
