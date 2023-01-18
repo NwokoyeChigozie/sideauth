@@ -28,6 +28,11 @@ type UserProfile struct {
 	UpdatedAt  time.Time `gorm:"column:updated_at; autoUpdateTime" json:"updated_at"`
 }
 
+type GetUserProfileModel struct {
+	ID        uint `json:"id"`
+	AccountID uint `json:"account_id" pgvalidate:"exists=auth$users$account_id"`
+}
+
 func (u *UserProfile) CreateUserProfile(db *gorm.DB) error {
 	err := postgresql.CreateOneRecord(db, &u)
 	if err != nil {
@@ -38,6 +43,17 @@ func (u *UserProfile) CreateUserProfile(db *gorm.DB) error {
 
 func (u *UserProfile) GetByAccountID(db *gorm.DB) (int, error) {
 	err, nilErr := postgresql.SelectOneFromDb(db, &u, "account_id = ? ", u.AccountID)
+	if nilErr != nil {
+		return http.StatusBadRequest, nilErr
+	}
+
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+	return http.StatusOK, nil
+}
+func (u *UserProfile) GetByID(db *gorm.DB) (int, error) {
+	err, nilErr := postgresql.SelectOneFromDb(db, &u, "id = ? ", u.ID)
 	if nilErr != nil {
 		return http.StatusBadRequest, nilErr
 	}

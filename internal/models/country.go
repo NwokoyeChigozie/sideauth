@@ -20,6 +20,13 @@ type Country struct {
 	UpdatedAt    time.Time `gorm:"column:updated_at; autoUpdateTime" json:"updated_at"`
 }
 
+type GetCountryModel struct {
+	ID           uint   `json:"id"`
+	Name         string `json:"name"`
+	CountryCode  string `json:"country_code"`
+	CurrencyCode string `json:"currency_code"`
+}
+
 func (c *Country) FindWithNameOrCode(db *gorm.DB) (int, error) {
 	err, nilErr := postgresql.SelectOneFromDb(db, &c, "name = ? or country_code = ?", c.Name, strings.ToUpper(c.Name))
 	if nilErr != nil {
@@ -42,6 +49,26 @@ func (c *Country) FindWithCurrencyAndCode(db *gorm.DB) (int, error) {
 		return http.StatusInternalServerError, err
 	}
 	return http.StatusOK, nil
+}
+
+func (c *Country) FindCountryByID(db *gorm.DB) (int, error) {
+	err, nilErr := postgresql.SelectOneFromDb(db, &c, "id = ?", c.ID)
+	if nilErr != nil {
+		return http.StatusBadRequest, nilErr
+	}
+
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+	return http.StatusOK, nil
+}
+
+func (c *Country) GetFirstCountry(db *gorm.DB) error {
+	err := postgresql.SelectFirstFromDb(db, &c)
+	if err != nil {
+		return fmt.Errorf("country selection failed: %v", err.Error())
+	}
+	return nil
 }
 
 func (c *Country) CreateCountry(db *gorm.DB) error {

@@ -27,8 +27,25 @@ type BankDetail struct {
 	UpdatedAt           time.Time `gorm:"column:updated_at; autoUpdateTime" json:"updated_at"`
 }
 
+type GetBankDetailModel struct {
+	ID        uint `json:"id"`
+	AccountID uint `json:"account_id" pgvalidate:"exists=auth$users$account_id"`
+}
+
 func (b *BankDetail) GetByAccountID(db *gorm.DB) (int, error) {
 	err, nilErr := postgresql.SelectOneFromDb(db, &b, "account_id = ? ", b.AccountID)
+	if nilErr != nil {
+		return http.StatusBadRequest, nilErr
+	}
+
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+	return http.StatusOK, nil
+}
+
+func (b *BankDetail) GetByID(db *gorm.DB) (int, error) {
+	err, nilErr := postgresql.SelectOneFromDb(db, &b, "id = ? ", b.ID)
 	if nilErr != nil {
 		return http.StatusBadRequest, nilErr
 	}

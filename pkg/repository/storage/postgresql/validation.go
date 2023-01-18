@@ -127,7 +127,7 @@ func ValidateNext(value reflect.Value) (interface{}, bool) {
 	} else if value.Type().Kind() == reflect.Int64 {
 		return value.Int(), value.Int() != 0
 	} else if value.Type().Kind() == reflect.Uint {
-		return value.Int(), value.Uint() != 0
+		return value.Uint(), value.Uint() != 0
 	} else if value.Type().Kind() == reflect.Uint8 {
 		return value.Int(), value.Uint() != 0
 	} else if value.Type().Kind() == reflect.Uint16 {
