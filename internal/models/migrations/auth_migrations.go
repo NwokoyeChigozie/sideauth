@@ -8,6 +8,7 @@ import (
 func AuthMigrationModels() []interface{} {
 	return []interface{}{
 		models.AccessToken{},
+		models.Authorize{},
 		models.BankDetail{},
 		models.BannedAccount{},
 		models.BusinessCharge{},

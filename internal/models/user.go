@@ -69,8 +69,8 @@ type LoginUserRequestModel struct {
 }
 
 type GetUserModel struct {
-	ID           uint   `json:"id"`
-	AccountID    uint   `json:"account_id"`
+	ID           uint   `json:"id" pgvalidate:"exists=auth$users$id"`
+	AccountID    uint   `json:"account_id" pgvalidate:"exists=auth$users$account_id"`
 	EmailAddress string `json:"email_address"`
 	PhoneNumber  string `json:"phone_number"`
 	Username     string `json:"username"`

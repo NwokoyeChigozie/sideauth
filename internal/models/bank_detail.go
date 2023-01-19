@@ -28,7 +28,7 @@ type BankDetail struct {
 }
 
 type GetBankDetailModel struct {
-	ID        uint `json:"id"`
+	ID        uint `json:"id" pgvalidate:"exists=auth$bank_details$id"`
 	AccountID uint `json:"account_id" pgvalidate:"exists=auth$users$account_id"`
 }
 
