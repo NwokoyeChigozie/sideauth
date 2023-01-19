@@ -39,3 +39,45 @@ func (base *Controller) GetUser(c *gin.Context) {
 	c.JSON(http.StatusOK, rd)
 
 }
+
+func (base *Controller) SetAuthorizationRequired(c *gin.Context) {
+	var (
+		req struct {
+			AccountID int  `json:"account_id" validate:"required" pgvalidate:"exists=auth$users$account_id"`
+			Status    bool `json:"status" `
+		}
+	)
+
+	err := c.ShouldBind(&req)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Failed to parse request body", err, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	err = base.Validator.Struct(&req)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Validation failed", utility.ValidationResponse(err, base.Validator), nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	user := models.User{AccountID: uint(req.AccountID)}
+	code, err := user.GetUserByAccountID(base.Db.Auth)
+	if err != nil {
+		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
+		c.JSON(code, rd)
+		return
+	}
+	user.AuthorizationRequired = req.Status
+	err = user.Update(base.Db.Auth)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusInternalServerError, "error", err.Error(), err, nil)
+		c.JSON(http.StatusInternalServerError, rd)
+		return
+	}
+
+	rd := utility.BuildSuccessResponse(http.StatusOK, "successful", true)
+	c.JSON(http.StatusOK, rd)
+
+}

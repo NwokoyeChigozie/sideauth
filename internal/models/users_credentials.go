@@ -21,7 +21,7 @@ type UsersCredential struct {
 }
 
 type GetUserCredentialModel struct {
-	ID                 uint   `json:"id"`
+	ID                 uint   `json:"id" pgvalidate:"exists=auth$users_credentials$id"`
 	AccountID          uint   `json:"account_id" pgvalidate:"exists=auth$users$account_id"`
 	IdentificationType string `json:"identification_type"`
 }
@@ -33,7 +33,7 @@ type CreateUserCredentialModel struct {
 	IdentificationData string `json:"identification_data"`
 }
 type UpdateUserCredentialModel struct {
-	ID                 uint   `json:"id" validate:"required"`
+	ID                 uint   `json:"id" validate:"required"  pgvalidate:"exists=auth$users_credentials$id"`
 	AccountID          uint   `json:"account_id" pgvalidate:"exists=auth$users$account_id"`
 	IdentificationType string `json:"identification_type"`
 	Bvn                string `json:"bvn"`

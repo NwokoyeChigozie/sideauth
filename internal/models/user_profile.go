@@ -29,7 +29,7 @@ type UserProfile struct {
 }
 
 type GetUserProfileModel struct {
-	ID        uint `json:"id"`
+	ID        uint `json:"id" pgvalidate:"exists=auth$user_profiles$id"`
 	AccountID uint `json:"account_id" pgvalidate:"exists=auth$users$account_id"`
 }
 

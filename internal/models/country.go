@@ -21,7 +21,7 @@ type Country struct {
 }
 
 type GetCountryModel struct {
-	ID           uint   `json:"id"`
+	ID           uint   `json:"id" pgvalidate:"exists=auth$countries$id"`
 	Name         string `json:"name"`
 	CountryCode  string `json:"country_code"`
 	CurrencyCode string `json:"currency_code"`
