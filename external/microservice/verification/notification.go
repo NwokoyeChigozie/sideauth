@@ -25,7 +25,7 @@ func SendVerificationEmail(logger *utility.Logger, authDb *gorm.DB, accountID in
 		"v-public-key":  accessToken.PublicKey,
 	}
 	data := map[string]interface{}{"account_id": accountID}
-	logger.Info("welcome email", data)
+	logger.Info("verification email", data)
 	err = external.SendRequest(logger, "service", "verification_email", headers, data, &outBoundResponse)
 	if err != nil {
 		logger.Info("verification email", outBoundResponse, err)

@@ -44,7 +44,7 @@ func GetUserRestrictionsService(logger *utility.Logger, db postgresql.Databases,
 		return restrictions, code, err
 	}
 	tier = user.TierType
-	dataSlice, code, err := TierChecks(logger, tier, int(user.AccountID), db)
+	dataSlice, code, err := TierChecks(logger, tier, int(user.AccountID), db, user.LoginAccessToken)
 	if err != nil {
 		return restrictions, code, err
 	}
@@ -60,7 +60,7 @@ func GetUserRestrictionsService(logger *utility.Logger, db postgresql.Databases,
 	}, http.StatusOK, nil
 }
 
-func TierChecks(logger *utility.Logger, tierType, accountID int, db postgresql.Databases) ([]string, int, error) {
+func TierChecks(logger *utility.Logger, tierType, accountID int, db postgresql.Databases, accessToken string) ([]string, int, error) {
 	response := []string{}
 	user := models.User{AccountID: uint(accountID)}
 	code, err := user.GetUserByAccountID(db.Auth)
@@ -89,16 +89,12 @@ func TierChecks(logger *utility.Logger, tierType, accountID int, db postgresql.D
 	} else if tierType == 2 {
 		fieldsMap := map[string]int{}
 		fields := []string{"national_id", "bvn"}
-		verifications, _ := verification.GetVerifications(logger, db.Auth, int(user.AccountID))
+		verifications, _ := verification.GetVerifications(logger, db.Auth, int(user.AccountID), accessToken)
 		for _, v := range verifications {
-			if v.IsVerified != nil {
-				if *v.IsVerified {
-					if v.VerificationType != nil {
-						val := fieldsMap[*v.VerificationType] + 1
-						fieldsMap[*v.VerificationType] = val
-					}
+			if v.IsVerified {
+				val := fieldsMap[v.VerificationType] + 1
+				fieldsMap[v.VerificationType] = val
 
-				}
 			}
 		}
 
