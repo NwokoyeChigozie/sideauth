@@ -124,8 +124,6 @@ func LoginResponse(logger *utility.Logger, user models.User, db postgresql.Datab
 		responseData = gin.H{}
 	)
 
-	verifications, _ := verification.GetVerifications(logger, db.Auth, int(user.AccountID))
-
 	token, err := middleware.CreateToken(user, false)
 	if err != nil {
 		return responseData, http.StatusInternalServerError, fmt.Errorf("error creating token: " + err.Error())
@@ -137,6 +135,9 @@ func LoginResponse(logger *utility.Logger, user models.User, db postgresql.Datab
 	if err != nil {
 		return responseData, http.StatusInternalServerError, fmt.Errorf("error saving token: " + err.Error())
 	}
+
+	verifications, _ := verification.GetVerifications(logger, db.Auth, int(user.AccountID), user.LoginAccessToken)
+
 	tracking := models.UserTracking{AccountID: int(user.AccountID)}
 	trackings, err := tracking.GetAllByAccountID(db.Auth)
 	if err != nil {
