@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/vesicash/auth-ms/pkg/repository/storage/postgresql"
@@ -30,6 +31,18 @@ type BusinessCharge struct {
 	UpdatedAt           time.Time `gorm:"column:updated_at; autoUpdateTime" json:"updated_at"`
 }
 
+type GetBusinessChargeModel struct {
+	ID         uint   `json:"id" pgvalidate:"exists=auth$business_charges$id"`
+	BusinessID uint   `json:"business_id" pgvalidate:"exists=auth$users$account_id"`
+	Country    string `json:"country"`
+	Currency   string `json:"currency"`
+}
+
+type InitBusinessChargeModel struct {
+	BusinessID uint   `json:"business_id" validate:"required" pgvalidate:"exists=auth$users$account_id"`
+	Currency   string `json:"currency" validate:"required"`
+}
+
 func (b *BusinessCharge) CreateBusinessCharge(db *gorm.DB) error {
 	err := postgresql.CreateOneRecord(db, &b)
 	if err != nil {
@@ -40,6 +53,40 @@ func (b *BusinessCharge) CreateBusinessCharge(db *gorm.DB) error {
 
 func (b *BusinessCharge) GetByAccountID(db *gorm.DB) (int, error) {
 	err, nilErr := postgresql.SelectOneFromDb(db, &b, "business_id = ? ", b.BusinessId)
+	if nilErr != nil {
+		return http.StatusBadRequest, nilErr
+	}
+
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+	return http.StatusOK, nil
+}
+
+func (b *BusinessCharge) GetByID(db *gorm.DB) (int, error) {
+	err, nilErr := postgresql.SelectOneFromDb(db, &b, "id = ? ", b.ID)
+	if nilErr != nil {
+		return http.StatusBadRequest, nilErr
+	}
+
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+	return http.StatusOK, nil
+}
+
+func (b *BusinessCharge) GetByBusinessIDAndOthers(db *gorm.DB) (int, error) {
+	query := `business_id = ? `
+
+	if b.Country != "" {
+		query += ` and country = '` + strings.ToUpper(b.Country) + `'`
+	}
+
+	if b.Currency != "" {
+		query += ` and currency = '` + strings.ToUpper(b.Currency) + `'`
+	}
+
+	err, nilErr := postgresql.SelectOneFromDb(db, &b, query, b.BusinessId)
 	if nilErr != nil {
 		return http.StatusBadRequest, nilErr
 	}

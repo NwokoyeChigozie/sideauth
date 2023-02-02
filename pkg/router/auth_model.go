@@ -31,6 +31,8 @@ func Model(r *gin.Engine, ApiVersion string, validator *validator.Validate, db p
 		modelTypeUrl.POST("/get_authorize", auth_model.GetAuthorize)
 		modelTypeUrl.POST("/create_authorize", auth_model.CreateAuthorize)
 		modelTypeUrl.POST("/update_authorize", auth_model.UpdateAuthorize)
+		modelTypeUrl.POST("/get_business_charge", auth_model.GetBusinessCharge)
+		modelTypeUrl.POST("/init_business_charge", auth_model.InitBusinessCharge)
 
 	}
 
