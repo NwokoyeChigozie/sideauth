@@ -1,8 +1,8 @@
 #!/bin/sh
 set -e
 
-image_name="vesicash/auth"
-image_tag="${1:-latest}"
+IMAGE_NAME="vesicash/auth"
+IMAGE_TAG="${1:-latest}"
 
 if [[ ! -f "app.env" ]]
 then
@@ -12,5 +12,5 @@ else
     echo "Environment file found 👌"
 fi
 
-echo "Building docker image ${image_tag} version 🛠️"
-docker build -t $image_name:$image_tag .
+echo "Building docker image ${IMAGE_TAG} version 🛠️"
+docker build -t $IMAGE_NAME:$IMAGE_TAG .
