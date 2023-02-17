@@ -73,6 +73,9 @@ func SignupService(logger *utility.Logger, req models.CreateUserRequestModel, db
 	if accountType == "" {
 		accountType = "individual"
 	}
+	if countryName == "" {
+		countryName = "nigeria"
+	}
 
 	country := models.Country{Name: countryName}
 	code, err := country.FindWithNameOrCode(db.Auth)
