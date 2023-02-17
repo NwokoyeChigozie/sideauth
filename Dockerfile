@@ -1,11 +1,23 @@
-FROM golang:1.19
+# Build stage
+FROM golang:1.20.1-alpine3.17 as build
 
 WORKDIR /usr/src/app
 
 COPY go.mod go.sum ./
+
 RUN go mod download && go mod verify
 
 COPY . .
-RUN go build -v -o /usr/local/bin/vesicash-auth-ms
+
+RUN go build -v -o /dist/vesicash-auth-ms
+
+# Deployment stage
+FROM alpine:3.17
+
+WORKDIR /usr/src/app
+
+COPY --from=build /usr/src/app ./
+
+COPY --from=build /dist/vesicash-auth-ms /usr/local/bin/vesicash-auth-ms
 
 CMD ["vesicash-auth-ms"]

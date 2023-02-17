@@ -21,11 +21,21 @@ $ go run main.go
 2. Create and populate a `app.env` file on the project root with its keys and corresponding values as listed in `app-sample.env`
 3. Build Docker Image by running this command on the project root
 
+#### Build image directly
+
 ```bash
 $ docker build -t <image tag> .
 ```
 
-4. Run image built with above command with
+#### Build using bash script
+
+```bash
+$ ./build-image.sh
+```
+
+#### Run application
+
+Run image built with above command with
 
 ```bash
 $ docker run -d -p <port>:<port> <image tag>
