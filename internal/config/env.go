@@ -14,6 +14,7 @@ type BaseConfig struct {
 
 	APP_NAME string `mapstructure:"APP_NAME"`
 	APP_KEY  string `mapstructure:"APP_KEY"`
+	APP_MODE string `mapstructure:"APP_MODE"`
 
 	DB_HOST          string `mapstructure:"DB_HOST"`
 	DB_PORT          string `mapstructure:"DB_PORT"`
@@ -80,6 +81,7 @@ func (config *BaseConfig) SetupConfigurationn() *Configuration {
 		App: App{
 			Name: config.APP_NAME,
 			Key:  config.APP_KEY,
+			Mode: config.APP_MODE,
 		},
 		Databases: Databases{
 			DB_HOST:          config.DB_HOST,

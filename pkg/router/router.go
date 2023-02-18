@@ -6,12 +6,16 @@ import (
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"github.com/vesicash/auth-ms/internal/config"
 	"github.com/vesicash/auth-ms/pkg/middleware"
 	"github.com/vesicash/auth-ms/pkg/repository/storage/postgresql"
 	"github.com/vesicash/auth-ms/utility"
 )
 
-func Setup(logger *utility.Logger, validator *validator.Validate, db postgresql.Databases) *gin.Engine {
+func Setup(logger *utility.Logger, validator *validator.Validate, db postgresql.Databases, appConfiguration *config.App) *gin.Engine {
+	if appConfiguration.Mode == "release" {
+		gin.SetMode(gin.ReleaseMode)
+	}
 	r := gin.New()
 
 	// Middlewares

@@ -26,7 +26,7 @@ func main() {
 		migrations.RunAllMigrations(db)
 	}
 
-	r := router.Setup(logger, validatorRef, db)
+	r := router.Setup(logger, validatorRef, db, &configuration.App)
 
 	utility.LogAndPrint(logger, "Server is starting at 127.0.0.1:%s", configuration.Server.Port)
 	log.Fatal(r.Run(":" + configuration.Server.Port))
