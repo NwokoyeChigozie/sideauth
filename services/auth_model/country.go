@@ -25,6 +25,11 @@ func GetCountryService(req models.GetCountryModel, db postgresql.Databases) (*mo
 		if err != nil {
 			return &models.Country{}, code, err
 		}
+	} else if req.CurrencyCode != "" && req.CountryCode == "" {
+		code, err := country.FindWithCurrency(db.Auth)
+		if err != nil {
+			return &models.Country{}, code, err
+		}
 	} else if req.Name != "" {
 		code, err := country.FindWithNameOrCode(db.Auth)
 		if err != nil {
