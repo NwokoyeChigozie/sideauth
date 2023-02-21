@@ -180,6 +180,10 @@ func LoginResponse(logger *utility.Logger, user models.User, db postgresql.Datab
 		otpReq := models.SendOtpTokenReq{AccountID: int(user.AccountID)}
 		SendOtpService(logger, otpReq, db)
 	}
+	permission := []string{}
+	if hasBvn(user.AccountID, db) {
+		permission = []string{"funding", "withdrawal", "escrow", "exchange"}
+	}
 
 	return gin.H{
 		"token_type":   "auth",
@@ -187,6 +191,7 @@ func LoginResponse(logger *utility.Logger, user models.User, db postgresql.Datab
 		"access_token": token.AccessToken,
 		"user":         user,
 		"login_count":  trackingCount,
+		"permission":   permission,
 		"profile": gin.H{
 			"business":         businessProfile,
 			"user":             userProfile,
@@ -196,4 +201,13 @@ func LoginResponse(logger *utility.Logger, user models.User, db postgresql.Datab
 			"verifications":    verifications,
 		},
 	}, http.StatusOK, nil
+}
+
+func hasBvn(accountID uint, db postgresql.Databases) bool {
+	userCredenetial := models.UsersCredential{AccountID: int(accountID), IdentificationType: "bvn"}
+	_, err := userCredenetial.GetUserCredentialByAccountIdAndType(db.Auth)
+	if err != nil {
+		return false
+	}
+	return userCredenetial.IdentificationData != ""
 }
