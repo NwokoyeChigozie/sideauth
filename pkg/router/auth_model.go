@@ -17,6 +17,7 @@ func Model(r *gin.Engine, ApiVersion string, validator *validator.Validate, db p
 	modelTypeUrl := r.Group(fmt.Sprintf("%v/auth", ApiVersion), middleware.Authorize(db, middleware.AppType))
 	{
 		modelTypeUrl.POST("/get_user", auth_model.GetUser)
+		modelTypeUrl.GET("/get_users_by_business_id/:business_id", auth_model.GetUsersByBusinessID)
 		modelTypeUrl.POST("/set_authorization_required", auth_model.SetAuthorizationRequired)
 		modelTypeUrl.POST("/get_user_credentials", auth_model.GetUserCredentials)
 		modelTypeUrl.POST("/create_user_credentials", auth_model.CreateUserCredentials)

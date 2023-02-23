@@ -49,3 +49,13 @@ func GetUserService(req models.GetUserModel, db postgresql.Databases) (*models.U
 		return nil, http.StatusBadRequest, fmt.Errorf("no request values provided")
 	}
 }
+
+func GetUsersByBusinessIDService(businessID int, db postgresql.Databases) ([]models.User, int, error) {
+	user := models.User{BusinessId: businessID}
+	users, err := user.SelectByBusinessID(db.Auth)
+	if err != nil {
+		return users, http.StatusInternalServerError, err
+	}
+
+	return users, http.StatusOK, nil
+}

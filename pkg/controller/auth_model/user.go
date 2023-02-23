@@ -1,7 +1,9 @@
 package auth_model
 
 import (
+	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/vesicash/auth-ms/internal/models"
@@ -36,6 +38,32 @@ func (base *Controller) GetUser(c *gin.Context) {
 	}
 
 	rd := utility.BuildSuccessResponse(http.StatusOK, "successful", gin.H{"user": user})
+	c.JSON(http.StatusOK, rd)
+
+}
+
+func (base *Controller) GetUsersByBusinessID(c *gin.Context) {
+	var (
+		businessID = c.Param("business_id")
+	)
+	fmt.Println(c.Params)
+
+	businessIDint, err := strconv.Atoi(businessID)
+	if err != nil {
+		fmt.Println(err.Error())
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "incorrect business id type", err, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	users, code, err := auth_model.GetUsersByBusinessIDService(businessIDint, base.Db)
+	if err != nil {
+		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
+		c.JSON(code, rd)
+		return
+	}
+
+	rd := utility.BuildSuccessResponse(http.StatusOK, "successful", users)
 	c.JSON(http.StatusOK, rd)
 
 }
