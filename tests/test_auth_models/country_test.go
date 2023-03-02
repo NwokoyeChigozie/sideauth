@@ -133,7 +133,8 @@ func TestGetCountry(t *testing.T) {
 			RequestBody: models.GetCountryModel{
 				CurrencyCode: country.CurrencyCode,
 			},
-			ExpectedCode: http.StatusBadRequest,
+			ExpectedCode: http.StatusOK,
+			Message:      "successful",
 			Headers: map[string]string{
 				"Content-Type": "application/json",
 				"v-app":        app.Key,

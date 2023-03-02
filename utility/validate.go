@@ -3,8 +3,9 @@ package utility
 import (
 	"net/mail"
 	"os"
-	"regexp"
 	"strings"
+
+	"github.com/nyaruka/phonenumbers"
 )
 
 func EmailValid(email string) bool {
@@ -13,21 +14,21 @@ func EmailValid(email string) bool {
 }
 
 func PhoneValid(phone string) (string, bool) {
-	if phone == "" || len(phone) < 5 {
-		return phone, false
-	}
-	re := regexp.MustCompile(`^(?:(?:\(?(?:00|\+)([1-4]\d\d|[1-9]\d?)\)?)?[\-\.\ \\\/]?)?((?:\(?\d{1,}\)?[\-\.\ \\\/]?){0,})(?:[\-\.\ \\\/]?(?:#|ext\.?|extension|x)[\-\.\ \\\/]?(\d+))?$`)
-
-	if strings.Contains(phone, "+234") {
-		phone = strings.Replace(phone, "+234", "0", 1)
-	} else if strings.Contains(phone, "234") {
-		phone = strings.Replace(phone, "234", "0", 1)
+	parsed, err := phonenumbers.Parse(phone, "")
+	if err != nil {
+		return strings.ReplaceAll(phone, " ", ""), false
 	}
 
-	return phone, re.MatchString(phone)
+	if !phonenumbers.IsValidNumber(parsed) {
+		return strings.ReplaceAll(phone, " ", ""), false
+	}
+
+	formattedNum := phonenumbers.Format(parsed, phonenumbers.NATIONAL)
+
+	return strings.ReplaceAll(formattedNum, " ", ""), true
 }
 
-func fileExists(filename string) bool {
+func FileExists(filename string) bool {
 	info, err := os.Stat(filename)
 	if os.IsNotExist(err) {
 		return false
