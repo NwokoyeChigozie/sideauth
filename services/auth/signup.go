@@ -35,10 +35,7 @@ func ValidateSignupRequest(req models.CreateUserRequestModel, dbs postgresql.Dat
 	}
 
 	if req.PhoneNumber != "" {
-		phone, status := utility.PhoneValid(req.PhoneNumber)
-		if !status {
-			return req, fmt.Errorf("phone number is invalid")
-		}
+		phone, _ := utility.PhoneValid(req.PhoneNumber)
 		req.PhoneNumber = phone
 		_, SErr := postgresql.SelectOneFromDb(dbs.Auth, &user, "phone_number = ?", req.PhoneNumber)
 		if SErr == nil {

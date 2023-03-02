@@ -3,6 +3,7 @@ package tests
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -68,6 +69,7 @@ func SignupUser(t *testing.T, r *gin.Engine, auth auth.Controller, userSignUpDat
 
 	rr := httptest.NewRecorder()
 	r.ServeHTTP(rr, req)
+	fmt.Println("signup check", ParseResponse(rr))
 }
 
 func GetLoginTokenAndAccountID(t *testing.T, r *gin.Engine, auth auth.Controller, loginData models.LoginUserRequestModel) (string, int) {

@@ -3,6 +3,7 @@ package utility
 import (
 	"net/mail"
 	"os"
+	"strings"
 
 	"github.com/nyaruka/phonenumbers"
 )
@@ -15,18 +16,19 @@ func EmailValid(email string) bool {
 func PhoneValid(phone string) (string, bool) {
 	parsed, err := phonenumbers.Parse(phone, "")
 	if err != nil {
-		return phone, false
+		return strings.ReplaceAll(phone, " ", ""), false
 	}
 
 	if !phonenumbers.IsValidNumber(parsed) {
-		return phone, false
+		return strings.ReplaceAll(phone, " ", ""), false
 	}
 
 	formattedNum := phonenumbers.Format(parsed, phonenumbers.NATIONAL)
-	return formattedNum, true
+
+	return strings.ReplaceAll(formattedNum, " ", ""), true
 }
 
-func fileExists(filename string) bool {
+func FileExists(filename string) bool {
 	info, err := os.Stat(filename)
 	if os.IsNotExist(err) {
 		return false
