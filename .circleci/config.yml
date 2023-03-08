@@ -28,8 +28,7 @@ jobs:
     working_directory: ~/auth-ms
     executor: golang
     environment:
-      SERVER_ADDRESS: $STAGING_ENV_SERVER
-      ANOTHER_ADDRESS: "staging.api.vesicash.com"
+      SERVER_ADDRESS: "staging.api.vesicash.com"
     steps:
       - checkout
       - restore_cache:
@@ -43,7 +42,6 @@ jobs:
           command: |
             sed -i '/^MS_NOTIFICATION/d' app.env
             echo MS_NOTIFICATION: "${SERVER_ADDRESS}/v1/notifications" >> app.env
-            cat app.env
       - run:
           name: Build application
           command: go build -v -o vesicash-auth-ms
