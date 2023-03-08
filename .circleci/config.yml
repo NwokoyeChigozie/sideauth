@@ -89,7 +89,17 @@ jobs:
             mv coverage.html /tmp/artifacts
       - store_artifacts:
           path: /tmp/artifacts
-  check-and-build-only:
+  lint-docker-file:
+    docker:
+      - image: cimg/go:1.20.1
+      - image: hadolint/hadolint
+    steps:
+      - checkout
+      - run:
+          name: Lint dockerfile
+          command: |
+            docker run --rm -i hadolint/hadolint < Dockerfile
+  build-and-push-image:
     executor: golang
     environment:
       REGISTRY: registry.digitalocean.com
@@ -109,15 +119,18 @@ workflows:
   default:
     jobs:
       - install-dependencies
+      - lint-docker-file:
+          requires:
+            - install-dependencies
       - build-application:
           requires:
             - install-dependencies
+      - build-and-push-image:
+          requires:
+            - lint-docker-file
       - test-application:
           requires:
             - build-application
       - generate-code-coverage-metrics:
-          requires:
-            - build-application
-      - check-and-build-only:
           requires:
             - build-application
