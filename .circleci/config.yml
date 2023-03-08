@@ -90,14 +90,16 @@ jobs:
       - store_artifacts:
           path: /tmp/artifacts
   lint-docker-file:
-    docker:
-      - image: cimg/go:1.20.1
-      - image: hadolint/hadolint
+    executor: golang
     steps:
       - checkout
+      - setup_remote_docker:
+          version: 20.10.14
+          docker_layer_caching: true
       - run:
           name: Lint dockerfile
           command: |
+            docker pull hadolint/hadolint
             docker run --rm -i hadolint/hadolint < Dockerfile
   build-and-push-image:
     executor: golang
