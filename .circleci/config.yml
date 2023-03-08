@@ -90,12 +90,22 @@ jobs:
       - store_artifacts:
           path: /tmp/artifacts
   check-and-build-only:
-    executor: docker/machine
+    docker:
+      - image: cimg:go:1.20.1
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
     steps:
       - checkout
-      - docker/check
-      - docker/build:
-          image: $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
+      - setup_remote_docker:
+          version: 20.10.14
+          docker_layer_caching: true
+      - run: 
+          command: |
+            TAG=0.1.$CIRCLE_BUILD_NUM
+            docker build -t $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME:$TAG .
+            echo $DOCKER_PASS | docker login $REGISTRY -u $DOCKER_USER --password-stdin
+      # docker push $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME:$TAG
 
 workflows:
   default:
@@ -112,4 +122,4 @@ workflows:
             - build-application
       - check-and-build-only:
           requires:
-            - generate-code-coverage-metrics
+            - install-dependencies
