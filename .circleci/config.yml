@@ -38,7 +38,7 @@ jobs:
       - run:
           name: Configure environment variables
           command: |
-            echo "STAGING_SERVER=${STAGING_ENV_SERVER}"
+            export STAGING_SERVER="${STAGING_ENV_SERVER}"
             sed -i 's/localhost:4000/'"${STAGING_SERVER}"'/g' app.env
             cat app.env
       - run:
