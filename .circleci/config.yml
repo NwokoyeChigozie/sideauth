@@ -36,6 +36,10 @@ jobs:
           name: Create environment variable
           command: cp app-sample.env app.env
       - run:
+          name: Configure environment variables
+          command: |
+            sed -i 's/MS_NOTIFICATION: localhost:4000/v1/notifications/${STAGING_ENV_MS_NOTIFICATION}' app.env
+      - run:
           name: Build application
           command: go build -v -o vesicash-auth-ms
       - persist_to_workspace:
@@ -63,6 +67,22 @@ jobs:
           command: |
             cat app.env
             go test -v  ./tests/... -timeout 99999s
+  generate-code-coverage-metrics:
+    executor: golang
+    steps:
+      - checkout
+      - run: go build
+      - run:
+          name: "Create a temp directory for artifacts"
+          command: |
+            mkdir -p /tmp/artifacts
+      - run:
+          command: |
+            go test -coverprofile=c.out
+            go tool cover -html=c.out -o coverage.html
+            mv coverage.html /tmp/artifacts
+      - store_artifacts:
+          path: /tmp/artifacts
 
 workflows:
   default:
