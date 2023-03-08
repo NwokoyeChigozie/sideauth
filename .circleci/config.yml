@@ -44,8 +44,13 @@ jobs:
             - vesicash-auth-ms
             - app.env
   test-application:
-    working_directory: ~/auth-ms
-    executor: golang
+    docker:
+      - image: cimg/go:1.20.1
+      - image: cimg/postgres:14.0
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_DATABASE: auth
     steps:
       - checkout
       - attach_workspace:
