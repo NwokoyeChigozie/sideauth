@@ -67,6 +67,6 @@ workflows:
       - build-application:
           requires:
             - install-dependencies
-      - run-tests:
+      - test-application:
           requires:
             - build-application
