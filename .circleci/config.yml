@@ -28,7 +28,7 @@ jobs:
     working_directory: ~/auth-ms
     executor: golang
     environment:
-      SERVER_ADDRESS: "${STAGING_ENV_SERVER}"
+      SERVER_ADDRESS: $STAGING_ENV_SERVER
       ANOTHER_ADDRESS: "staging.api.vesicash.com"
     steps:
       - checkout
