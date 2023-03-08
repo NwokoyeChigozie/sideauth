@@ -90,11 +90,7 @@ jobs:
       - store_artifacts:
           path: /tmp/artifacts
   check-and-build-only:
-    docker:
-      - image: cimg/go:1.20.1
-        auth:
-          username: $DOCKER_USER
-          password: $DOCKER_PASS
+    executor: golang
     steps:
       - checkout
       - setup_remote_docker:
