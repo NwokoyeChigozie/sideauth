@@ -51,3 +51,6 @@ workflows:
   default:
     jobs:
       - install-dependencies
+      - build-application:
+          requires:
+            - install-dependencies
