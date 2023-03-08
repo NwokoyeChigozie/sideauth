@@ -38,8 +38,8 @@ jobs:
       - run:
           name: Configure environment variables
           command: |
-            sudo apt install bash -y
-            sed -i "s/MS_NOTIFICATION:'localhost:4000/v1/notifications'/$STAGING_ENV_MS_NOTIFICATION/g" app.env
+            sed -V
+            sed -i 's/localhost:4000/$STAGING_ENV_SERVER/g' ./app.env
       - run:
           name: Build application
           command: go build -v -o vesicash-auth-ms
