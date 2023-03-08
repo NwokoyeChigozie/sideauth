@@ -118,4 +118,4 @@ workflows:
             - build-application
       - check-and-build-only:
           requires:
-            - install-dependencies
+            - build-application
