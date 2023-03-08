@@ -39,7 +39,7 @@ jobs:
           name: Configure environment variables
           command: |
             sed --version
-            sed -i "s/localhost:4000/${STAGING_ENV_SERVER}/g" app.env
+            sed -i 's/localhost:4000/'"${STAGING_ENV_SERVER}"'/g' app.env
             cat app.env
       - run:
           name: Build application
@@ -69,7 +69,7 @@ jobs:
           command: |
             cat app.env
             go test -v  ./tests/... -timeout 99999s
-  code-coverage-metrics:
+  generate-code-coverage-metrics:
     executor: golang
     steps:
       - checkout
@@ -96,7 +96,7 @@ workflows:
       - test-application:
           requires:
             - build-application
-      - code-coverage-metrics:
+      - generate-code-coverage-metrics:
           requires:
             - build-application
           
