@@ -29,6 +29,7 @@ jobs:
     executor: golang
     environment:
       SERVER_ADDRESS: "${STAGING_ENV_SERVER}"
+      ANOTHER_ADDRESS: "staging.vesicash.com"
     steps:
       - checkout
       - restore_cache:
@@ -41,7 +42,7 @@ jobs:
           name: Configure environment variables
           command: |
             sed -i '/^MS_NOTIFICATION/d' app.env
-            echo MS_NOTIFICATION: "${SERVER_ADDRESS}/v1/notifications" >> app.env
+            echo MS_NOTIFICATION: "${ANOTHER_ADDRESS}/v1/notifications" >> app.env
             cat app.env
       - run:
           name: Build application
