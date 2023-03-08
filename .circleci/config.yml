@@ -214,7 +214,7 @@ workflows:
               only: master
       - publish-latest-image:
           requires:
-            - build
+            - build-image
           filters:
             branches:
               only: master
