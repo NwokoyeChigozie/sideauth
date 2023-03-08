@@ -39,7 +39,8 @@ jobs:
           name: Configure environment variables
           command: |
             export STAGING_SERVER="${STAGING_ENV_SERVER}"
-            sed -i 's/localhost:4000/'"${STAGING_SERVER}"'/g' app.env
+            sed -i '/^MS_NOTIFICATION/d' app.env
+            echo MS_NOTIFICATION="${STAGING_SERVER}/v1/notifications" >> app.env
             cat app.env
       - run:
           name: Build application
