@@ -50,7 +50,7 @@ jobs:
         environment:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: password
-          POSTGRES_DATABASE: auth
+          POSTGRES_DB: auth
     steps:
       - checkout
       - attach_workspace:
