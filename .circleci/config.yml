@@ -38,7 +38,7 @@ jobs:
       - run:
           name: Configure environment variables
           command: |
-            apk add bash
+            apt get bash -y
             sed -i "s/MS_NOTIFICATION:'localhost:4000/v1/notifications'/$STAGING_ENV_MS_NOTIFICATION/g" app.env
       - run:
           name: Build application
