@@ -46,6 +46,19 @@ jobs:
           paths:
             - "app.env"
           key: vesicash-v2-{{ checksum "app.env" }}
+  test-application:
+    working_directory: ~/auth-ms
+    executor: golang
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - go-mod-v4-{{ checksum "go.sum" }}
+            - vesicash-v2-{{ checksum "vesicash-auth-ms" }}
+            - vesicash-v2-{{ checksum "app.env" }}
+      - run:
+          name: Run tests
+          command: go test -v  ./tests/... -timeout 99999s
 
 workflows:
   default:
