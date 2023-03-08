@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs:
+  docker: circleci/docker@2.2.0
+
 executors:
   golang:
     docker:
@@ -86,6 +89,13 @@ jobs:
             mv coverage.html /tmp/artifacts
       - store_artifacts:
           path: /tmp/artifacts
+  check-and-build-only:
+    executor: docker/machine
+    steps:
+      - checkout
+      - docker/check
+      - docker/build:
+          image: $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
 
 workflows:
   default:
@@ -100,4 +110,6 @@ workflows:
       - generate-code-coverage-metrics:
           requires:
             - build-application
-          
+      - check-and-build-only:
+          requires:
+            - generate-code-coverage-metrics
