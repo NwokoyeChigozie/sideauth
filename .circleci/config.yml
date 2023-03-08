@@ -8,7 +8,7 @@ executors:
     environment:
       REGISTRY: registry.digitalocean.com
       TAG: latest
-      IMAGE_NAME: $REGISTRY/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
+      IMAGE_NAME: "${REGISTRY}/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}"
       IMAGE_TAG: "0.1.${CIRCLE_BUILD_NUM}"
     docker:
       - image: cimg/base:2023.03
@@ -208,7 +208,13 @@ workflows:
             - build-image
   build-master:
     jobs:
+      - lint-docker-file:
+          filters:
+            branches:
+              only: master
       - build-image:
+          requires:
+            - lint-docker-file
           filters:
             branches:
               only: master
@@ -220,7 +226,12 @@ workflows:
               only: master
   release:
     jobs:
-      - lint-docker-file
+      - lint-docker-file:
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
       - build-image:
           requires:
             - lint-docker-file
