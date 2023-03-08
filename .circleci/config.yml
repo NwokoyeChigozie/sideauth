@@ -4,6 +4,14 @@ orbs:
   docker: circleci/docker@2.2.0
 
 executors:
+  ubuntu:
+    environment:
+      REGISTRY: registry.digitalocean.com
+      TAG: latest
+      IMAGE_NAME: $REGISTRY/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
+      IMAGE_TAG: "0.1.${CIRCLE_BUILD_NUM}"
+    docker:
+      - image: cimg/base:2023.03
   golang:
     docker:
       - image: cimg/go:1.20.1
@@ -101,38 +109,131 @@ jobs:
           command: |
             docker pull hadolint/hadolint
             docker run --rm -i hadolint/hadolint < Dockerfile
-  build-and-push-image:
-    executor: golang
-    environment:
-      REGISTRY: registry.digitalocean.com
+  build-image:
+    executor: ubuntu
     steps:
       - checkout
       - setup_remote_docker:
           version: 20.10.14
           docker_layer_caching: true
-      - run: 
+      - run:
+          name: Build Docker image
+          command: docker build -t $IMAGE_NAME:$TAG .
+      - run:
+          name: Archive Docker image
+          command: docker save -o image.tar $IMAGE_NAME
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./image.tar
+  publish-image:
+    executor: ubuntu
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - setup_remote_docker:
+          version: 20.10.14
+          docker_layer_caching: true
+      - run:
+          name: Load archived Docker image
+          command: docker load -i /tmp/workspace/image.tar
+      - run:
+          name: Publish Docker image
           command: |
-            TAG=0.1.$CIRCLE_BUILD_NUM
-            docker build -t $REGISTRY/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME:$TAG .
             echo $DOCKER_PASS | docker login $REGISTRY -u $DOCKER_USER --password-stdin
-            docker push $REGISTRY/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME:$TAG
+            docker tag $IMAGE_NAME:latest $IMAGE_NAME:$IMAGE_TAG
+            docker push $IMAGE_NAME:$IMAGE_TAG
+  publish-latest-image:
+    executor: ubuntu
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - setup_remote_docker:
+          version: 20.10.14
+          docker_layer_caching: true
+      - run:
+          name: Load archived Docker image
+          command: docker load -i /tmp/workspace/image.tar
+      - run:
+          name: Publish Docker image
+          command: |
+            echo $DOCKER_PASS | docker login $REGISTRY -u $DOCKER_USER --password-stdin
+            docker tag $IMAGE_NAME:latest $IMAGE_NAME:$IMAGE_TAG
+            docker push $IMAGE_NAME:latest
+            docker push $IMAGE_NAME:$IMAGE_TAG
+  publish-tagged-image:
+    executor: ubuntu
+    environment:
+      IMAGE_TAG: "${CIRCLE_TAG/v/''}"
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - setup_remote_docker:
+          version: 20.10.14
+          docker_layer_caching: true
+      - run:
+          name: Load archived Docker image
+          command: docker load -i /tmp/workspace/image.tar
+      - run:
+          name: Publish Docker image
+          command: |
+            echo $DOCKER_PASS | docker login $REGISTRY -u $DOCKER_USER --password-stdin
+            docker tag $IMAGE_NAME:latest $IMAGE_NAME:$IMAGE_TAG
+            docker push $IMAGE_NAME:latest
+            docker push $IMAGE_NAME:$IMAGE_TAG
+      # docker build -t $REGISTRY/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME:$TAG .
+      # docker push $REGISTRY/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME:$TAG
 
 workflows:
   default:
     jobs:
       - install-dependencies
-      - lint-docker-file:
-          requires:
-            - install-dependencies
       - build-application:
           requires:
             - install-dependencies
-      - build-and-push-image:
-          requires:
-            - lint-docker-file
       - test-application:
           requires:
             - build-application
       - generate-code-coverage-metrics:
           requires:
             - build-application
+  development:
+    jobs:
+      - lint-docker-file
+      - build-image:
+          requires:
+            - lint-docker-file
+      - publish-image:
+          requires:
+            - build-image
+  build-master:
+    jobs:
+      - build-image:
+          filters:
+            branches:
+              only: master
+      - publish-latest-image:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
+  release:
+    jobs:
+      - lint-docker-file
+      - build-image:
+          requires:
+            - lint-docker-file
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+      - publish-tagged-image:
+          requires:
+            - build-image
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
