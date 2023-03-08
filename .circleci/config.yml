@@ -19,12 +19,33 @@ jobs:
           command: go mod download
       - run:
           name: Verify installation
-          working_directory: ./
           command: go mod verify
       - save_cache:
-          key: go-mod-v4-{{ checksum "go.sum" }}
           paths:
             - "/go/pkg/mod"
+          key: go-mod-v4-{{ checksum "go.sum" }}
+  build-application:
+    working_directory: ~/auth-ms
+    executor: golang
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - go-mod-v4-{{ checksum "go.sum" }}
+      - run:
+          name: Create environment variable
+          command: cp app-sample.env app.env
+      - run:
+          name: Build application
+          command: go build -v -o vesicash-auth-ms
+      - save_cache:
+          paths:
+            - "vesicash-auth-ms"
+          key: vesicash-v2-{{ checksum "vesicash-auth-ms" }}
+      - save_cache:
+          paths:
+            - "app.env"
+          key: vesicash-v2-{{ checksum "app.env" }}
 
 workflows:
   default:
