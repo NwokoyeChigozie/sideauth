@@ -38,8 +38,8 @@ jobs:
       - run:
           name: Configure environment variables
           command: |
-            sed --version
-            sed -i 's/localhost:4000/'"${STAGING_ENV_SERVER}"'/g' app.env
+            echo "STAGING_SERVER=${STAGING_ENV_SERVER}"
+            sed -i 's/localhost:4000/'"${STAGING_SERVER}"'/g' app.env
             cat app.env
       - run:
           name: Build application
