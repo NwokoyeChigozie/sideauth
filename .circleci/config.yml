@@ -8,7 +8,6 @@ executors:
     environment:
       REGISTRY: registry.digitalocean.com
       TAG: latest
-      IMAGE_NAME: auth-ms
     docker:
       - image: cimg/base:2023.03
   golang:
@@ -118,7 +117,7 @@ jobs:
       - run:
           name: Build Docker image
           command: |
-            IMAGE_NAME: "${REGISTRY}/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}"
+            IMAGE_NAME="${REGISTRY}/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}"
             docker build -t $IMAGE_NAME:$TAG .
       - run:
           name: Archive Docker image
