@@ -42,6 +42,9 @@ type User struct {
 	AuthorizationRequired     bool      `gorm:"column:authorization_required; type:bool; default:false;not null" json:"authorization_required"`
 	Meta                      string    `gorm:"column:meta; type:text" json:"meta"`
 	ThePeerReference          string    `gorm:"column:the_peer_reference; type:varchar(250)" json:"the_peer_reference"`
+	CanMakeWithdrawal         bool      `gorm:"column:can_make_withdrawal; type:bool; default:false;not null" json:"can_make_withdrawal"`
+	CanFund                   bool      `gorm:"column:can_fund; type:bool; default:true;not null" json:"can_fund"`
+	CanExchange               bool      `gorm:"column:can_exchange; type:bool; default:false;not null" json:"can_exchange"`
 }
 
 type CreateUserRequestModel struct {

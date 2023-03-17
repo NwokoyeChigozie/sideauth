@@ -25,5 +25,7 @@ func AuthMigrationModels() []interface{} {
 		models.User{},
 		models.UsersCredential{},
 		models.WalletBalance{},
+		models.WalletHistory{},
+		models.WalletTransaction{},
 	}
 }
