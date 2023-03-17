@@ -121,7 +121,7 @@ jobs:
             docker build -t $IMAGE_NAME:$TAG .
       - run:
           name: Archive Docker image
-          command: docker save -o image.tar $IMAGE_NAME
+          command: docker save -o image.tar $IMAGE_NAME:$TAG
       - persist_to_workspace:
           root: .
           paths:
