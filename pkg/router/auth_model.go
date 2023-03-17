@@ -38,6 +38,8 @@ func Model(r *gin.Engine, ApiVersion string, validator *validator.Validate, db p
 		modelTypeUrl.POST("/create_wallet", auth_model.CreateWallet)
 		modelTypeUrl.GET("/get_wallet/:account_id/:currency", auth_model.GetWalletByAccountIDAndCurrency)
 		modelTypeUrl.PATCH("/update_wallet_balance", auth_model.UpdateWalletBalance)
+		modelTypeUrl.POST("/create_wallet_history", auth_model.CreateWalletHistory)
+		modelTypeUrl.POST("/create_wallet_transaction", auth_model.CreateWalletTransaction)
 
 	}
 
