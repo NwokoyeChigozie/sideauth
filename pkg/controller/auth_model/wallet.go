@@ -12,9 +12,6 @@ import (
 	"github.com/vesicash/auth-ms/utility"
 )
 
-// CreateWallet
-// GetWalletByAccountIDAndCurrency
-// UpdateWalletBalance
 func (base *Controller) CreateWallet(c *gin.Context) {
 	var (
 		req models.CreateWalletRequest
@@ -113,5 +110,105 @@ func (base *Controller) GetWalletByAccountIDAndCurrency(c *gin.Context) {
 
 	rd := utility.BuildSuccessResponse(http.StatusOK, "successful", walletBalance)
 	c.JSON(http.StatusOK, rd)
+
+}
+
+func (base *Controller) CreateWalletHistory(c *gin.Context) {
+	var (
+		req models.CreateWalletHistoryRequest
+	)
+
+	err := c.ShouldBind(&req)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Failed to parse request body", err, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	err = base.Validator.Struct(&req)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Validation failed", utility.ValidationResponse(err, base.Validator), nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	err = postgresql.ValidateRequest(req)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", err.Error(), err, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	walletHistory := models.WalletHistory{
+		AccountID:        strconv.Itoa(req.AccountID),
+		Reference:        req.Reference,
+		Amount:           req.Amount,
+		Currency:         req.Currency,
+		Type:             req.Type,
+		AvailableBalance: req.AvailableBalance,
+	}
+
+	err = walletHistory.CreateWalletHistory(base.Db.Auth)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", err.Error(), err, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	rd := utility.BuildSuccessResponse(http.StatusCreated, "successful", walletHistory)
+	c.JSON(http.StatusCreated, rd)
+
+}
+
+func (base *Controller) CreateWalletTransaction(c *gin.Context) {
+	var (
+		req models.CreateWalletTransactionRequest
+	)
+
+	err := c.ShouldBind(&req)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Failed to parse request body", err, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	err = base.Validator.Struct(&req)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Validation failed", utility.ValidationResponse(err, base.Validator), nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	err = postgresql.ValidateRequest(req)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", err.Error(), err, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	walletTransaction := models.WalletTransaction{
+		SenderAccountID:   strconv.Itoa(req.SenderAccountID),
+		ReceiverAccountID: strconv.Itoa(req.ReceiverAccountID),
+		SenderAmount:      req.SenderAmount,
+		ReceiverAmount:    req.ReceiverAmount,
+		SenderCurrency:    req.SenderCurrency,
+		ReceiverCurrency:  req.ReceiverCurrency,
+		Approved:          req.Approved,
+		FirstApproval:     req.FirstApproval,
+	}
+
+	if req.SecondApproval != nil {
+		walletTransaction.SecondApproval = *req.SecondApproval
+	}
+
+	err = walletTransaction.CreateWalletTransaction(base.Db.Auth)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", err.Error(), err, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	rd := utility.BuildSuccessResponse(http.StatusCreated, "successful", walletTransaction)
+	c.JSON(http.StatusCreated, rd)
 
 }

@@ -447,3 +447,503 @@ func TestGetWalletByAccountIDAndCurrency(t *testing.T) {
 	}
 
 }
+
+func TestCreateWalletHistory(t *testing.T) {
+	logger := tst.Setup()
+	app := config.GetConfig().App
+	gin.SetMode(gin.TestMode)
+	validatorRef := validator.New()
+	db := postgresql.Connection()
+	var (
+		muuid, _       = uuid.NewV4()
+		userSignUpData = models.CreateUserRequestModel{
+			EmailAddress: fmt.Sprintf("testuser%v@qa.team", muuid.String()),
+			PhoneNumber:  fmt.Sprintf("+234%v", utility.GetRandomNumbersInRange(7000000000, 9099999999)),
+			AccountType:  "individual",
+			Firstname:    "test",
+			Lastname:     "user",
+			Password:     "password",
+			Country:      "nigeria",
+			Username:     fmt.Sprintf("test_username%v", muuid.String()),
+		}
+		loginData = models.LoginUserRequestModel{
+			Username:     userSignUpData.Username,
+			EmailAddress: userSignUpData.EmailAddress,
+			PhoneNumber:  userSignUpData.PhoneNumber,
+			Password:     userSignUpData.Password,
+		}
+	)
+
+	auth := auth.Controller{Db: db, Validator: validatorRef, Logger: logger}
+	r := gin.Default()
+	tst.SignupUser(t, r, auth, userSignUpData)
+	_, accountID := tst.GetLoginTokenAndAccountID(t, r, auth, loginData)
+	us := models.User{AccountID: uint(accountID)}
+	_, err := us.GetUserByAccountID(db.Auth)
+	if err != nil {
+		log.Panic(err.Error())
+	}
+
+	tests := []struct {
+		Name         string
+		RequestBody  models.CreateWalletHistoryRequest
+		ExpectedCode int
+		Headers      map[string]string
+		Message      string
+	}{
+		{
+			Name: "OK create wallet history",
+			RequestBody: models.CreateWalletHistoryRequest{
+				AccountID:        int(us.AccountID),
+				Reference:        utility.RandomString(20),
+				Amount:           200,
+				Currency:         "NGN",
+				Type:             "credit",
+				AvailableBalance: 250,
+			},
+			ExpectedCode: http.StatusCreated,
+			Message:      "successful",
+			Headers: map[string]string{
+				"Content-Type": "application/json",
+				"v-app":        app.Key,
+			},
+		},
+		{
+			Name: "no account id",
+			RequestBody: models.CreateWalletHistoryRequest{
+				Reference:        utility.RandomString(20),
+				Amount:           200,
+				Currency:         "NGN",
+				Type:             "credit",
+				AvailableBalance: 250,
+			},
+			ExpectedCode: http.StatusBadRequest,
+			Headers: map[string]string{
+				"Content-Type": "application/json",
+				"v-app":        app.Key,
+			},
+		},
+		{
+			Name: "no reference",
+			RequestBody: models.CreateWalletHistoryRequest{
+				AccountID:        int(us.AccountID),
+				Amount:           200,
+				Currency:         "NGN",
+				Type:             "credit",
+				AvailableBalance: 250,
+			},
+			ExpectedCode: http.StatusBadRequest,
+			Headers: map[string]string{
+				"Content-Type": "application/json",
+				"v-app":        app.Key,
+			},
+		},
+		{
+			Name: "no amount",
+			RequestBody: models.CreateWalletHistoryRequest{
+				AccountID:        int(us.AccountID),
+				Reference:        utility.RandomString(20),
+				Currency:         "NGN",
+				Type:             "credit",
+				AvailableBalance: 250,
+			},
+			ExpectedCode: http.StatusBadRequest,
+			Headers: map[string]string{
+				"Content-Type": "application/json",
+				"v-app":        app.Key,
+			},
+		},
+		{
+			Name: "no currency",
+			RequestBody: models.CreateWalletHistoryRequest{
+				AccountID:        int(us.AccountID),
+				Reference:        utility.RandomString(20),
+				Amount:           200,
+				Type:             "credit",
+				AvailableBalance: 250,
+			},
+			ExpectedCode: http.StatusBadRequest,
+			Headers: map[string]string{
+				"Content-Type": "application/json",
+				"v-app":        app.Key,
+			},
+		},
+		{
+			Name: "no type",
+			RequestBody: models.CreateWalletHistoryRequest{
+				AccountID:        int(us.AccountID),
+				Reference:        utility.RandomString(20),
+				Amount:           200,
+				Currency:         "NGN",
+				AvailableBalance: 250,
+			},
+			ExpectedCode: http.StatusBadRequest,
+			Headers: map[string]string{
+				"Content-Type": "application/json",
+				"v-app":        app.Key,
+			},
+		},
+		{
+			Name: "wrong type",
+			RequestBody: models.CreateWalletHistoryRequest{
+				AccountID:        int(us.AccountID),
+				Reference:        utility.RandomString(20),
+				Amount:           200,
+				Currency:         "NGN",
+				Type:             "wrong",
+				AvailableBalance: 250,
+			},
+			ExpectedCode: http.StatusBadRequest,
+			Headers: map[string]string{
+				"Content-Type": "application/json",
+				"v-app":        app.Key,
+			},
+		},
+		{
+			Name: "no available balancce",
+			RequestBody: models.CreateWalletHistoryRequest{
+				AccountID: int(us.AccountID),
+				Reference: utility.RandomString(20),
+				Amount:    200,
+				Currency:  "NGN",
+				Type:      "credit",
+			},
+			ExpectedCode: http.StatusBadRequest,
+			Headers: map[string]string{
+				"Content-Type": "application/json",
+				"v-app":        app.Key,
+			},
+		},
+		{
+			Name:         "no input",
+			RequestBody:  models.CreateWalletHistoryRequest{},
+			ExpectedCode: http.StatusBadRequest,
+			Headers: map[string]string{
+				"Content-Type": "application/json",
+				"v-app":        app.Key,
+			},
+		},
+	}
+
+	auth_model := auth_model.Controller{Db: db, Validator: validatorRef}
+
+	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AppType))
+	{
+		authTypeUrl.POST("/create_wallet_history", auth_model.CreateWalletHistory)
+	}
+
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			var b bytes.Buffer
+			json.NewEncoder(&b).Encode(test.RequestBody)
+			URI := url.URL{Path: "/v2/auth/create_wallet_history"}
+
+			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			for i, v := range test.Headers {
+				req.Header.Set(i, v)
+			}
+
+			rr := httptest.NewRecorder()
+			r.ServeHTTP(rr, req)
+
+			tst.AssertStatusCode(t, rr.Code, test.ExpectedCode)
+
+			data := tst.ParseResponse(rr)
+
+			code := int(data["code"].(float64))
+			tst.AssertStatusCode(t, code, test.ExpectedCode)
+
+			if test.Message != "" {
+				message := data["message"]
+				if message != nil {
+					tst.AssertResponseMessage(t, message.(string), test.Message)
+				} else {
+					tst.AssertResponseMessage(t, "", test.Message)
+				}
+
+			}
+
+		})
+
+	}
+
+}
+func TestCreateWalletTransaction(t *testing.T) {
+	logger := tst.Setup()
+	app := config.GetConfig().App
+	gin.SetMode(gin.TestMode)
+	validatorRef := validator.New()
+	db := postgresql.Connection()
+	var (
+		muuid, _       = uuid.NewV4()
+		userSignUpData = models.CreateUserRequestModel{
+			EmailAddress: fmt.Sprintf("testuser%v@qa.team", muuid.String()),
+			PhoneNumber:  fmt.Sprintf("+234%v", utility.GetRandomNumbersInRange(7000000000, 9099999999)),
+			AccountType:  "individual",
+			Firstname:    "test",
+			Lastname:     "user",
+			Password:     "password",
+			Country:      "nigeria",
+			Username:     fmt.Sprintf("test_username%v", muuid.String()),
+		}
+		loginData = models.LoginUserRequestModel{
+			Username:     userSignUpData.Username,
+			EmailAddress: userSignUpData.EmailAddress,
+			PhoneNumber:  userSignUpData.PhoneNumber,
+			Password:     userSignUpData.Password,
+		}
+	)
+
+	auth := auth.Controller{Db: db, Validator: validatorRef, Logger: logger}
+	r := gin.Default()
+	tst.SignupUser(t, r, auth, userSignUpData)
+	_, accountID := tst.GetLoginTokenAndAccountID(t, r, auth, loginData)
+	us := models.User{AccountID: uint(accountID)}
+	_, err := us.GetUserByAccountID(db.Auth)
+	if err != nil {
+		log.Panic(err.Error())
+	}
+
+	falseValue := false
+	tests := []struct {
+		Name         string
+		RequestBody  models.CreateWalletTransactionRequest
+		ExpectedCode int
+		Headers      map[string]string
+		Message      string
+	}{
+		{
+			Name: "OK create wallet transaction with first approval",
+			RequestBody: models.CreateWalletTransactionRequest{
+				SenderAccountID:   int(us.AccountID),
+				ReceiverAccountID: int(us.AccountID),
+				SenderAmount:      200,
+				ReceiverAmount:    3000,
+				SenderCurrency:    "USD",
+				ReceiverCurrency:  "NGN",
+				Approved:          "pending",
+				FirstApproval:     false,
+			},
+			ExpectedCode: http.StatusCreated,
+			Message:      "successful",
+			Headers: map[string]string{
+				"Content-Type": "application/json",
+				"v-app":        app.Key,
+			},
+		}, {
+			Name: "OK create wallet transaction with first and second approval",
+			RequestBody: models.CreateWalletTransactionRequest{
+				SenderAccountID:   int(us.AccountID),
+				ReceiverAccountID: int(us.AccountID),
+				SenderAmount:      200,
+				ReceiverAmount:    3000,
+				SenderCurrency:    "USD",
+				ReceiverCurrency:  "NGN",
+				Approved:          "pending",
+				FirstApproval:     false,
+				SecondApproval:    &falseValue,
+			},
+			ExpectedCode: http.StatusCreated,
+			Message:      "successful",
+			Headers: map[string]string{
+				"Content-Type": "application/json",
+				"v-app":        app.Key,
+			},
+		},
+		{
+			Name: "no sender account id",
+			RequestBody: models.CreateWalletTransactionRequest{
+				ReceiverAccountID: int(us.AccountID),
+				SenderAmount:      200,
+				ReceiverAmount:    3000,
+				SenderCurrency:    "USD",
+				ReceiverCurrency:  "NGN",
+				Approved:          "pending",
+				FirstApproval:     false,
+			},
+			ExpectedCode: http.StatusBadRequest,
+			Headers: map[string]string{
+				"Content-Type": "application/json",
+				"v-app":        app.Key,
+			},
+		},
+		{
+			Name: "no receiver account id",
+			RequestBody: models.CreateWalletTransactionRequest{
+				SenderAccountID:  int(us.AccountID),
+				SenderAmount:     200,
+				ReceiverAmount:   3000,
+				SenderCurrency:   "USD",
+				ReceiverCurrency: "NGN",
+				Approved:         "pending",
+				FirstApproval:    false,
+			},
+			ExpectedCode: http.StatusBadRequest,
+			Headers: map[string]string{
+				"Content-Type": "application/json",
+				"v-app":        app.Key,
+			},
+		},
+		{
+			Name: "no sender amount",
+			RequestBody: models.CreateWalletTransactionRequest{
+				SenderAccountID:   int(us.AccountID),
+				ReceiverAccountID: int(us.AccountID),
+				ReceiverAmount:    3000,
+				SenderCurrency:    "USD",
+				ReceiverCurrency:  "NGN",
+				Approved:          "pending",
+				FirstApproval:     false,
+			},
+			ExpectedCode: http.StatusBadRequest,
+			Headers: map[string]string{
+				"Content-Type": "application/json",
+				"v-app":        app.Key,
+			},
+		},
+		{
+			Name: "no receiver amount",
+			RequestBody: models.CreateWalletTransactionRequest{
+				SenderAccountID:   int(us.AccountID),
+				ReceiverAccountID: int(us.AccountID),
+				SenderAmount:      200,
+				SenderCurrency:    "USD",
+				ReceiverCurrency:  "NGN",
+				Approved:          "pending",
+				FirstApproval:     false,
+			},
+			ExpectedCode: http.StatusBadRequest,
+			Headers: map[string]string{
+				"Content-Type": "application/json",
+				"v-app":        app.Key,
+			},
+		},
+		{
+			Name: "no sender currency",
+			RequestBody: models.CreateWalletTransactionRequest{
+				SenderAccountID:   int(us.AccountID),
+				ReceiverAccountID: int(us.AccountID),
+				SenderAmount:      200,
+				ReceiverAmount:    3000,
+				ReceiverCurrency:  "NGN",
+				Approved:          "pending",
+				FirstApproval:     false,
+			},
+			ExpectedCode: http.StatusBadRequest,
+			Headers: map[string]string{
+				"Content-Type": "application/json",
+				"v-app":        app.Key,
+			},
+		},
+		{
+			Name: "no receiver currency",
+			RequestBody: models.CreateWalletTransactionRequest{
+				SenderAccountID:   int(us.AccountID),
+				ReceiverAccountID: int(us.AccountID),
+				SenderAmount:      200,
+				ReceiverAmount:    3000,
+				SenderCurrency:    "USD",
+				Approved:          "pending",
+				FirstApproval:     false,
+			},
+			ExpectedCode: http.StatusBadRequest,
+			Headers: map[string]string{
+				"Content-Type": "application/json",
+				"v-app":        app.Key,
+			},
+		},
+		{
+			Name: "no approved",
+			RequestBody: models.CreateWalletTransactionRequest{
+				SenderAccountID:   int(us.AccountID),
+				ReceiverAccountID: int(us.AccountID),
+				SenderAmount:      200,
+				ReceiverAmount:    3000,
+				SenderCurrency:    "USD",
+				ReceiverCurrency:  "NGN",
+				FirstApproval:     false,
+			},
+			ExpectedCode: http.StatusBadRequest,
+			Headers: map[string]string{
+				"Content-Type": "application/json",
+				"v-app":        app.Key,
+			},
+		},
+		{
+			Name: "wrong approved value",
+			RequestBody: models.CreateWalletTransactionRequest{
+				SenderAccountID:   int(us.AccountID),
+				ReceiverAccountID: int(us.AccountID),
+				SenderAmount:      200,
+				ReceiverAmount:    3000,
+				SenderCurrency:    "USD",
+				Approved:          "wrong",
+				FirstApproval:     false,
+			},
+			ExpectedCode: http.StatusBadRequest,
+			Headers: map[string]string{
+				"Content-Type": "application/json",
+				"v-app":        app.Key,
+			},
+		},
+		{
+			Name:         "no input",
+			RequestBody:  models.CreateWalletTransactionRequest{},
+			ExpectedCode: http.StatusBadRequest,
+			Headers: map[string]string{
+				"Content-Type": "application/json",
+				"v-app":        app.Key,
+			},
+		},
+	}
+
+	auth_model := auth_model.Controller{Db: db, Validator: validatorRef}
+
+	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AppType))
+	{
+		authTypeUrl.POST("/create_wallet_transaction", auth_model.CreateWalletTransaction)
+	}
+
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			var b bytes.Buffer
+			json.NewEncoder(&b).Encode(test.RequestBody)
+			URI := url.URL{Path: "/v2/auth/create_wallet_transaction"}
+
+			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			for i, v := range test.Headers {
+				req.Header.Set(i, v)
+			}
+
+			rr := httptest.NewRecorder()
+			r.ServeHTTP(rr, req)
+
+			tst.AssertStatusCode(t, rr.Code, test.ExpectedCode)
+
+			data := tst.ParseResponse(rr)
+			code := int(data["code"].(float64))
+			tst.AssertStatusCode(t, code, test.ExpectedCode)
+
+			if test.Message != "" {
+				message := data["message"]
+				if message != nil {
+					tst.AssertResponseMessage(t, message.(string), test.Message)
+				} else {
+					tst.AssertResponseMessage(t, "", test.Message)
+				}
+
+			}
+
+		})
+
+	}
+
+}
