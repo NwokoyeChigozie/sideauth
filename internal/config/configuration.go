@@ -20,6 +20,7 @@ func Setup(logger *utility.Logger, name string) *Configuration {
 	viper.SetConfigName(name)
 	viper.SetConfigType("env")
 	viper.AddConfigPath(".")
+	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err != nil {
 		log.Fatalf("Error reading config file, %s", err)

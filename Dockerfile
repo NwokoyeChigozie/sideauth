@@ -9,7 +9,8 @@ RUN go mod download && go mod verify
 
 COPY . .
 
-RUN go build -v -o /dist/vesicash-auth-ms
+RUN mv app-sample.env app.env && \
+    go build -v -o /dist/vesicash-auth-ms
 
 # Deployment stage
 FROM alpine:3.17
