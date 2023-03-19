@@ -26,8 +26,6 @@ func Setup(logger *utility.Logger, name string) *Configuration {
 		log.Fatalf("Error reading config file, %s", err)
 	}
 
-	viper.AutomaticEnv()
-
 	err := viper.Unmarshal(&baseConfiguration)
 	if err != nil {
 		log.Fatalf("Unable to decode into struct, %v", err)
