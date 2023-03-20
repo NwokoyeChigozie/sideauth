@@ -50,14 +50,23 @@ func (b *BankDetail) GetByAccountID(db *gorm.DB) (int, error) {
 func (b *BankDetail) GetBankDetailByQuery(db *gorm.DB) (int, error) {
 	query := ""
 	if b.AccountID != 0 {
+		if query != "" {
+			query += " and "
+		}
 		query += fmt.Sprintf(" account_id = %v ", b.AccountID)
 	}
 
 	if b.Country != "" {
+		if query != "" {
+			query += " and "
+		}
 		query += fmt.Sprintf(" LOWER(country) = '%v' ", strings.ToLower(b.Country))
 	}
 
 	if b.Currency != "" {
+		if query != "" {
+			query += " and "
+		}
 		query += fmt.Sprintf(" LOWER(currency) = '%v' ", strings.ToLower(b.Currency))
 	}
 
