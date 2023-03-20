@@ -100,6 +100,8 @@ func TestGetBankDetail(t *testing.T) {
 			Name: "OK get user profile by account id",
 			RequestBody: models.GetBankDetailModel{
 				AccountID: us.AccountID,
+				Currency:  bankDetail.Currency,
+				Country:   bankDetail.Country,
 			},
 			ExpectedCode: http.StatusOK,
 			Message:      "successful",
