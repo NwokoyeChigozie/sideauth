@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/vesicash/auth-ms/pkg/repository/storage/postgresql"
@@ -28,12 +29,39 @@ type BankDetail struct {
 }
 
 type GetBankDetailModel struct {
-	ID        uint `json:"id" pgvalidate:"exists=auth$bank_details$id"`
-	AccountID uint `json:"account_id" pgvalidate:"exists=auth$users$account_id"`
+	ID        uint   `json:"id" pgvalidate:"exists=auth$bank_details$id"`
+	AccountID uint   `json:"account_id" pgvalidate:"exists=auth$users$account_id"`
+	Country   string `json:"country"`
+	Currency  string `json:"currency"`
 }
 
 func (b *BankDetail) GetByAccountID(db *gorm.DB) (int, error) {
 	err, nilErr := postgresql.SelectOneFromDb(db, &b, "account_id = ? ", b.AccountID)
+	if nilErr != nil {
+		return http.StatusBadRequest, nilErr
+	}
+
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+	return http.StatusOK, nil
+}
+
+func (b *BankDetail) GetBankDetailByQuery(db *gorm.DB) (int, error) {
+	query := ""
+	if b.AccountID != 0 {
+		query += fmt.Sprintf(" account_id = %v ", b.AccountID)
+	}
+
+	if b.Country != "" {
+		query += fmt.Sprintf(" LOWER(country) = '%v' ", strings.ToLower(b.Country))
+	}
+
+	if b.Currency != "" {
+		query += fmt.Sprintf(" LOWER(currency) = '%v' ", strings.ToLower(b.Currency))
+	}
+
+	err, nilErr := postgresql.SelectOneFromDb(db, &b, query)
 	if nilErr != nil {
 		return http.StatusBadRequest, nilErr
 	}
