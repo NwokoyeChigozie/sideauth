@@ -9,7 +9,7 @@ import (
 )
 
 func GetBankDetailService(req models.GetBankDetailModel, db postgresql.Databases) (*models.BankDetail, int, error) {
-	bankDetail := models.BankDetail{ID: req.ID, AccountID: int(req.AccountID)}
+	bankDetail := models.BankDetail{ID: req.ID, AccountID: int(req.AccountID), Currency: req.Currency, Country: req.Country}
 
 	if req.AccountID == 0 && req.ID == 0 {
 		return &models.BankDetail{}, http.StatusBadRequest, fmt.Errorf("either id or account_id is required")
@@ -20,13 +20,11 @@ func GetBankDetailService(req models.GetBankDetailModel, db postgresql.Databases
 		if err != nil {
 			return &models.BankDetail{}, code, err
 		}
-	} else if req.AccountID != 0 {
-		code, err := bankDetail.GetByAccountID(db.Auth)
+	} else {
+		code, err := bankDetail.GetBankDetailByQuery(db.Auth)
 		if err != nil {
 			return &models.BankDetail{}, code, err
 		}
-	} else {
-		return &models.BankDetail{}, http.StatusBadRequest, fmt.Errorf("error occured please check your input")
 	}
 
 	return &bankDetail, http.StatusOK, nil
