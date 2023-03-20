@@ -209,5 +209,5 @@ func hasBvn(accountID uint, db postgresql.Databases) bool {
 	if err != nil {
 		return false
 	}
-	return userCredenetial.IdentificationData != ""
+	return userCredenetial.Bvn != ""
 }
