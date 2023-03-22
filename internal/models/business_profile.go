@@ -45,14 +45,16 @@ type BusinessProfile struct {
 	EscrowCharge                  jsonmap   `gorm:"column:escrow_charge; type:json; not null; default: '{\"type\":\"percentage\",\"value\":\"0.05\"}'" json:"escrow_charge"`
 	Bio                           string    `gorm:"column:bio; type:text" json:"bio"`
 	BusinessEmail                 string    `gorm:"column:business_email; type:varchar(255)" json:"business_email"`
+	FlutterwaveMerchantID         string    `gorm:"column:flutterwave_merchant_id; type:varchar(255)" json:"flutterwave_merchant_id"`
 	DeletedAt                     time.Time `gorm:"column:deleted_at" json:"deleted_at"`
 	CreatedAt                     time.Time `gorm:"column:created_at; autoCreateTime" json:"created_at"`
 	UpdatedAt                     time.Time `gorm:"column:updated_at; autoUpdateTime" json:"updated_at"`
 }
 
 type GetBusinessProfileModel struct {
-	ID        uint `json:"id"`
-	AccountID uint `json:"account_id" pgvalidate:"exists=auth$users$account_id"`
+	ID                    uint   `json:"id"`
+	AccountID             uint   `json:"account_id" pgvalidate:"exists=auth$users$account_id"`
+	FlutterwaveMerchantID string `json:"flutterwave_merchant_id" pgvalidate:"exists=auth$business_Profiles$flutterwave_merchant_id"`
 }
 
 func (b *BusinessProfile) CreateBusinessProfile(db *gorm.DB) error {
@@ -65,6 +67,17 @@ func (b *BusinessProfile) CreateBusinessProfile(db *gorm.DB) error {
 
 func (b *BusinessProfile) GetByAccountID(db *gorm.DB) (int, error) {
 	err, nilErr := postgresql.SelectOneFromDb(db, &b, "account_id = ? ", b.AccountID)
+	if nilErr != nil {
+		return http.StatusBadRequest, nilErr
+	}
+
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+	return http.StatusOK, nil
+}
+func (b *BusinessProfile) GetByFlutterwaveMerchantID(db *gorm.DB) (int, error) {
+	err, nilErr := postgresql.SelectOneFromDb(db, &b, "flutterwave_merchant_id = ? ", b.FlutterwaveMerchantID)
 	if nilErr != nil {
 		return http.StatusBadRequest, nilErr
 	}
