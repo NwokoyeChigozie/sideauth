@@ -131,13 +131,14 @@ func SignupService(logger *utility.Logger, req models.CreateUserRequestModel, db
 
 	if user.AccountType == "business" {
 		businessProfile := models.BusinessProfile{
-			AccountID:       int(user.AccountID),
-			BusinessName:    req.BusinessName,
-			BusinessType:    req.BusinessType,
-			BusinessAddress: req.BusinessAddress,
-			Country:         countryCode,
-			Currency:        currency,
-			Webhook_uri:     webhookUri,
+			AccountID:             int(user.AccountID),
+			BusinessName:          req.BusinessName,
+			BusinessType:          req.BusinessType,
+			BusinessAddress:       req.BusinessAddress,
+			Country:               countryCode,
+			Currency:              currency,
+			Webhook_uri:           webhookUri,
+			FlutterwaveMerchantID: req.FlutterwaveMerchantID,
 		}
 
 		err = businessProfile.CreateBusinessProfile(db.Auth)

@@ -48,20 +48,21 @@ type User struct {
 }
 
 type CreateUserRequestModel struct {
-	BusinessID      int    `json:"business_id" pgvalidate:"exists=auth$users$account_id"`
-	EmailAddress    string `json:"email_address" validate:"" pgvalidate:"notexists=auth$users$email_address, email"`
-	PhoneNumber     string `json:"phone_number" pgvalidate:"notexists=auth$users$phone_number"`
-	AccountType     string `json:"account_type" validate:"oneof=business individual others"`
-	Firstname       string `json:"firstname"`
-	Lastname        string `json:"lastname"`
-	Username        string `json:"username" pgvalidate:"notexists=auth$users$username"`
-	ReferralCode    string `json:"referral_code" pgvalidate:"exists=auth$users$username"`
-	Password        string `json:"password"`
-	Country         string `json:"country"`
-	WebhookURI      string `json:"webhook_uri"`
-	BusinessName    string `json:"business_name"`
-	BusinessType    string `json:"business_type"`
-	BusinessAddress string `json:"business_address"`
+	BusinessID            int    `json:"business_id" pgvalidate:"exists=auth$users$account_id"`
+	EmailAddress          string `json:"email_address" validate:"" pgvalidate:"notexists=auth$users$email_address, email"`
+	PhoneNumber           string `json:"phone_number" pgvalidate:"notexists=auth$users$phone_number"`
+	AccountType           string `json:"account_type" validate:"oneof=business individual others"`
+	Firstname             string `json:"firstname"`
+	Lastname              string `json:"lastname"`
+	Username              string `json:"username" pgvalidate:"notexists=auth$users$username"`
+	ReferralCode          string `json:"referral_code" pgvalidate:"exists=auth$users$username"`
+	Password              string `json:"password"`
+	Country               string `json:"country"`
+	WebhookURI            string `json:"webhook_uri"`
+	BusinessName          string `json:"business_name"`
+	BusinessType          string `json:"business_type"`
+	BusinessAddress       string `json:"business_address"`
+	FlutterwaveMerchantID string `json:"flutterwave_merchant_id"`
 }
 
 type LoginUserRequestModel struct {
