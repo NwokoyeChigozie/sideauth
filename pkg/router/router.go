@@ -38,7 +38,7 @@ func Setup(logger *utility.Logger, validator *validator.Validate, db postgresql.
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"code":    200,
-			"message": "Welcome to auth microservice",
+			"message": "Welcome to auth micro-service",
 			"status":  http.StatusOK,
 		})
 	})
