@@ -124,7 +124,7 @@ func TestGetUserProfile(t *testing.T) {
 		t.Run(test.Name, func(t *testing.T) {
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/auth/get_user_profile"}
+			URI := url.URL{Path: "/v2/get_user_profile"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {

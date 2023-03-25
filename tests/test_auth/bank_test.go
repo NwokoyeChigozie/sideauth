@@ -145,7 +145,7 @@ func TestAddBankDetails(t *testing.T) {
 		t.Run(test.Name, func(t *testing.T) {
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/auth/user/bank_details"}
+			URI := url.URL{Path: "/v2/user/bank_details"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {
@@ -245,7 +245,7 @@ func TestAddGetBusinessCustomersBankDetails(t *testing.T) {
 
 	}
 
-	createBankDetailURI := url.URL{Path: "/v2/auth/user/bank_details"}
+	createBankDetailURI := url.URL{Path: "/v2/user/bank_details"}
 	var b bytes.Buffer
 	json.NewEncoder(&b).Encode(createBankDetailRequest)
 	req, err := http.NewRequest(http.MethodPost, createBankDetailURI.String(), &b)
@@ -262,7 +262,7 @@ func TestAddGetBusinessCustomersBankDetails(t *testing.T) {
 		t.Run(test.Name, func(t *testing.T) {
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/auth/business/customers/bank_details"}
+			URI := url.URL{Path: "/v2/business/customers/bank_details"}
 
 			req, err := http.NewRequest(http.MethodGet, URI.String(), &b)
 			if err != nil {

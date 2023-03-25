@@ -14,7 +14,7 @@ import (
 func Model(r *gin.Engine, ApiVersion string, validator *validator.Validate, db postgresql.Databases, logger *utility.Logger) *gin.Engine {
 	auth_model := auth_model.Controller{Db: db, Validator: validator, Logger: logger}
 
-	modelTypeUrl := r.Group(fmt.Sprintf("%v/auth", ApiVersion), middleware.Authorize(db, middleware.AppType))
+	modelTypeUrl := r.Group(fmt.Sprintf("%v", ApiVersion), middleware.Authorize(db, middleware.AppType))
 	{
 		modelTypeUrl.POST("/get_user", auth_model.GetUser)
 		modelTypeUrl.GET("/get_users_by_business_id/:business_id", auth_model.GetUsersByBusinessID)

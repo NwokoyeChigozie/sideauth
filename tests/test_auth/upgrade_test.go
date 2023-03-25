@@ -117,7 +117,7 @@ func TestUpgradeTier(t *testing.T) {
 		t.Run(test.Name, func(t *testing.T) {
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/auth/user/upgrade_tier"}
+			URI := url.URL{Path: "/v2/user/upgrade_tier"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {
@@ -241,7 +241,7 @@ func TestGetUserRestrictions(t *testing.T) {
 				}
 				upgradeReq := requestBody{Tier: test.Tier}
 
-				requestResetURI := url.URL{Path: "/v2/auth/user/upgrade_tier"}
+				requestResetURI := url.URL{Path: "/v2/user/upgrade_tier"}
 				var f bytes.Buffer
 				json.NewEncoder(&f).Encode(upgradeReq)
 				fReq, err := http.NewRequest(http.MethodPost, requestResetURI.String(), &f)
@@ -257,7 +257,7 @@ func TestGetUserRestrictions(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/auth/user/restrictions"}
+			URI := url.URL{Path: "/v2/user/restrictions"}
 
 			req, err := http.NewRequest(http.MethodGet, URI.String(), &b)
 			if err != nil {
@@ -436,7 +436,7 @@ func TestUpgradeAccount(t *testing.T) {
 		t.Run(test.Name, func(t *testing.T) {
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/auth/user/upgrade/account"}
+			URI := url.URL{Path: "/v2/user/upgrade/account"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {

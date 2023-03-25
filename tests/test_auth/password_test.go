@@ -110,7 +110,7 @@ func TestRequestPasswordReset(t *testing.T) {
 		t.Run(test.Name, func(t *testing.T) {
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/auth/reset-password"}
+			URI := url.URL{Path: "/v2/reset-password"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {
@@ -262,7 +262,7 @@ func TestUpdatePasswordWithToken(t *testing.T) {
 		t.Run(test.Name, func(t *testing.T) {
 			token := 0
 			if test.Name != "incorrect token" && test.Name != "no request body" {
-				requestResetURI := url.URL{Path: "/v2/auth/reset-password"}
+				requestResetURI := url.URL{Path: "/v2/reset-password"}
 				var b bytes.Buffer
 				json.NewEncoder(&b).Encode(resetReq)
 				req, err := http.NewRequest(http.MethodPost, requestResetURI.String(), &b)
@@ -283,7 +283,7 @@ func TestUpdatePasswordWithToken(t *testing.T) {
 			requestB.Token = token
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(requestB)
-			URI := url.URL{Path: "/v2/auth/reset-password/change-password"}
+			URI := url.URL{Path: "/v2/reset-password/change-password"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {
@@ -430,7 +430,7 @@ func TestUpdatePassword(t *testing.T) {
 		t.Run(test.Name, func(t *testing.T) {
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/auth/user/security/update_password"}
+			URI := url.URL{Path: "/v2/user/security/update_password"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {

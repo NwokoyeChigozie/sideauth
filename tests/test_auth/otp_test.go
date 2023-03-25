@@ -63,7 +63,7 @@ func TestSendOTP(t *testing.T) {
 			RequestBody:  models.SendOtpTokenReq{},
 			ExpectedCode: http.StatusOK,
 			Message:      "OTP Generated",
-			Path:         "/v2/auth/send_otp",
+			Path:         "/v2/send_otp",
 			Headers: map[string]string{
 				"Content-Type":  "application/json",
 				"Authorization": "Bearer " + token,
@@ -72,7 +72,7 @@ func TestSendOTP(t *testing.T) {
 			Name:         "otp without authentication token",
 			RequestBody:  models.SendOtpTokenReq{},
 			ExpectedCode: http.StatusUnauthorized,
-			Path:         "/v2/auth/send_otp",
+			Path:         "/v2/send_otp",
 			Headers: map[string]string{
 				"Content-Type": "application/json",
 			},
@@ -81,7 +81,7 @@ func TestSendOTP(t *testing.T) {
 			RequestBody:  models.SendOtpTokenReq{AccountID: accountID},
 			ExpectedCode: http.StatusOK,
 			Message:      "OTP Generated",
-			Path:         "/v2/auth/api/send_otp",
+			Path:         "/v2/api/send_otp",
 			Headers: map[string]string{
 				"Content-Type":  "application/json",
 				"v-private-key": accessToken.PrivateKey,
@@ -92,7 +92,7 @@ func TestSendOTP(t *testing.T) {
 			RequestBody:  models.SendOtpTokenReq{AccountID: accountID},
 			ExpectedCode: http.StatusOK,
 			Message:      "OTP Generated",
-			Path:         "/v2/auth/otp/send_otp",
+			Path:         "/v2/otp/send_otp",
 			Headers: map[string]string{
 				"Content-Type": "application/json",
 			},
@@ -100,7 +100,7 @@ func TestSendOTP(t *testing.T) {
 			Name:         "no account_id for otp without access token",
 			RequestBody:  models.SendOtpTokenReq{},
 			ExpectedCode: http.StatusBadRequest,
-			Path:         "/v2/auth/otp/send_otp",
+			Path:         "/v2/otp/send_otp",
 			Headers: map[string]string{
 				"Content-Type": "application/json",
 			},
@@ -108,7 +108,7 @@ func TestSendOTP(t *testing.T) {
 			Name:         "otp without access token",
 			RequestBody:  models.SendOtpTokenReq{AccountID: accountID},
 			ExpectedCode: http.StatusUnauthorized,
-			Path:         "/v2/auth/api/send_otp",
+			Path:         "/v2/api/send_otp",
 			Headers: map[string]string{
 				"Content-Type": "application/json",
 			},
@@ -116,7 +116,7 @@ func TestSendOTP(t *testing.T) {
 			Name:         "otp without account id",
 			RequestBody:  models.SendOtpTokenReq{},
 			ExpectedCode: http.StatusBadRequest,
-			Path:         "/v2/auth/api/send_otp",
+			Path:         "/v2/api/send_otp",
 			Headers: map[string]string{
 				"Content-Type":  "application/json",
 				"v-private-key": accessToken.PrivateKey,
@@ -136,7 +136,7 @@ func TestSendOTP(t *testing.T) {
 		authTypeUrl.POST("/send_otp", auth.SendOTP)
 
 	}
-	authApiUrl := r.Group(fmt.Sprintf("%v/auth/api", "v2"), middleware.Authorize(db, middleware.ApiType))
+	authApiUrl := r.Group(fmt.Sprintf("%v/api", "v2"), middleware.Authorize(db, middleware.ApiType))
 	{
 		authApiUrl.POST("/send_otp", auth.SendOTPAPI)
 

@@ -14,7 +14,7 @@ import (
 func Auth(r *gin.Engine, ApiVersion string, validator *validator.Validate, db postgresql.Databases, logger *utility.Logger) *gin.Engine {
 	auth := auth.Controller{Db: db, Validator: validator, Logger: logger}
 
-	authUrl := r.Group(fmt.Sprintf("%v/auth", ApiVersion))
+	authUrl := r.Group(fmt.Sprintf("%v", ApiVersion))
 	{
 		authUrl.POST("/signup", auth.Signup)
 		authUrl.POST("/signup/bulk", auth.BulkSignup)
@@ -32,7 +32,7 @@ func Auth(r *gin.Engine, ApiVersion string, validator *validator.Validate, db po
 
 	}
 
-	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", ApiVersion), middleware.Authorize(db, middleware.AuthType))
+	authTypeUrl := r.Group(fmt.Sprintf("%v", ApiVersion), middleware.Authorize(db, middleware.AuthType))
 	{
 		authTypeUrl.POST("/send_otp", auth.SendOTP)
 
@@ -54,7 +54,7 @@ func Auth(r *gin.Engine, ApiVersion string, validator *validator.Validate, db po
 		authTypeUrl.POST("/logout", auth.Logout)
 
 	}
-	authApiUrl := r.Group(fmt.Sprintf("%v/auth/api", ApiVersion), middleware.Authorize(db, middleware.ApiType))
+	authApiUrl := r.Group(fmt.Sprintf("%v/api", ApiVersion), middleware.Authorize(db, middleware.ApiType))
 	{
 		authApiUrl.POST("/send_otp", auth.SendOTPAPI)
 

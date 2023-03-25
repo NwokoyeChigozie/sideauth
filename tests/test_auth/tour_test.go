@@ -95,7 +95,7 @@ func TestTourStatusUpdate(t *testing.T) {
 		t.Run(test.Name, func(t *testing.T) {
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/auth/user/update_tour_status"}
+			URI := url.URL{Path: "/v2/user/update_tour_status"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {

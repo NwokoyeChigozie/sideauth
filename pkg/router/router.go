@@ -35,6 +35,14 @@ func Setup(logger *utility.Logger, validator *validator.Validate, db postgresql.
 	Auth(r, ApiVersion, validator, db, logger)
 	Model(r, ApiVersion, validator, db, logger)
 
+	r.GET("/", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"code":    200,
+			"message": "Welcome to auth microservice",
+			"status":  http.StatusOK,
+		})
+	})
+
 	r.NoRoute(func(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{
 			"name":    "Not Found",
