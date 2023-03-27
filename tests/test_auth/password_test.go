@@ -100,7 +100,7 @@ func TestRequestPasswordReset(t *testing.T) {
 		},
 	}
 
-	authUrl := r.Group(fmt.Sprintf("%v/auth", "v2"))
+	authUrl := r.Group(fmt.Sprintf("%v", "v2"))
 	{
 		authUrl.POST("/reset-password", auth.RequestPasswordReset)
 
@@ -251,7 +251,7 @@ func TestUpdatePasswordWithToken(t *testing.T) {
 		},
 	}
 
-	authUrl := r.Group(fmt.Sprintf("%v/auth", "v2"))
+	authUrl := r.Group(fmt.Sprintf("%v", "v2"))
 	{
 		authUrl.POST("/reset-password", auth.RequestPasswordReset)
 		authUrl.POST("/reset-password/change-password", auth.UpdatePasswordWithToken)
@@ -420,7 +420,7 @@ func TestUpdatePassword(t *testing.T) {
 		},
 	}
 
-	authUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AuthType))
+	authUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, middleware.AuthType))
 	{
 		authUrl.POST("/user/security/update_password", auth.UpdatePassword)
 

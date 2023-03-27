@@ -189,7 +189,7 @@ func TestContactUs(t *testing.T) {
 		},
 	}
 
-	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"))
+	authTypeUrl := r.Group(fmt.Sprintf("%v", "v2"))
 	{
 		authTypeUrl.POST("/contact-us", auth.ContactUs)
 

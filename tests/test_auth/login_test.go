@@ -310,7 +310,7 @@ func TestLogout(t *testing.T) {
 		},
 	}
 
-	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AuthType))
+	authTypeUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, middleware.AuthType))
 	{
 		authTypeUrl.POST("/logout", auth.Logout)
 
@@ -406,7 +406,7 @@ func TestValidateToken(t *testing.T) {
 		},
 	}
 
-	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AuthType))
+	authTypeUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, middleware.AuthType))
 	{
 		authTypeUrl.POST("/validate-token", auth.ValidateToken)
 
@@ -502,7 +502,7 @@ func TestGetAccessToken(t *testing.T) {
 		},
 	}
 
-	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AuthType))
+	authTypeUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, middleware.AuthType))
 	{
 		authTypeUrl.POST("/user/security/get_access_token", auth.GetAccessToken)
 

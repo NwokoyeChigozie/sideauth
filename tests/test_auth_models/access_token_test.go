@@ -51,7 +51,7 @@ func TestGetAccessToken(t *testing.T) {
 
 	auth_model := auth_model.Controller{Db: db, Validator: validatorRef, Logger: logger}
 
-	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AppType))
+	authTypeUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, middleware.AppType))
 	{
 		authTypeUrl.GET("/get_access_token", auth_model.GetAccessToken)
 
@@ -180,7 +180,7 @@ func TestGetAccessTokenByKey(t *testing.T) {
 
 	auth_model := auth_model.Controller{Db: db, Validator: validatorRef, Logger: logger}
 
-	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AppType))
+	authTypeUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, middleware.AppType))
 	{
 		authTypeUrl.GET("/get_access_token_by_key/:key", auth_model.GetAccessTokenByKey)
 

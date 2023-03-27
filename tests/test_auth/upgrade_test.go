@@ -107,7 +107,7 @@ func TestUpgradeTier(t *testing.T) {
 		},
 	}
 
-	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AuthType))
+	authTypeUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, middleware.AuthType))
 	{
 		authTypeUrl.POST("/user/upgrade_tier", auth.UpgradeUserTier)
 
@@ -227,7 +227,7 @@ func TestGetUserRestrictions(t *testing.T) {
 		},
 	}
 
-	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AuthType))
+	authTypeUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, middleware.AuthType))
 	{
 		authTypeUrl.GET("/user/restrictions", auth.GetUserRestrictions)
 		authTypeUrl.POST("/user/upgrade_tier", auth.UpgradeUserTier)
@@ -426,7 +426,7 @@ func TestUpgradeAccount(t *testing.T) {
 		},
 	}
 
-	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AuthType))
+	authTypeUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, middleware.AuthType))
 	{
 		authTypeUrl.POST("/user/upgrade/account", auth.UpgradeAccount)
 
