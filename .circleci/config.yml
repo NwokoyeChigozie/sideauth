@@ -78,7 +78,7 @@ jobs:
           name: Run tests
           command: |
             cat app.env
-            go test -v -parallel 6 ./tests/... -timeout 99999s
+            go test -v -parallel 3 ./tests/... -timeout 99999s
   generate-code-coverage-metrics:
     executor: golang
     steps:
