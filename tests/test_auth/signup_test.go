@@ -25,7 +25,7 @@ func TestSignup(t *testing.T) {
 	// getConfig := config.GetConfig()
 	validatorRef := validator.New()
 	db := postgresql.Connection()
-	requestURI := url.URL{Path: "/v2/auth/signup"}
+	requestURI := url.URL{Path: "/v2/signup"}
 	iuuid, _ := uuid.NewV4()
 	buuid, _ := uuid.NewV4()
 	ouuid, _ := uuid.NewV4()
@@ -138,7 +138,7 @@ func TestSignup(t *testing.T) {
 	for _, test := range tests {
 		r := gin.Default()
 
-		r.POST("/v2/auth/signup", auth.Signup)
+		r.POST("/v2/signup", auth.Signup)
 
 		t.Run(test.Name, func(t *testing.T) {
 			var b bytes.Buffer
@@ -183,7 +183,7 @@ func TestBulkSignup(t *testing.T) {
 	// getConfig := config.GetConfig()
 	validatorRef := validator.New()
 	db := postgresql.Connection()
-	requestURI := url.URL{Path: "/v2/auth/signup/bulk"}
+	requestURI := url.URL{Path: "/v2/signup/bulk"}
 	iuuid, _ := uuid.NewV4()
 	buuid, _ := uuid.NewV4()
 	ouuid, _ := uuid.NewV4()
@@ -289,7 +289,7 @@ func TestBulkSignup(t *testing.T) {
 	for _, test := range tests {
 		r := gin.Default()
 
-		r.POST("/v2/auth/signup/bulk", auth.BulkSignup)
+		r.POST("/v2/signup/bulk", auth.BulkSignup)
 
 		t.Run(test.Name, func(t *testing.T) {
 			var b bytes.Buffer

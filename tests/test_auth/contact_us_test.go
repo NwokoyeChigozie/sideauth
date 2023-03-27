@@ -189,7 +189,7 @@ func TestContactUs(t *testing.T) {
 		},
 	}
 
-	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"))
+	authTypeUrl := r.Group(fmt.Sprintf("%v", "v2"))
 	{
 		authTypeUrl.POST("/contact-us", auth.ContactUs)
 
@@ -199,7 +199,7 @@ func TestContactUs(t *testing.T) {
 		t.Run(test.Name, func(t *testing.T) {
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/auth/contact-us"}
+			URI := url.URL{Path: "/v2/contact-us"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {

@@ -103,7 +103,7 @@ func FindMicroserviceRequest(name string, headers map[string]string, data interf
 		}, nil
 	case "verification_email":
 		return RequestObj{
-			Path:         fmt.Sprintf("%v/v2/verification/email", config.Microservices.Verification),
+			Path:         fmt.Sprintf("%v/v2/email", config.Microservices.Verification),
 			Method:       "POST",
 			Headers:      headers,
 			SuccessCode:  200,
@@ -112,7 +112,7 @@ func FindMicroserviceRequest(name string, headers map[string]string, data interf
 		}, nil
 	case "verification_sms":
 		return RequestObj{
-			Path:         fmt.Sprintf("%v/v2/verification/phone", config.Microservices.Verification),
+			Path:         fmt.Sprintf("%v/v2/phone", config.Microservices.Verification),
 			Method:       "POST",
 			Headers:      headers,
 			SuccessCode:  200,
@@ -121,7 +121,7 @@ func FindMicroserviceRequest(name string, headers map[string]string, data interf
 		}, nil
 	case "get_verifications":
 		return RequestObj{
-			Path:         fmt.Sprintf("%v/v2/verification/fetch", config.Microservices.Verification),
+			Path:         fmt.Sprintf("%v/v2/fetch", config.Microservices.Verification),
 			Method:       "GET",
 			Headers:      headers,
 			SuccessCode:  200,

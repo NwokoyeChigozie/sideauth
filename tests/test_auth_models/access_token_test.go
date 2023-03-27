@@ -51,7 +51,7 @@ func TestGetAccessToken(t *testing.T) {
 
 	auth_model := auth_model.Controller{Db: db, Validator: validatorRef, Logger: logger}
 
-	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AppType))
+	authTypeUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, middleware.AppType))
 	{
 		authTypeUrl.GET("/get_access_token", auth_model.GetAccessToken)
 
@@ -61,7 +61,7 @@ func TestGetAccessToken(t *testing.T) {
 		t.Run(test.Name, func(t *testing.T) {
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/auth/get_access_token"}
+			URI := url.URL{Path: "/v2/get_access_token"}
 
 			req, err := http.NewRequest(http.MethodGet, URI.String(), &b)
 			if err != nil {
@@ -180,7 +180,7 @@ func TestGetAccessTokenByKey(t *testing.T) {
 
 	auth_model := auth_model.Controller{Db: db, Validator: validatorRef, Logger: logger}
 
-	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AppType))
+	authTypeUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, middleware.AppType))
 	{
 		authTypeUrl.GET("/get_access_token_by_key/:key", auth_model.GetAccessTokenByKey)
 
@@ -190,7 +190,7 @@ func TestGetAccessTokenByKey(t *testing.T) {
 		t.Run(test.Name, func(t *testing.T) {
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/auth/get_access_token_by_key/" + test.Key}
+			URI := url.URL{Path: "/v2/get_access_token_by_key/" + test.Key}
 
 			req, err := http.NewRequest(http.MethodGet, URI.String(), &b)
 			if err != nil {

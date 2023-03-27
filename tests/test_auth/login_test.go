@@ -26,7 +26,7 @@ func TestLogin(t *testing.T) {
 	validatorRef := validator.New()
 	db := postgresql.Connection()
 	var (
-		loginPath      = "/v2/auth/login"
+		loginPath      = "/v2/login"
 		loginURI       = url.URL{Path: loginPath}
 		muuid, _       = uuid.NewV4()
 		duuid, _       = uuid.NewV4()
@@ -163,7 +163,7 @@ func TestLoginPhone(t *testing.T) {
 	validatorRef := validator.New()
 	db := postgresql.Connection()
 	var (
-		loginPath      = "/v2/auth/login-phone"
+		loginPath      = "/v2/login-phone"
 		loginURI       = url.URL{Path: loginPath}
 		muuid, _       = uuid.NewV4()
 		userSignUpData = models.CreateUserRequestModel{
@@ -310,7 +310,7 @@ func TestLogout(t *testing.T) {
 		},
 	}
 
-	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AuthType))
+	authTypeUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, middleware.AuthType))
 	{
 		authTypeUrl.POST("/logout", auth.Logout)
 
@@ -320,7 +320,7 @@ func TestLogout(t *testing.T) {
 		t.Run(test.Name, func(t *testing.T) {
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/auth/logout"}
+			URI := url.URL{Path: "/v2/logout"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {
@@ -406,7 +406,7 @@ func TestValidateToken(t *testing.T) {
 		},
 	}
 
-	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AuthType))
+	authTypeUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, middleware.AuthType))
 	{
 		authTypeUrl.POST("/validate-token", auth.ValidateToken)
 
@@ -416,7 +416,7 @@ func TestValidateToken(t *testing.T) {
 		t.Run(test.Name, func(t *testing.T) {
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/auth/validate-token"}
+			URI := url.URL{Path: "/v2/validate-token"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {
@@ -502,7 +502,7 @@ func TestGetAccessToken(t *testing.T) {
 		},
 	}
 
-	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AuthType))
+	authTypeUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, middleware.AuthType))
 	{
 		authTypeUrl.POST("/user/security/get_access_token", auth.GetAccessToken)
 
@@ -512,7 +512,7 @@ func TestGetAccessToken(t *testing.T) {
 		t.Run(test.Name, func(t *testing.T) {
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/auth/user/security/get_access_token"}
+			URI := url.URL{Path: "/v2/user/security/get_access_token"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {

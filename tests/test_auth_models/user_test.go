@@ -136,7 +136,7 @@ func TestGetUser(t *testing.T) {
 
 	auth_model := auth_model.Controller{Db: db, Validator: validatorRef}
 
-	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AppType))
+	authTypeUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, middleware.AppType))
 	{
 		authTypeUrl.POST("/get_user", auth_model.GetUser)
 
@@ -146,7 +146,7 @@ func TestGetUser(t *testing.T) {
 		t.Run(test.Name, func(t *testing.T) {
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/auth/get_user"}
+			URI := url.URL{Path: "/v2/get_user"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {
@@ -252,7 +252,7 @@ func TestGetUsersByBusinessID(t *testing.T) {
 
 	auth_model := auth_model.Controller{Db: db, Validator: validatorRef, Logger: logger}
 
-	modelTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AppType))
+	modelTypeUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, middleware.AppType))
 	{
 		modelTypeUrl.GET("/get_users_by_business_id/:business_id", auth_model.GetUsersByBusinessID)
 
@@ -262,7 +262,7 @@ func TestGetUsersByBusinessID(t *testing.T) {
 		t.Run(test.Name, func(t *testing.T) {
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/auth/get_users_by_business_id/" + test.BusinessID}
+			URI := url.URL{Path: "/v2/get_users_by_business_id/" + test.BusinessID}
 			req, err := http.NewRequest(http.MethodGet, URI.String(), &b)
 			if err != nil {
 				t.Fatal(err)
@@ -382,7 +382,7 @@ func TestSetAuthorizationRequired(t *testing.T) {
 
 	auth_model := auth_model.Controller{Db: db, Validator: validatorRef}
 
-	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AppType))
+	authTypeUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, middleware.AppType))
 	{
 		authTypeUrl.POST("/set_authorization_required", auth_model.SetAuthorizationRequired)
 
@@ -392,7 +392,7 @@ func TestSetAuthorizationRequired(t *testing.T) {
 		t.Run(test.Name, func(t *testing.T) {
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/auth/set_authorization_required"}
+			URI := url.URL{Path: "/v2/set_authorization_required"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {

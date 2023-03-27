@@ -55,7 +55,7 @@ func AssertResponseMessage(t *testing.T, got, expected string) {
 
 func SignupUser(t *testing.T, r *gin.Engine, auth auth.Controller, userSignUpData models.CreateUserRequestModel) {
 	var (
-		signupPath = "/v2/auth/signup"
+		signupPath = "/v2/signup"
 		signupURI  = url.URL{Path: signupPath}
 	)
 	r.POST(signupPath, auth.Signup)
@@ -74,7 +74,7 @@ func SignupUser(t *testing.T, r *gin.Engine, auth auth.Controller, userSignUpDat
 
 func GetLoginTokenAndAccountID(t *testing.T, r *gin.Engine, auth auth.Controller, loginData models.LoginUserRequestModel) (string, int) {
 	var (
-		loginPath = "/v2/auth/login"
+		loginPath = "/v2/login"
 		loginURI  = url.URL{Path: loginPath}
 	)
 	r.POST(loginPath, auth.Login)
