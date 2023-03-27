@@ -130,7 +130,7 @@ func TestCreateWallet(t *testing.T) {
 
 	auth_model := auth_model.Controller{Db: db, Validator: validatorRef}
 
-	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AppType))
+	authTypeUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, middleware.AppType))
 	{
 		authTypeUrl.POST("/create_wallet", auth_model.CreateWallet)
 	}
@@ -276,7 +276,7 @@ func TestUpdateWalletBalance(t *testing.T) {
 
 	auth_model := auth_model.Controller{Db: db, Validator: validatorRef}
 
-	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AppType))
+	authTypeUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, middleware.AppType))
 	{
 		authTypeUrl.PATCH("/update_wallet_balance", auth_model.UpdateWalletBalance)
 	}
@@ -402,7 +402,7 @@ func TestGetWalletByAccountIDAndCurrency(t *testing.T) {
 
 	auth_model := auth_model.Controller{Db: db, Validator: validatorRef}
 
-	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AppType))
+	authTypeUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, middleware.AppType))
 	{
 		authTypeUrl.GET("/get_wallet/:account_id/:currency", auth_model.GetWalletByAccountIDAndCurrency)
 	}
@@ -627,7 +627,7 @@ func TestCreateWalletHistory(t *testing.T) {
 
 	auth_model := auth_model.Controller{Db: db, Validator: validatorRef}
 
-	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AppType))
+	authTypeUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, middleware.AppType))
 	{
 		authTypeUrl.POST("/create_wallet_history", auth_model.CreateWalletHistory)
 	}
@@ -903,7 +903,7 @@ func TestCreateWalletTransaction(t *testing.T) {
 
 	auth_model := auth_model.Controller{Db: db, Validator: validatorRef}
 
-	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AppType))
+	authTypeUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, middleware.AppType))
 	{
 		authTypeUrl.POST("/create_wallet_transaction", auth_model.CreateWalletTransaction)
 	}

@@ -123,7 +123,7 @@ func TestGetBankDetail(t *testing.T) {
 
 	auth_model := auth_model.Controller{Db: db, Validator: validatorRef}
 
-	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AppType))
+	authTypeUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, middleware.AppType))
 	{
 		authTypeUrl.POST("/get_bank_detail", auth_model.GetBankDetail)
 

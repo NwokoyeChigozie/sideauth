@@ -142,7 +142,7 @@ func TestGetUserCredential(t *testing.T) {
 
 	auth_model := auth_model.Controller{Db: db, Validator: validatorRef}
 
-	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AppType))
+	authTypeUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, middleware.AppType))
 	{
 		authTypeUrl.POST("/get_user_credentials", auth_model.GetUserCredentials)
 
@@ -311,7 +311,7 @@ func TestCreateUserCredential(t *testing.T) {
 
 	auth_model := auth_model.Controller{Db: db, Validator: validatorRef}
 
-	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AppType))
+	authTypeUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, middleware.AppType))
 	{
 		authTypeUrl.POST("/create_user_credentials", auth_model.CreateUserCredentials)
 
@@ -480,7 +480,7 @@ func TestUpdateUserCredential(t *testing.T) {
 
 	auth_model := auth_model.Controller{Db: db, Validator: validatorRef}
 
-	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AppType))
+	authTypeUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, middleware.AppType))
 	{
 		authTypeUrl.POST("/update_user_credentials", auth_model.UpdateUserCredentials)
 

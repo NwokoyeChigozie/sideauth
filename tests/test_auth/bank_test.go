@@ -135,7 +135,7 @@ func TestAddBankDetails(t *testing.T) {
 		},
 	}
 
-	authUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AuthType))
+	authUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, middleware.AuthType))
 	{
 		authUrl.POST("/user/bank_details", auth.AddBankDetails)
 
@@ -238,7 +238,7 @@ func TestAddGetBusinessCustomersBankDetails(t *testing.T) {
 		},
 	}
 
-	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AuthType))
+	authTypeUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, middleware.AuthType))
 	{
 		authTypeUrl.POST("/user/bank_details", auth.AddBankDetails)
 		authTypeUrl.GET("/business/customers/bank_details", auth.GetBusinessCustomersBankDetails)

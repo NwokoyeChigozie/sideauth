@@ -85,7 +85,7 @@ func TestTourStatusUpdate(t *testing.T) {
 		},
 	}
 
-	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AuthType))
+	authTypeUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, middleware.AuthType))
 	{
 		authTypeUrl.POST("/user/update_tour_status", auth.UpdateTourStatus)
 

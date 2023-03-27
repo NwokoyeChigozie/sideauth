@@ -126,7 +126,7 @@ func TestGetAuthorize(t *testing.T) {
 
 	auth_model := auth_model.Controller{Db: db, Validator: validatorRef}
 
-	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AppType))
+	authTypeUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, middleware.AppType))
 	{
 		authTypeUrl.POST("/get_authorize", auth_model.GetAuthorize)
 
@@ -359,7 +359,7 @@ func TestCreateAuthorize(t *testing.T) {
 
 	auth_model := auth_model.Controller{Db: db, Validator: validatorRef}
 
-	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AppType))
+	authTypeUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, middleware.AppType))
 	{
 		authTypeUrl.POST("/create_authorize", auth_model.CreateAuthorize)
 
@@ -568,7 +568,7 @@ func TestUpdateAuthorize(t *testing.T) {
 
 	auth_model := auth_model.Controller{Db: db, Validator: validatorRef}
 
-	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AppType))
+	authTypeUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, middleware.AppType))
 	{
 		authTypeUrl.POST("/update_authorize", auth_model.UpdateAuthorize)
 

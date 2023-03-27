@@ -125,13 +125,13 @@ func TestSendOTP(t *testing.T) {
 		},
 	}
 
-	authUrl := r.Group(fmt.Sprintf("%v/auth", "v2"))
+	authUrl := r.Group(fmt.Sprintf("%v", "v2"))
 	{
 		authUrl.POST("/otp/send_otp", auth.SendOTPAPI)
 
 	}
 
-	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AuthType))
+	authTypeUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, middleware.AuthType))
 	{
 		authTypeUrl.POST("/send_otp", auth.SendOTP)
 

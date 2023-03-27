@@ -136,7 +136,7 @@ func TestGetUser(t *testing.T) {
 
 	auth_model := auth_model.Controller{Db: db, Validator: validatorRef}
 
-	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AppType))
+	authTypeUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, middleware.AppType))
 	{
 		authTypeUrl.POST("/get_user", auth_model.GetUser)
 
@@ -252,7 +252,7 @@ func TestGetUsersByBusinessID(t *testing.T) {
 
 	auth_model := auth_model.Controller{Db: db, Validator: validatorRef, Logger: logger}
 
-	modelTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AppType))
+	modelTypeUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, middleware.AppType))
 	{
 		modelTypeUrl.GET("/get_users_by_business_id/:business_id", auth_model.GetUsersByBusinessID)
 
@@ -382,7 +382,7 @@ func TestSetAuthorizationRequired(t *testing.T) {
 
 	auth_model := auth_model.Controller{Db: db, Validator: validatorRef}
 
-	authTypeUrl := r.Group(fmt.Sprintf("%v/auth", "v2"), middleware.Authorize(db, middleware.AppType))
+	authTypeUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, middleware.AppType))
 	{
 		authTypeUrl.POST("/set_authorization_required", auth_model.SetAuthorizationRequired)
 
