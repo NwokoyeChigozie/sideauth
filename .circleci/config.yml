@@ -79,7 +79,7 @@ jobs:
           command: |
             cat app.env
             go test -v  -parallel 3 ./tests/test_auth/... -timeout 99999s
-             go test -v  -parallel 3 ./tests/test_auth_models/... -timeout 99999s
+            go test -v  -parallel 3 ./tests/test_auth_models/... -timeout 99999s
   generate-code-coverage-metrics:
     executor: golang
     steps:

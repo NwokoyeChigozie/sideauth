@@ -2,3 +2,8 @@ logs/
 config.yaml
 _ignore/
 app.env
+.idea
+datasources.yaml
+Docker-compose.yml
+prometheus.yml
+grafana.yaml
