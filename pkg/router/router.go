@@ -6,7 +6,6 @@ import (
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/vesicash/auth-ms/internal/config"
 	"github.com/vesicash/auth-ms/pkg/middleware"
 	"github.com/vesicash/auth-ms/pkg/repository/storage/postgresql"
@@ -17,6 +16,7 @@ func Setup(logger *utility.Logger, validator *validator.Validate, db postgresql.
 	if appConfiguration.Mode == "release" {
 		gin.SetMode(gin.ReleaseMode)
 	}
+
 	r := gin.New()
 
 	// Middlewares
@@ -44,8 +44,6 @@ func Setup(logger *utility.Logger, validator *validator.Validate, db postgresql.
 			"status":  http.StatusOK,
 		})
 	})
-
-	r.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
 	r.NoRoute(func(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{

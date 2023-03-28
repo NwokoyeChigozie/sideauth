@@ -3,9 +3,10 @@ package router
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/vesicash/auth-ms/internal/config"
 )
 
-func SetupMetrics() *gin.Engine {
+func SetupMetrics(appConfiguration *config.App) *gin.Engine {
 	if appConfiguration.Mode == "release" {
 		gin.SetMode(gin.ReleaseMode)
 	}
