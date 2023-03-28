@@ -11,7 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/vesicash/auth-ms/internal/models"
-	"github.com/vesicash/auth-ms/pkg/controller/health"
+	"github.com/vesicash/auth-ms/pkg/controller/status"
 	"github.com/vesicash/auth-ms/pkg/repository/storage/postgresql"
 	tst "github.com/vesicash/auth-ms/tests"
 )
@@ -38,7 +38,7 @@ func TestGetPing(t *testing.T) {
 		},
 	}
 
-	auth := health.Controller{Db: db, Validator: validatorRef, Logger: logger}
+	auth := status.Controller{Db: db, Validator: validatorRef, Logger: logger}
 
 	for _, test := range tests {
 		r := gin.Default()
@@ -103,7 +103,7 @@ func TestPostPing(t *testing.T) {
 		},
 	}
 
-	auth := health.Controller{Db: db, Validator: validatorRef, Logger: logger}
+	auth := status.Controller{Db: db, Validator: validatorRef, Logger: logger}
 
 	for _, test := range tests {
 		r := gin.Default()
