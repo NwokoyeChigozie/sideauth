@@ -11,11 +11,10 @@ import (
 )
 
 func Health(r *gin.Engine, ApiVersion string, validator *validator.Validate, db postgresql.Databases, logger *utility.Logger) *gin.Engine {
-	statusController := status.Controller{Db: db, Validator: validator, Logger: logger}
+	statusController := status.Controller{Db: db, Logger: logger}
 
 	healthUrl := r.Group(fmt.Sprintf("%v", ApiVersion))
 	{
-		healthUrl.POST("/status", statusController.Post)
 		healthUrl.GET("/status", statusController.Get)
 	}
 	return r
