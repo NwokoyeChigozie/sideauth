@@ -124,25 +124,28 @@ func (u *User) Update(db *gorm.DB) error {
 func (u *User) GetUserByUsernameEmailOrPhone(db *gorm.DB) (int, error) {
 	var (
 		err, nilErr error
+		query       string
 	)
+
 	if u.Username != "" {
-		err, nilErr = postgresql.SelectOneFromDb(db, &u, "LOWER(username) = ? ", strings.ToLower(u.Username))
-		if nilErr != nil {
-			nilErr = fmt.Errorf("username not found")
-		}
-	} else if u.EmailAddress != "" {
-		err, nilErr = postgresql.SelectOneFromDb(db, &u, "LOWER(email_address) = ?", strings.ToLower(u.EmailAddress))
-		if nilErr != nil {
-			nilErr = fmt.Errorf("email address not found")
-		}
-	} else if u.PhoneNumber != "" {
+		query = addQuery(query, fmt.Sprintf(" LOWER(username) = '%v' ", strings.ToLower(u.Username)), "AND")
+	}
+
+	if u.EmailAddress != "" {
+		query = addQuery(query, fmt.Sprintf(" LOWER(email_address) = '%v' ", strings.ToLower(u.EmailAddress)), "AND")
+	}
+	if u.PhoneNumber != "" {
 		phone, _ := utility.PhoneValid(u.PhoneNumber)
-		err, nilErr = postgresql.SelectOneFromDb(db, &u, "phone_number = ? or phone_number = ? ", u.PhoneNumber, phone)
-		if nilErr != nil {
-			nilErr = fmt.Errorf("phone number not found")
-		}
-	} else {
-		err = fmt.Errorf("no values for GetUserByUsernameEmailOrPhone")
+		query = addQuery(query, fmt.Sprintf(" phone_number = '%v' or phone_number = '%v'  ", u.PhoneNumber, phone), "AND")
+	}
+
+	err, nilErr = postgresql.SelectOneFromDb(db, &u, query)
+	if nilErr != nil {
+		nilErr = fmt.Errorf("user not found")
+	}
+
+	if query == "" {
+		return http.StatusBadRequest, fmt.Errorf("no values for GetUserByUsernameEmailOrPhone")
 	}
 
 	if nilErr != nil {

@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/vesicash/auth-ms/pkg/controller/status"
+	"github.com/vesicash/auth-ms/pkg/controller/health"
 	"github.com/vesicash/auth-ms/pkg/repository/storage/postgresql"
 	tst "github.com/vesicash/auth-ms/tests"
 )
@@ -35,7 +35,7 @@ func TestGetPing(t *testing.T) {
 		},
 	}
 
-	auth := status.Controller{Db: db, Logger: logger}
+	auth := health.Controller{Db: db, Logger: logger}
 
 	for _, test := range tests {
 		r := gin.Default()
