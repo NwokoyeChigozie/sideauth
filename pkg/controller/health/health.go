@@ -1,4 +1,4 @@
-package status
+package health
 
 import (
 	"net/http"
