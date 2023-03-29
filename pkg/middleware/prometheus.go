@@ -45,8 +45,6 @@ func init() {
 func PrometheusMiddleware() gin.HandlerFunc {
 	service := "auth"
 	return func(c *gin.Context) {
-		// start := time.Now()
-
 		c.Next()
 
 		status := strconv.Itoa(c.Writer.Status())
