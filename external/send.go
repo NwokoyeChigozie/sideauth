@@ -58,18 +58,18 @@ func SendRequest(logger *utility.Logger, reqType, name string, headers map[strin
 		return err
 	}
 
-	if reqObject.DecodeMethod != PhpSerializerMethod {
-		err = json.NewDecoder(res.Body).Decode(response)
-		if err != nil {
-			logger.Error("json decoding error", name, err.Error())
-			return err
-		}
-	}
-
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		logger.Error("readin body error", name, err.Error())
 		return err
+	}
+
+	if reqObject.DecodeMethod != PhpSerializerMethod {
+		err = json.Unmarshal(body, response)
+		if err != nil {
+			logger.Error("json decoding error", name, err.Error())
+			return err
+		}
 	}
 
 	logger.Info("response body", name, reqObject.Path, string(body))
@@ -88,7 +88,7 @@ func SendRequest(logger *utility.Logger, reqType, name string, headers map[strin
 		return nil
 	}
 
-	if res.StatusCode < 200 && res.StatusCode > 299 {
+	if res.StatusCode < 200 || res.StatusCode > 299 {
 		return fmt.Errorf("Error " + strconv.Itoa(res.StatusCode))
 	}
 
