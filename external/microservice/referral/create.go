@@ -16,7 +16,7 @@ func CreateReferralRequest(logger *utility.Logger, authDb *gorm.DB, accountID in
 	)
 	err := accessToken.GetAccessTokens(authDb)
 	if err != nil {
-		logger.Info("create_referral email", outBoundResponse, err)
+		logger.Error("create_referral email", outBoundResponse, err)
 		return outBoundResponse, err
 	}
 
@@ -29,7 +29,7 @@ func CreateReferralRequest(logger *utility.Logger, authDb *gorm.DB, accountID in
 	logger.Info("welcome email", data)
 	err = external.SendRequest(logger, "service", "create_referral", headers, data, &outBoundResponse)
 	if err != nil {
-		logger.Info("create_referral email", outBoundResponse, err)
+		logger.Error("create_referral email", outBoundResponse, err)
 		return outBoundResponse, err
 	}
 	logger.Info("create_referral email", outBoundResponse)

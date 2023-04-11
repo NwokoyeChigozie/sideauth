@@ -17,7 +17,7 @@ func GetIpInfo(logger *utility.Logger, ip4IpAddress string) (map[interface{}]int
 
 	err := external.SendRequest(logger, "third_party", "get_ip_info", headers, nil, &outBoundResponse, "?ip="+ip4IpAddress)
 	if err != nil {
-		logger.Info("get ip info", outBoundResponse, err)
+		logger.Error("get ip info", outBoundResponse, err)
 		return outBoundResponse, err
 	}
 	logger.Info("get ip info", outBoundResponse)

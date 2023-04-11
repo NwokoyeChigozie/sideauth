@@ -18,7 +18,7 @@ func GetDisbursement(logger *utility.Logger, authDb *gorm.DB, accountID int) ([]
 	)
 	err := accessToken.GetAccessTokens(authDb)
 	if err != nil {
-		logger.Info("get disbursements", outBoundResponse, err)
+		logger.Error("get disbursements", outBoundResponse, err)
 		return outBoundResponse.Data, err
 	}
 
@@ -31,7 +31,7 @@ func GetDisbursement(logger *utility.Logger, authDb *gorm.DB, accountID int) ([]
 	logger.Info("get disbursements", data)
 	err = external.SendRequest(logger, "service", "get_disbursements", headers, data, &outBoundResponse, "/"+strconv.Itoa(accountID))
 	if err != nil {
-		logger.Info("get disbursements", outBoundResponse, err)
+		logger.Error("get disbursements", outBoundResponse, err)
 		return outBoundResponse.Data, err
 	}
 	logger.Info("get disbursements", outBoundResponse)
