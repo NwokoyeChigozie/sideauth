@@ -26,7 +26,7 @@ type CreateWalletRequest struct {
 }
 type UpdateWalletRequest struct {
 	ID        uint    `json:"id" validate:"required" pgvalidate:"exists=auth$wallet_balances$id"`
-	Available float64 `json:"available" validate:"required"`
+	Available float64 `json:"available"`
 }
 
 func (w *WalletBalance) GetWalletBalanceByID(db *gorm.DB) (int, error) {

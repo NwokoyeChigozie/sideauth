@@ -253,17 +253,6 @@ func TestUpdateWalletBalance(t *testing.T) {
 			},
 		},
 		{
-			Name: "no available",
-			RequestBody: models.UpdateWalletRequest{
-				ID: wallet.ID,
-			},
-			ExpectedCode: http.StatusBadRequest,
-			Headers: map[string]string{
-				"Content-Type": "application/json",
-				"v-app":        app.Key,
-			},
-		},
-		{
 			Name:         "no input",
 			RequestBody:  models.UpdateWalletRequest{},
 			ExpectedCode: http.StatusBadRequest,
