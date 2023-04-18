@@ -60,22 +60,17 @@ func TestGetBankDetail(t *testing.T) {
 	}
 
 	bankDetail := models.BankDetail{
-		AccountID:   accountID,
-		BankID:      2,
-		AccountName: "acc name",
-		AccountNo:   "0097738293",
-		Country:     "NG",
-		Currency:    "NGN",
+		AccountID:           accountID,
+		BankID:              2,
+		AccountName:         "acc name",
+		AccountNo:           "0097738293",
+		Country:             "NG",
+		Currency:            "NGN",
+		MobileMoneyOperator: "yvuyviqv",
 	}
-	code, err := bankDetail.GetByAccountID(db.Auth)
+	_, err = bankDetail.CreateBankDetail(db.Auth)
 	if err != nil {
-		if code == http.StatusInternalServerError {
-			log.Panic(err.Error())
-		}
-		_, err = bankDetail.CreateBankDetail(db.Auth)
-		if err != nil {
-			log.Panic(err.Error())
-		}
+		log.Panic(err.Error())
 	}
 
 	tests := []struct {
@@ -99,9 +94,10 @@ func TestGetBankDetail(t *testing.T) {
 		}, {
 			Name: "OK get user profile by account id",
 			RequestBody: models.GetBankDetailModel{
-				AccountID: us.AccountID,
-				Currency:  bankDetail.Currency,
-				Country:   bankDetail.Country,
+				AccountID:             uint(bankDetail.AccountID),
+				Currency:              bankDetail.Currency,
+				Country:               bankDetail.Country,
+				IsMobileMoneyOperator: true,
 			},
 			ExpectedCode: http.StatusOK,
 			Message:      "successful",

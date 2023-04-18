@@ -21,7 +21,7 @@ func GetBankDetailService(req models.GetBankDetailModel, db postgresql.Databases
 			return &models.BankDetail{}, code, err
 		}
 	} else {
-		code, err := bankDetail.GetBankDetailByQuery(db.Auth)
+		code, err := bankDetail.GetBankDetailByQuery(db.Auth, req.IsMobileMoneyOperator)
 		if err != nil {
 			return &models.BankDetail{}, code, err
 		}

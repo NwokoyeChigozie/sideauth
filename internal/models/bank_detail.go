@@ -29,10 +29,11 @@ type BankDetail struct {
 }
 
 type GetBankDetailModel struct {
-	ID        uint   `json:"id" pgvalidate:"exists=auth$bank_details$id"`
-	AccountID uint   `json:"account_id" pgvalidate:"exists=auth$users$account_id"`
-	Country   string `json:"country"`
-	Currency  string `json:"currency"`
+	ID                    uint   `json:"id" pgvalidate:"exists=auth$bank_details$id"`
+	AccountID             uint   `json:"account_id" pgvalidate:"exists=auth$users$account_id"`
+	Country               string `json:"country"`
+	Currency              string `json:"currency"`
+	IsMobileMoneyOperator bool   `json:"is_mobile_money_operator"`
 }
 
 func (b *BankDetail) GetByAccountID(db *gorm.DB) (int, error) {
@@ -47,7 +48,7 @@ func (b *BankDetail) GetByAccountID(db *gorm.DB) (int, error) {
 	return http.StatusOK, nil
 }
 
-func (b *BankDetail) GetBankDetailByQuery(db *gorm.DB) (int, error) {
+func (b *BankDetail) GetBankDetailByQuery(db *gorm.DB, isMobileMoneyOperator bool) (int, error) {
 	query := ""
 	if b.AccountID != 0 {
 		if query != "" {
@@ -68,6 +69,13 @@ func (b *BankDetail) GetBankDetailByQuery(db *gorm.DB) (int, error) {
 			query += " and "
 		}
 		query += fmt.Sprintf(" LOWER(currency) = '%v' ", strings.ToLower(b.Currency))
+	}
+
+	if isMobileMoneyOperator {
+		if query != "" {
+			query += " and "
+		}
+		query += " (mobile_money_operator != '' and mobile_money_operator is not null)"
 	}
 
 	err, nilErr := postgresql.SelectOneFromDb(db, &b, query)
