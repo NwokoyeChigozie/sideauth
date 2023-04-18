@@ -19,7 +19,7 @@ func GetVerifications(logger *utility.Logger, authDb *gorm.DB, accountID int, to
 	logger.Info("get verifications", data)
 	err := external.SendRequest(logger, "service", "get_verifications", headers, data, &outBoundResponse)
 	if err != nil {
-		logger.Info("get verifications", outBoundResponse, err)
+		logger.Error("get verifications", outBoundResponse, err)
 		return outBoundResponse.Data, err
 	}
 	logger.Info("get verifications", outBoundResponse)

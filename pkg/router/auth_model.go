@@ -28,6 +28,7 @@ func Model(r *gin.Engine, ApiVersion string, validator *validator.Validate, db p
 		modelTypeUrl.POST("/get_business_profile", auth_model.GetBusinessProfile)
 		modelTypeUrl.GET("/get_access_token", auth_model.GetAccessToken)
 		modelTypeUrl.GET("/get_access_token_by_key/:key", auth_model.GetAccessTokenByKey)
+		modelTypeUrl.GET("/get_access_token_by_busines_id/:business_id", auth_model.GetAccessTokenByBusinessID)
 		modelTypeUrl.POST("/validate_on_db", auth_model.ValidateOnDB)
 		modelTypeUrl.POST("/validate_authorization", auth_model.ValidateAuthorization)
 		modelTypeUrl.POST("/get_authorize", auth_model.GetAuthorize)

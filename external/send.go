@@ -44,7 +44,6 @@ func SendRequest(logger *utility.Logger, reqType, name string, headers map[strin
 	req, err := http.NewRequest(reqObject.Method, reqObject.Path, buf)
 	if err != nil {
 		logger.Error("request creation error", name, err.Error())
-		fmt.Println(name, "4", err)
 		return err
 	}
 
@@ -89,7 +88,7 @@ func SendRequest(logger *utility.Logger, reqType, name string, headers map[strin
 	}
 
 	if res.StatusCode < 200 || res.StatusCode > 299 {
-		return fmt.Errorf("Error " + strconv.Itoa(res.StatusCode))
+		return fmt.Errorf("external requests error for request %v, code %v", name, strconv.Itoa(res.StatusCode))
 	}
 
 	return nil

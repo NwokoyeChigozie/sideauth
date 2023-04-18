@@ -15,7 +15,7 @@ func SendVerificationEmail(logger *utility.Logger, authDb *gorm.DB, accountID in
 	)
 	err := accessToken.GetAccessTokens(authDb)
 	if err != nil {
-		logger.Info("verification email", outBoundResponse, err)
+		logger.Error("verification email", outBoundResponse, err)
 		return err
 	}
 
@@ -28,7 +28,7 @@ func SendVerificationEmail(logger *utility.Logger, authDb *gorm.DB, accountID in
 	logger.Info("verification email", data)
 	err = external.SendRequest(logger, "service", "verification_email", headers, data, &outBoundResponse)
 	if err != nil {
-		logger.Info("verification email", outBoundResponse, err)
+		logger.Error("verification email", outBoundResponse, err)
 		return err
 	}
 	logger.Info("verification email", outBoundResponse)
@@ -43,7 +43,7 @@ func SendVerificationSms(logger *utility.Logger, authDb *gorm.DB, accountID int)
 	)
 	err := accessToken.GetAccessTokens(authDb)
 	if err != nil {
-		logger.Info("verification email", outBoundResponse, err)
+		logger.Error("verification email", outBoundResponse, err)
 		return err
 	}
 
@@ -56,7 +56,7 @@ func SendVerificationSms(logger *utility.Logger, authDb *gorm.DB, accountID int)
 	logger.Info("welcome email", data)
 	err = external.SendRequest(logger, "service", "verification_sms", headers, data, &outBoundResponse)
 	if err != nil {
-		logger.Info("verification email", outBoundResponse, err)
+		logger.Error("verification email", outBoundResponse, err)
 		return err
 	}
 	logger.Info("verification email", outBoundResponse)

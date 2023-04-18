@@ -18,7 +18,7 @@ func SendWelcomeNotification(logger *utility.Logger, authDb *gorm.DB, accountID 
 	)
 	err := accessToken.GetAccessTokens(authDb)
 	if err != nil {
-		logger.Info("welcome email", outBoundResponse, err)
+		logger.Error("welcome email", outBoundResponse, err)
 		return err
 	}
 
@@ -31,7 +31,7 @@ func SendWelcomeNotification(logger *utility.Logger, authDb *gorm.DB, accountID 
 	logger.Info("welcome email", data)
 	err = external.SendRequest(logger, "service", "welcome_notification", headers, data, &outBoundResponse)
 	if err != nil {
-		logger.Info("welcome email", outBoundResponse, err)
+		logger.Error("welcome email", outBoundResponse, err)
 		return err
 	}
 	logger.Info("welcome email", outBoundResponse)
@@ -45,7 +45,7 @@ func SendWelcomeSmsNotification(logger *utility.Logger, authDb *gorm.DB, account
 	)
 	err := accessToken.GetAccessTokens(authDb)
 	if err != nil {
-		logger.Info("welcome sms", outBoundResponse, err)
+		logger.Error("welcome sms", outBoundResponse, err)
 		return err
 	}
 
@@ -58,7 +58,7 @@ func SendWelcomeSmsNotification(logger *utility.Logger, authDb *gorm.DB, account
 	logger.Info("welcome sms", data)
 	err = external.SendRequest(logger, "service", "welcome_sms_notification", headers, data, &outBoundResponse)
 	if err != nil {
-		logger.Info("welcome sms", outBoundResponse, err)
+		logger.Error("welcome sms", outBoundResponse, err)
 		return err
 	}
 	logger.Info("welcome sms", outBoundResponse)
@@ -79,13 +79,13 @@ func SendWelcomePasswordReset(logger *utility.Logger, authDb *gorm.DB, accountID
 	)
 	err := accessToken.GetAccessTokens(authDb)
 	if err != nil {
-		logger.Info("welcome password reset", outBoundResponse, err)
+		logger.Error("welcome password reset", outBoundResponse, err)
 		return err
 	}
 
 	err = resetTokens.CreatePasswordResetToken(authDb)
 	if err != nil {
-		logger.Info("welcome password reset", outBoundResponse, err)
+		logger.Error("welcome password reset", outBoundResponse, err)
 		return err
 	}
 
@@ -99,7 +99,7 @@ func SendWelcomePasswordReset(logger *utility.Logger, authDb *gorm.DB, accountID
 	logger.Info("welcome email", data)
 	err = external.SendRequest(logger, "service", "welcome_password_reset_notification", headers, data, &outBoundResponse)
 	if err != nil {
-		logger.Info("welcome password reset", outBoundResponse, err)
+		logger.Error("welcome password reset", outBoundResponse, err)
 		return err
 	}
 	logger.Info("welcome password reset", outBoundResponse)

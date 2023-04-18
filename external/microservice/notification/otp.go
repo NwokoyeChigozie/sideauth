@@ -15,7 +15,7 @@ func SendOtp(logger *utility.Logger, authDb *gorm.DB, accountID, token int) erro
 	)
 	err := accessToken.GetAccessTokens(authDb)
 	if err != nil {
-		logger.Info("send otp", outBoundResponse, err)
+		logger.Error("send otp", outBoundResponse, err)
 		return err
 	}
 
@@ -28,7 +28,7 @@ func SendOtp(logger *utility.Logger, authDb *gorm.DB, accountID, token int) erro
 	logger.Info("send otp", data)
 	err = external.SendRequest(logger, "service", "send_otp_notification", headers, data, &outBoundResponse)
 	if err != nil {
-		logger.Info("send otp", outBoundResponse, err)
+		logger.Error("send otp", outBoundResponse, err)
 		return err
 	}
 	logger.Info("send otp", outBoundResponse)

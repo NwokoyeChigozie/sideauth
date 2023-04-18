@@ -2,6 +2,7 @@ package auth_model
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/vesicash/auth-ms/internal/models"
@@ -30,6 +31,30 @@ func (base *Controller) GetAccessTokenByKey(c *gin.Context) {
 	)
 
 	code, err := accessToken.LiveTokensWithPublicOrPrivateKey(base.Db.Auth)
+	if err != nil {
+		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
+		c.JSON(code, rd)
+		return
+	}
+
+	rd := utility.BuildSuccessResponse(http.StatusOK, "successful", accessToken)
+	c.JSON(http.StatusOK, rd)
+}
+func (base *Controller) GetAccessTokenByBusinessID(c *gin.Context) {
+	var (
+		businessIDStr = c.Param("business_id")
+		accessToken   = models.AccessToken{IsLive: true}
+	)
+
+	businessID, err := strconv.Atoi(businessIDStr)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "invalid business id type", err, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+	accessToken.AccountID = businessID
+
+	code, err := accessToken.GetLatestByAccountIDAndIsLive(base.Db.Auth)
 	if err != nil {
 		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
 		c.JSON(code, rd)

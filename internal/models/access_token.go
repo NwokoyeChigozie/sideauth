@@ -42,6 +42,18 @@ func (a *AccessToken) GetByAccountID(db *gorm.DB) (int, error) {
 	return http.StatusOK, nil
 }
 
+func (a *AccessToken) GetLatestByAccountIDAndIsLive(db *gorm.DB) (int, error) {
+	err, nilErr := postgresql.SelectLatestFromDb(db, &a, "account_id = ? and is_live = ? ", a.AccountID, a.IsLive)
+	if nilErr != nil {
+		return http.StatusBadRequest, nilErr
+	}
+
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+	return http.StatusOK, nil
+}
+
 func (a *AccessToken) CreateAccessToken(db *gorm.DB) error {
 	app := config.GetConfig().App
 	if a.AccountID == 0 {
