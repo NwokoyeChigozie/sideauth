@@ -31,7 +31,7 @@ func FindMicroserviceRequest(name string, headers map[string]string, data interf
 	switch name {
 	case "welcome_notification":
 		return RequestObj{
-			Path:         fmt.Sprintf("%v/email/send/welcome", config.Microservices.Notification),
+			Path:         fmt.Sprintf("%v/v2/send/send_welcome_mail", config.Microservices.Notification),
 			Method:       "POST",
 			Headers:      headers,
 			SuccessCode:  200,
@@ -40,7 +40,7 @@ func FindMicroserviceRequest(name string, headers map[string]string, data interf
 		}, nil
 	case "welcome_sms_notification":
 		return RequestObj{
-			Path:         fmt.Sprintf("%v/phone/send/welcome", config.Microservices.Notification),
+			Path:         fmt.Sprintf("%v/v2/send/send_welcome_sms", config.Microservices.Notification),
 			Method:       "POST",
 			Headers:      headers,
 			SuccessCode:  200,
@@ -49,7 +49,7 @@ func FindMicroserviceRequest(name string, headers map[string]string, data interf
 		}, nil
 	case "send_otp_notification":
 		return RequestObj{
-			Path:         fmt.Sprintf("%v/send_otp", config.Microservices.Notification),
+			Path:         fmt.Sprintf("%v/v2/send/send_otp", config.Microservices.Notification),
 			Method:       "POST",
 			Headers:      headers,
 			SuccessCode:  200,
@@ -58,7 +58,7 @@ func FindMicroserviceRequest(name string, headers map[string]string, data interf
 		}, nil
 	case "welcome_password_reset_notification":
 		return RequestObj{
-			Path:         fmt.Sprintf("%v/email/send/welcome_password", config.Microservices.Notification),
+			Path:         fmt.Sprintf("%v/v2/send/send_welcome_password_mail", config.Microservices.Notification),
 			Method:       "POST",
 			Headers:      headers,
 			SuccessCode:  200,
@@ -67,7 +67,7 @@ func FindMicroserviceRequest(name string, headers map[string]string, data interf
 		}, nil
 	case "email_password_reset_notification":
 		return RequestObj{
-			Path:         fmt.Sprintf("%v/email/send/reset_password", config.Microservices.Notification),
+			Path:         fmt.Sprintf("%v/v2/send/send_reset_password_mail", config.Microservices.Notification),
 			Method:       "POST",
 			Headers:      headers,
 			SuccessCode:  200,
@@ -76,7 +76,7 @@ func FindMicroserviceRequest(name string, headers map[string]string, data interf
 		}, nil
 	case "phone_password_reset_notification":
 		return RequestObj{
-			Path:         fmt.Sprintf("%v/phone/send/reset_password", config.Microservices.Notification),
+			Path:         fmt.Sprintf("%v/v2/send/send_reset_password_sms", config.Microservices.Notification),
 			Method:       "POST",
 			Headers:      headers,
 			SuccessCode:  200,
@@ -85,7 +85,7 @@ func FindMicroserviceRequest(name string, headers map[string]string, data interf
 		}, nil
 	case "email_password_reset_done_notification":
 		return RequestObj{
-			Path:         fmt.Sprintf("%v/email/send/reset_password/done", config.Microservices.Notification),
+			Path:         fmt.Sprintf("%v/v2/send/send_reset_password_done_mail", config.Microservices.Notification),
 			Method:       "POST",
 			Headers:      headers,
 			SuccessCode:  200,
@@ -94,7 +94,7 @@ func FindMicroserviceRequest(name string, headers map[string]string, data interf
 		}, nil
 	case "phone_password_reset_done_notification":
 		return RequestObj{
-			Path:         fmt.Sprintf("%v/phone/send/reset_password/done", config.Microservices.Notification),
+			Path:         fmt.Sprintf("%v/v2/send/send_reset_password_done_sms", config.Microservices.Notification),
 			Method:       "POST",
 			Headers:      headers,
 			SuccessCode:  200,
