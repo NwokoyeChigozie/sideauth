@@ -12,9 +12,9 @@ import (
 type WalletTransaction struct {
 	ID                uint      `gorm:"column:id; type:uint; not null; primaryKey; unique; autoIncrement" json:"id"`
 	SenderAccountID   string    `gorm:"column:sender_account_id; type:varchar(255); not null" json:"sender_account_id"`
-	ReceiverAccountID string    `gorm:"column:receiver_account_id; type:varchar(255); not null" json:"receiver_account_id"`
+	ReceiverAccountID string    `gorm:"column:receiver_account_id; type:varchar(255)" json:"receiver_account_id"`
 	SenderAmount      float64   `gorm:"column:sender_amount; type:decimal(20,2); not null" json:"sender_amount"`
-	ReceiverAmount    float64   `gorm:"column:receiver_amount; type:decimal(20,2); not null" json:"receiver_amount"`
+	ReceiverAmount    float64   `gorm:"column:receiver_amount; type:decimal(20,2)" json:"receiver_amount"`
 	SenderCurrency    string    `gorm:"column:sender_currency; type:varchar(255); not null" json:"sender_currency"`
 	ReceiverCurrency  string    `gorm:"column:receiver_currency; type:varchar(255); not null" json:"receiver_currency"`
 	Approved          string    `gorm:"column:approved; type:varchar(255); not null; default: pending; comment: yes,no,pending" json:"approved"`

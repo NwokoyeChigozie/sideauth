@@ -28,7 +28,7 @@ type GetCountryModel struct {
 }
 
 func (c *Country) FindWithNameOrCode(db *gorm.DB) (int, error) {
-	err, nilErr := postgresql.SelectOneFromDb(db, &c, "name = ? or country_code = ?", c.Name, strings.ToUpper(c.Name))
+	err, nilErr := postgresql.SelectOneFromDb(db, &c, "LOWER(name) = ? or LOWER(country_code) = ?", strings.ToLower(c.Name), strings.ToLower(c.Name))
 	if nilErr != nil {
 		return http.StatusBadRequest, nilErr
 	}
@@ -93,7 +93,7 @@ func (c *Country) CreateCountry(db *gorm.DB) error {
 func AddCountriesIfNotExist(db *gorm.DB) error {
 	countries := []Country{
 		{
-			Name:         "nigeria",
+			Name:         "Nigeria",
 			CountryCode:  "NG",
 			CurrencyCode: "NGN",
 		}, {
