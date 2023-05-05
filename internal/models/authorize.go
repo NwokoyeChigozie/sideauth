@@ -16,7 +16,7 @@ type Authorize struct {
 	Token        string    `gorm:"column:token; type:varchar(250); not null" json:"token"`
 	IpAddress    string    `gorm:"column:ip_address; type:varchar(250); not null" json:"ip_address"`
 	Browser      string    `gorm:"column:browser; type:varchar(250); not null" json:"browser"`
-	Os           string    `gorm:"column:os; type:varchar(250); not null" json:"os"`
+	Os           string    `gorm:"column:os; type:varchar(250)" json:"os"`
 	Location     string    `gorm:"column:location; type:varchar(250); not null" json:"location"`
 	Attempt      int       `gorm:"column:attempt; type:int; default: 0" json:"attempt"`
 	AuthorizedAt time.Time `gorm:"column:authorized_at" json:"authorized_at"`
