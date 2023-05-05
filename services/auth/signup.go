@@ -67,6 +67,8 @@ func SignupService(logger *utility.Logger, req models.CreateUserRequestModel, db
 		processingFee       float32
 	)
 
+	fmt.Println("ssss1")
+
 	if accountType == "" {
 		accountType = "individual"
 	}
@@ -79,11 +81,13 @@ func SignupService(logger *utility.Logger, req models.CreateUserRequestModel, db
 	if err != nil {
 		return nil, code, err
 	}
+	fmt.Println("ssss2")
 
 	password, err = utility.Hash(req.Password)
 	if err != nil {
 		return nil, http.StatusInternalServerError, err
 	}
+	fmt.Println("ssss3")
 
 	currency, countryCode = country.CurrencyCode, country.CountryCode
 
