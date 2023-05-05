@@ -16,7 +16,7 @@ type WalletTransaction struct {
 	SenderAmount      float64   `gorm:"column:sender_amount; type:decimal(20,2); not null" json:"sender_amount"`
 	ReceiverAmount    float64   `gorm:"column:receiver_amount; type:decimal(20,2)" json:"receiver_amount"`
 	SenderCurrency    string    `gorm:"column:sender_currency; type:varchar(255); not null" json:"sender_currency"`
-	ReceiverCurrency  string    `gorm:"column:receiver_currency; type:varchar(255); not null" json:"receiver_currency"`
+	ReceiverCurrency  string    `gorm:"column:receiver_currency; type:varchar(255)" json:"receiver_currency"`
 	Approved          string    `gorm:"column:approved; type:varchar(255); not null; default: pending; comment: yes,no,pending" json:"approved"`
 	CreatedAt         time.Time `gorm:"column:created_at; autoCreateTime" json:"created_at"`
 	UpdatedAt         time.Time `gorm:"column:updated_at; autoUpdateTime" json:"updated_at"`
