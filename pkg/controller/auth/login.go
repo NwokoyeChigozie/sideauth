@@ -115,3 +115,17 @@ func (base *Controller) GetAccessToken(c *gin.Context) {
 	c.JSON(http.StatusOK, rd)
 
 }
+
+func (base *Controller) RevokeTokenHandler(c *gin.Context) {
+
+	_, code, err := auth.RevokeAccessTokenService(base.Db, models.MyIdentity.AccountID)
+	if err != nil {
+		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
+		c.JSON(code, rd)
+		return
+	}
+
+	rd := utility.BuildSuccessResponse(http.StatusOK, "Business access token has been revoked", nil)
+	c.JSON(http.StatusOK, rd)
+
+}
