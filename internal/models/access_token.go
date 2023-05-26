@@ -69,6 +69,15 @@ func (a *AccessToken) CreateAccessToken(db *gorm.DB) error {
 	return nil
 }
 
+func (a *AccessToken) RevokeAccessToken(db *gorm.DB) error {
+	if a.AccountID == 0 {
+		return fmt.Errorf("account id not provided to revoke access token")
+	}
+	a.IsLive = false
+	_, err := postgresql.SaveAllFields(db, &a)
+	return err
+}
+
 func (a *AccessToken) LiveTokensWithPublicOrPrivateKey(db *gorm.DB) (int, error) {
 	err, nilErr := postgresql.SelectOneFromDb(db, &a, "(public_key = ? or private_key = ?) and is_live = ?", a.PublicKey, a.PrivateKey, a.IsLive)
 	if nilErr != nil {
@@ -79,4 +88,9 @@ func (a *AccessToken) LiveTokensWithPublicOrPrivateKey(db *gorm.DB) (int, error)
 		return http.StatusInternalServerError, err
 	}
 	return http.StatusOK, nil
+}
+
+func (a *AccessToken) Update(db *gorm.DB) error {
+	_, err := postgresql.SaveAllFields(db, &a)
+	return err
 }
