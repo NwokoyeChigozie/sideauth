@@ -4,11 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"net/http"
-	"net/http/httptest"
-	"net/url"
-	"testing"
-
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofrs/uuid"
@@ -18,6 +13,10 @@ import (
 	"github.com/vesicash/auth-ms/pkg/repository/storage/postgresql"
 	tst "github.com/vesicash/auth-ms/tests"
 	"github.com/vesicash/auth-ms/utility"
+	"net/http"
+	"net/http/httptest"
+	"net/url"
+	"testing"
 )
 
 func TestLogin(t *testing.T) {
@@ -451,6 +450,110 @@ func TestValidateToken(t *testing.T) {
 
 	}
 
+}
+
+func TestRevokeAccessToken(t *testing.T) {
+	logger := tst.Setup()
+	gin.SetMode(gin.TestMode)
+	validatorRef := validator.New()
+	db := postgresql.Connection()
+	r := gin.Default()
+
+	var (
+		muuid, _       = uuid.NewV4()
+		userSignUpData = models.CreateUserRequestModel{
+			EmailAddress: fmt.Sprintf("testuser%v@qa.team", muuid.String()),
+			PhoneNumber:  fmt.Sprintf("+234%v", utility.GetRandomNumbersInRange(7000000000, 9099999999)),
+			AccountType:  "individual",
+			Firstname:    "test",
+			Lastname:     "user",
+			Password:     "password",
+			Country:      "nigeria",
+			Username:     fmt.Sprintf("test_username%v", muuid.String()),
+		}
+		loginData = models.LoginUserRequestModel{
+			Username:     userSignUpData.Username,
+			EmailAddress: userSignUpData.EmailAddress,
+			PhoneNumber:  userSignUpData.PhoneNumber,
+			Password:     userSignUpData.Password,
+		}
+	)
+
+	auth := auth.Controller{Db: db, Validator: validatorRef, Logger: logger}
+	tst.SignupUser(t, r, auth, userSignUpData)
+	token, accountId := tst.GetLoginTokenAndAccountID(t, r, auth, loginData)
+
+	accesstoken := models.AccessToken{
+		AccountID: accountId,
+	}
+
+	err := accesstoken.CreateAccessToken(db.Auth)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	tests := []struct {
+		Name         string
+		RequestBody  interface{}
+		ExpectedCode int
+		Headers      map[string]string
+		Message      string
+	}{
+		{
+			Name:         "Ok revoke access token",
+			ExpectedCode: http.StatusOK,
+			Message:      "Business access token has been revoked",
+			Headers: map[string]string{
+				"Content-Type":  "application/json",
+				"Authorization": "Bearer " + token,
+			},
+		},
+	}
+
+	authTypeUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, middleware.AuthType))
+	{
+		authTypeUrl.POST("/revoke-token", auth.RevokeTokenHandler)
+
+	}
+
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			var b bytes.Buffer
+			json.NewEncoder(&b).Encode(test.RequestBody)
+			URI := url.URL{Path: "/v2/revoke-token"}
+
+			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			for i, v := range test.Headers {
+				req.Header.Set(i, v)
+			}
+
+			rr := httptest.NewRecorder()
+			r.ServeHTTP(rr, req)
+
+			tst.AssertStatusCode(t, rr.Code, test.ExpectedCode)
+
+			data := tst.ParseResponse(rr)
+
+			code := int(data["code"].(float64))
+			tst.AssertStatusCode(t, code, test.ExpectedCode)
+
+			if test.Message != "" {
+				message := data["message"]
+				if message != nil {
+					tst.AssertResponseMessage(t, message.(string), test.Message)
+				} else {
+					tst.AssertResponseMessage(t, "", test.Message)
+				}
+
+			}
+
+		})
+
+	}
 }
 
 func TestGetAccessToken(t *testing.T) {
