@@ -3,11 +3,10 @@ package auth
 import (
 	"fmt"
 	"github.com/vesicash/auth-ms/internal/config"
-	"github.com/vesicash/auth-ms/utility"
-	"net/http"
-
 	"github.com/vesicash/auth-ms/internal/models"
 	"github.com/vesicash/auth-ms/pkg/repository/storage/postgresql"
+	"github.com/vesicash/auth-ms/utility"
+	"net/http"
 )
 
 func IssueAccessTokenService(db postgresql.Databases, accountID int) (models.AccessToken, int, error) {
@@ -44,6 +43,27 @@ func IssueAccessTokenService(db postgresql.Databases, accountID int) (models.Acc
 	}
 
 	return token, http.StatusOK, nil
+
+}
+
+func UpdateUserMorSettings(db postgresql.Databases, req models.EnableMORReq) (models.User, int, error) {
+
+	var (
+		userDetails = models.User{AccountID: uint(req.AccountID)}
+	)
+
+	code, err := userDetails.GetUserByAccountID(db.Auth)
+	if err != nil {
+		return models.User{}, code, err
+	}
+
+	userDetails.IsMorEnabled = req.Status
+	err = userDetails.Update(db.Auth)
+	if err != nil {
+		return userDetails, http.StatusInternalServerError, nil
+	}
+
+	return userDetails, http.StatusOK, nil
 
 }
 

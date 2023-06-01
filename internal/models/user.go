@@ -45,6 +45,7 @@ type User struct {
 	CanMakeWithdrawal         bool      `gorm:"column:can_make_withdrawal; type:bool; default:false;not null" json:"can_make_withdrawal"`
 	CanFund                   bool      `gorm:"column:can_fund; type:bool; default:true;not null" json:"can_fund"`
 	CanExchange               bool      `gorm:"column:can_exchange; type:bool; default:false;not null" json:"can_exchange"`
+	IsMorEnabled              bool      `gorm:"column:is_mor_enabled;type:bool;default:false;not null" json:"is_mor_enabled"`
 }
 
 type CreateUserRequestModel struct {
@@ -78,6 +79,11 @@ type GetUserModel struct {
 	EmailAddress string `json:"email_address"`
 	PhoneNumber  string `json:"phone_number"`
 	Username     string `json:"username"`
+}
+
+type EnableMORReq struct {
+	AccountID int  `json:"account_id" validate:"required" pgvalidate:"exists=auth$users$account_id"`
+	Status    bool `json:"status" validate:"required"`
 }
 
 type BulkCreateUserRequestModel struct {
@@ -166,4 +172,9 @@ func (u *User) SelectByBusinessID(db *gorm.DB) ([]User, error) {
 		return users, err
 	}
 	return users, nil
+}
+
+func (u *User) UpdateAllFields(db *gorm.DB) error {
+	_, err := postgresql.SaveAllFields(db, &u)
+	return err
 }

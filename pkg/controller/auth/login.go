@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"fmt"
+	"github.com/vesicash/auth-ms/pkg/repository/storage/postgresql"
 	"net/http"
 	"strconv"
 	"time"
@@ -114,6 +116,50 @@ func (base *Controller) GetAccessToken(c *gin.Context) {
 	rd := utility.BuildSuccessResponse(http.StatusOK, "success", accessToken)
 	c.JSON(http.StatusOK, rd)
 
+}
+
+func (base *Controller) EnableMor(c *gin.Context) {
+	var (
+		req models.EnableMORReq
+	)
+
+	err := c.ShouldBind(&req)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Failed to parse request body", err, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	err = base.Validator.Struct(&req)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Validation failed", utility.ValidationResponse(err, base.Validator), nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	if models.MyIdentity.AccountID != req.AccountID {
+		err := fmt.Errorf("not authorized to create mor settings for this user")
+		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "error", err.Error(), err, nil)
+		c.JSON(http.StatusUnauthorized, rd)
+		return
+	}
+
+	err = postgresql.ValidateRequest(req)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", err.Error(), err, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	userDetails, code, err := auth.UpdateUserMorSettings(base.Db, req)
+	if err != nil {
+		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
+		c.JSON(code, rd)
+		return
+	}
+
+	rd := utility.BuildSuccessResponse(http.StatusOK, "mor status updated!", userDetails)
+	c.JSON(http.StatusOK, rd)
 }
 
 func (base *Controller) RevokeTokenHandler(c *gin.Context) {

@@ -53,6 +53,8 @@ func Auth(r *gin.Engine, ApiVersion string, validator *validator.Validate, db po
 		authTypeUrl.POST("/validate-token", auth.ValidateToken)
 		authTypeUrl.POST("/logout", auth.Logout)
 
+		authTypeUrl.POST("/enable-mor", auth.EnableMor)
+
 		authTypeUrl.POST("/revoke-token", auth.RevokeTokenHandler)
 
 	}
