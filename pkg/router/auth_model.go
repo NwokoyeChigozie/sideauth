@@ -37,6 +37,7 @@ func Model(r *gin.Engine, ApiVersion string, validator *validator.Validate, db p
 		modelTypeUrl.POST("/get_business_charge", auth_model.GetBusinessCharge)
 		modelTypeUrl.POST("/init_business_charge", auth_model.InitBusinessCharge)
 		modelTypeUrl.POST("/create_wallet", auth_model.CreateWallet)
+		modelTypeUrl.POST("/get_wallets/:account_id", auth_model.GetWalletsByAccountIDAndCurrencies)
 		modelTypeUrl.GET("/get_wallet/:account_id/:currency", auth_model.GetWalletByAccountIDAndCurrency)
 		modelTypeUrl.PATCH("/update_wallet_balance", auth_model.UpdateWalletBalance)
 		modelTypeUrl.POST("/create_wallet_history", auth_model.CreateWalletHistory)

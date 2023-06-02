@@ -28,6 +28,9 @@ type UpdateWalletRequest struct {
 	ID        uint    `json:"id" validate:"required" pgvalidate:"exists=auth$wallet_balances$id"`
 	Available float64 `json:"available"`
 }
+type GetWalletsRequest struct {
+	Currencies []string `json:"currencies" validate:"required"`
+}
 
 func (w *WalletBalance) GetWalletBalanceByID(db *gorm.DB) (int, error) {
 	err, nilErr := postgresql.SelectOneFromDb(db, &w, "id = ? ", w.ID)
@@ -40,6 +43,7 @@ func (w *WalletBalance) GetWalletBalanceByID(db *gorm.DB) (int, error) {
 	}
 	return http.StatusOK, nil
 }
+
 func (w *WalletBalance) GetWalletBalanceByAccountIDAndCurrency(db *gorm.DB) (int, error) {
 	err, nilErr := postgresql.SelectOneFromDb(db, &w, "account_id = ? and LOWER(currency)=?", w.AccountID, strings.ToLower(w.Currency))
 	if nilErr != nil {
@@ -50,6 +54,21 @@ func (w *WalletBalance) GetWalletBalanceByAccountIDAndCurrency(db *gorm.DB) (int
 		return http.StatusInternalServerError, err
 	}
 	return http.StatusOK, nil
+}
+
+func (w *WalletBalance) GetWalletBalancesByAccountIDAndCurrencies(db *gorm.DB, currencies []string) ([]WalletBalance, error) {
+	lowerCurrencies := []string{}
+	for _, v := range currencies {
+		lowerCurrencies = append(lowerCurrencies, strings.ToLower(v))
+	}
+	fmt.Println("lowerCurrencies", lowerCurrencies)
+	wallets := []WalletBalance{}
+	err := postgresql.SelectAllFromDb(db, "asc", &wallets, "account_id = ? and LOWER(currency) IN (?) ", w.AccountID, lowerCurrencies)
+	if err != nil {
+		return wallets, err
+	}
+	fmt.Println("wallets", wallets)
+	return wallets, nil
 }
 
 func (w *WalletBalance) CreateWalletBalance(db *gorm.DB) error {
