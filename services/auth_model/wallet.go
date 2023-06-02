@@ -1,7 +1,6 @@
 package auth_model
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -74,20 +73,15 @@ func GetWalletsByAccountIDAndCurrenciesService(db postgresql.Databases, accountI
 		wallet            = models.WalletBalance{AccountID: accountID}
 		walletBalancesMap = map[string]models.WalletBalance{}
 	)
-	fmt.Println("currencies", currencies)
 
 	walletBalances, err := wallet.GetWalletBalancesByAccountIDAndCurrencies(db.Auth, currencies)
 	if err != nil {
 		return walletBalancesMap, http.StatusInternalServerError, err
 	}
 
-	fmt.Println("walletBalances", walletBalances)
-
 	for _, w := range walletBalances {
 		walletBalancesMap[w.Currency] = w
 	}
-
-	fmt.Println("walletBalancesMap", walletBalancesMap)
 
 	return walletBalancesMap, http.StatusOK, nil
 }

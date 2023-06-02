@@ -61,13 +61,13 @@ func (w *WalletBalance) GetWalletBalancesByAccountIDAndCurrencies(db *gorm.DB, c
 	for _, v := range currencies {
 		lowerCurrencies = append(lowerCurrencies, strings.ToLower(v))
 	}
-	fmt.Println("lowerCurrencies", lowerCurrencies)
+
 	wallets := []WalletBalance{}
 	err := postgresql.SelectAllFromDb(db, "asc", &wallets, "account_id = ? and LOWER(currency) IN (?) ", w.AccountID, lowerCurrencies)
 	if err != nil {
 		return wallets, err
 	}
-	fmt.Println("wallets", wallets)
+
 	return wallets, nil
 }
 
