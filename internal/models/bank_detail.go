@@ -13,7 +13,7 @@ import (
 type BankDetail struct {
 	ID                  uint      `gorm:"column:id; type:uint; not null; primaryKey; unique; autoIncrement" json:"id"`
 	AccountID           int       `gorm:"column:account_id; type:int; not null" json:"account_id"`
-	BankID              int       `gorm:"column:bank_id; type:int; not null" json:"bank_id"`
+	BankID              int       `gorm:"column:bank_id; type:int" json:"bank_id"`
 	AccountName         string    `gorm:"column:account_name; type:varchar(250); not null" json:"account_name"`
 	AccountNo           string    `gorm:"column:account_no; type:varchar(250); not null" json:"account_no"`
 	MobileMoneyOperator string    `gorm:"column:mobile_money_operator; type:varchar(250)" json:"mobile_money_operator"`
