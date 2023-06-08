@@ -17,5 +17,5 @@ type Databases struct {
 	TRANSACTIONS_DB  string
 	VERIFICATION_DB  string
 	CRON_DB          string
-	Migrate          bool
+	Migrate          string
 }

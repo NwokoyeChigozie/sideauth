@@ -38,7 +38,7 @@ type BaseConfig struct {
 	TRANSACTIONS_DB  string `mapstructure:"TRANSACTIONS_DB"`
 	VERIFICATION_DB  string `mapstructure:"VERIFICATION_DB"`
 	CRON_DB          string `mapstructure:"CRON_DB"`
-	MIGRATE          bool   `mapstructure:"MIGRATE"`
+	MIGRATE          string `mapstructure:"MIGRATE"`
 
 	TEST_DB_HOST          string `mapstructure:"TEST_DB_HOST"`
 	TEST_DB_PORT          string `mapstructure:"TEST_DB_PORT"`
@@ -56,7 +56,7 @@ type BaseConfig struct {
 	TEST_TRANSACTIONS_DB  string `mapstructure:"TEST_TRANSACTIONS_DB"`
 	TEST_VERIFICATION_DB  string `mapstructure:"TEST_VERIFICATION_DB"`
 	TEST_CRON_DB          string `mapstructure:"TEST_CRON_DB"`
-	TEST_MIGRATE          bool   `mapstructure:"TEST_MIGRATE"`
+	TEST_MIGRATE          string `mapstructure:"TEST_MIGRATE"`
 
 	MS_ADMIN        string `mapstructure:"MS_ADMIN"`
 	MS_AUTH         string `mapstructure:"MS_AUTH"`

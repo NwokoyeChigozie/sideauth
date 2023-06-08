@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"strconv"
 
 	"github.com/vesicash/auth-ms/internal/config"
 	"github.com/vesicash/auth-ms/internal/models/migrations"
@@ -23,7 +24,8 @@ func main() {
 	validatorRef := validator.New()
 	db := postgresql.Connection()
 
-	if configuration.Databases.Migrate {
+	shouldMigrate, _ := strconv.ParseBool(configuration.Databases.Migrate)
+	if shouldMigrate {
 		migrations.RunAllMigrations(db)
 	}
 
