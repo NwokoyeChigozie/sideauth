@@ -90,6 +90,16 @@ func (c *Country) CreateCountry(db *gorm.DB) error {
 	return nil
 }
 
+func (c *Country) GetSelectedCountries(db *gorm.DB) ([]Country, error) {
+	var countries []Country
+	selectedCountries := []string{"Ghana", "Nigeria", "Zambia", "Egypt", "Kenya"}
+	err := db.Order("id desc").Where("name IN ?", selectedCountries).Find(&countries).Error
+	if err != nil {
+		return countries, err
+	}
+	return countries, nil
+}
+
 func AddCountriesIfNotExist(db *gorm.DB) error {
 	countries := []Country{
 		{

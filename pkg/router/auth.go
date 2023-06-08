@@ -53,11 +53,20 @@ func Auth(r *gin.Engine, ApiVersion string, validator *validator.Validate, db po
 		authTypeUrl.POST("/validate-token", auth.ValidateToken)
 		authTypeUrl.POST("/logout", auth.Logout)
 
-		authTypeUrl.POST("/enable-mor", auth.EnableMor)
+		authTypeUrl.POST("/toggle-mor-status", auth.ToggleMorStatus)
 
 		authTypeUrl.POST("/revoke-token", auth.RevokeTokenHandler)
 
 	}
+
+	businessAdminUrl := r.Group(fmt.Sprintf("%v", ApiVersion), middleware.Authorize(db, middleware.BusinessAdmin))
+	{
+		businessAdminUrl.GET("/users/get", auth.GetUsers)
+
+		businessAdminUrl.GET("/countries/mor", auth.ListSelectedCountries)
+
+	}
+
 	authApiUrl := r.Group(fmt.Sprintf("%v/api", ApiVersion), middleware.Authorize(db, middleware.ApiType))
 	{
 		authApiUrl.POST("/send_otp", auth.SendOTPAPI)
