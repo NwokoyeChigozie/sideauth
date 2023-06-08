@@ -21,17 +21,17 @@ var (
 )
 
 type User struct {
-	ID                        uint      `gorm:"column:id; type:uint; not null; primaryKey; unique; autoIncrement" json:"id"`
-	AccountID                 uint      `gorm:"column:account_id; type:int; not null" json:"account_id"`
-	AccountType               string    `gorm:"column:account_type; type:varchar(250)" json:"account_type"`
-	Firstname                 string    `gorm:"column:firstname; type:varchar(250)" json:"firstname"`
-	Lastname                  string    `gorm:"column:lastname; type:varchar(250)" json:"lastname"`
-	EmailAddress              string    `gorm:"column:email_address; type:varchar(250)" json:"email_address"`
-	PhoneNumber               string    `gorm:"column:phone_number; type:varchar(250)" json:"phone_number"`
-	Username                  string    `gorm:"column:username; type:varchar(250)" json:"username"`
-	Password                  string    `gorm:"column:password; type:varchar(250)" json:"-"`
-	TierType                  int       `gorm:"column:tier_type; type:int" json:"tier_type"`
-	DeletedAt                 time.Time `gorm:"column:deleted_at" json:"deleted_at"`
+	ID           uint   `gorm:"column:id; type:uint; not null; primaryKey; unique; autoIncrement" json:"id"`
+	AccountID    uint   `gorm:"column:account_id; type:int; not null" json:"account_id"`
+	AccountType  string `gorm:"column:account_type; type:varchar(250)" json:"account_type"`
+	Firstname    string `gorm:"column:firstname; type:varchar(250)" json:"firstname"`
+	Lastname     string `gorm:"column:lastname; type:varchar(250)" json:"lastname"`
+	EmailAddress string `gorm:"column:email_address; type:varchar(250)" json:"email_address"`
+	PhoneNumber  string `gorm:"column:phone_number; type:varchar(250)" json:"phone_number"`
+	Username     string `gorm:"column:username; type:varchar(250)" json:"username"`
+	Password     string `gorm:"column:password; type:varchar(250)" json:"-"`
+	TierType     int    `gorm:"column:tier_type; type:int" json:"tier_type"`
+	//DeletedAt                 time.Time `gorm:"column:deleted_at" json:"deleted_at"`
 	CreatedAt                 time.Time `gorm:"column:created_at; autoCreateTime" json:"created_at"`
 	UpdatedAt                 time.Time `gorm:"column:updated_at; autoUpdateTime" json:"updated_at"`
 	LoginAccessToken          string    `gorm:"column:login_access_token; type:text" json:"-"`
@@ -82,8 +82,7 @@ type GetUserModel struct {
 }
 
 type EnableMORReq struct {
-	AccountID int  `json:"account_id" validate:"required" pgvalidate:"exists=auth$users$account_id"`
-	Status    bool `json:"status" validate:"required"`
+	Status *bool `json:"status" validate:"required"`
 }
 
 type BulkCreateUserRequestModel struct {
@@ -177,4 +176,28 @@ func (u *User) SelectByBusinessID(db *gorm.DB) ([]User, error) {
 func (u *User) UpdateAllFields(db *gorm.DB) error {
 	_, err := postgresql.SaveAllFields(db, &u)
 	return err
+}
+
+func (u *User) GetUsers(db *gorm.DB, searchParam string, isMorEnabled *bool) ([]User, error) {
+	query := ""
+
+	if searchParam != "" {
+		query = addQuery(query, fmt.Sprintf("(email_address ILIKE '%v' OR firstname ILIKE '%v' OR lastname ILIKE '%v')", "%"+searchParam+"%", "%"+searchParam+"%", "%"+searchParam+"%"), "OR")
+	}
+
+	if isMorEnabled != nil {
+		query = addQuery(query, fmt.Sprintf("(is_mor_enabled = %v and is_mor_enabled IS NOT NULL)", *isMorEnabled), "AND")
+	}
+
+	var users []User
+	err := postgresql.SelectAllFromDb(db, "desc", &users, query)
+	if err != nil {
+		return users, err
+	}
+
+	if err != nil {
+		return users, err
+	}
+
+	return users, nil
 }

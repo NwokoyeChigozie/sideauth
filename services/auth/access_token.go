@@ -2,11 +2,13 @@ package auth
 
 import (
 	"fmt"
+	"net/http"
+	"strings"
+
 	"github.com/vesicash/auth-ms/internal/config"
 	"github.com/vesicash/auth-ms/internal/models"
 	"github.com/vesicash/auth-ms/pkg/repository/storage/postgresql"
 	"github.com/vesicash/auth-ms/utility"
-	"net/http"
 )
 
 func IssueAccessTokenService(db postgresql.Databases, accountID int) (models.AccessToken, int, error) {
@@ -46,10 +48,10 @@ func IssueAccessTokenService(db postgresql.Databases, accountID int) (models.Acc
 
 }
 
-func UpdateUserMorSettings(db postgresql.Databases, req models.EnableMORReq) (models.User, int, error) {
+func UpdateUserMorSettings(db postgresql.Databases, req models.EnableMORReq, accountId int) (models.User, int, error) {
 
 	var (
-		userDetails = models.User{AccountID: uint(req.AccountID)}
+		userDetails = models.User{AccountID: uint(accountId)}
 	)
 
 	code, err := userDetails.GetUserByAccountID(db.Auth)
@@ -57,13 +59,58 @@ func UpdateUserMorSettings(db postgresql.Databases, req models.EnableMORReq) (mo
 		return models.User{}, code, err
 	}
 
-	userDetails.IsMorEnabled = req.Status
+	if req.Status != nil {
+		userDetails.IsMorEnabled = *req.Status
+	}
+
 	err = userDetails.Update(db.Auth)
 	if err != nil {
 		return userDetails, http.StatusInternalServerError, nil
 	}
 
 	return userDetails, http.StatusOK, nil
+
+}
+
+func GetUserService(db postgresql.Databases, searchParam string, isMorEnabledParam string) (interface{}, int, error) {
+
+	var (
+		resp          = []map[string]interface{}{}
+		isMorEnabled  *bool
+		trueD, falseD = true, false
+	)
+
+	if strings.EqualFold(isMorEnabledParam, "true") {
+		isMorEnabled = &trueD
+	} else if strings.EqualFold(isMorEnabledParam, "false") {
+		isMorEnabled = &falseD
+	}
+
+	user := models.User{}
+	users, err := user.GetUsers(db.Auth, searchParam, isMorEnabled)
+
+	if err != nil {
+		return resp, http.StatusInternalServerError, err
+	}
+
+	return users, http.StatusOK, nil
+
+}
+
+func ListSelectedCountriesService(db postgresql.Databases) (interface{}, int, error) {
+
+	var (
+		resp = []map[string]interface{}{}
+	)
+
+	country := models.Country{}
+	countries, err := country.GetSelectedCountries(db.Auth)
+
+	if err != nil {
+		return resp, http.StatusInternalServerError, err
+	}
+
+	return countries, http.StatusOK, nil
 
 }
 
