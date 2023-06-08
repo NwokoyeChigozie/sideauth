@@ -178,27 +178,22 @@ func (u *User) UpdateAllFields(db *gorm.DB) error {
 	return err
 }
 
-func (u *User) GetUsers(db *gorm.DB, searchParam string, isMorEnabledParam string) ([]User, error) {
-	query := db.Model(&User{})
+func (u *User) GetUsers(db *gorm.DB, searchParam string, isMorEnabled *bool) ([]User, error) {
+	query := ""
 
 	if searchParam != "" {
-		query = query.Where("email_address ILIKE ? OR firstname ILIKE ? or lastname ILIKE ?", "%"+searchParam+"%", "%"+searchParam+"%", "%"+searchParam+"%")
+		query = addQuery(query, `email_address ILIKE '%`+searchParam+`%' OR firstname ILIKE '%`+searchParam+`%' or lastname ILIKE '%`+searchParam+`%'`, "")
 	}
 
-	if isMorEnabledParam != "" {
-		var isMorEnabled bool
-		if isMorEnabledParam == "true" {
-			isMorEnabled = true
-		} else if isMorEnabledParam == "false" {
-			isMorEnabled = false
-		}
-
-		query = query.Where("is_mor_enabled = ?", isMorEnabled)
-		query = query.Where("is_mor_enabled IS NOT NULL")
+	if isMorEnabled != nil {
+		query = addQuery(query, fmt.Sprintf("(is_mor_enabled = %v and is_mor_enabled IS NOT NULL)", isMorEnabled), "and")
 	}
 
 	var users []User
-	err := query.Order("id desc").Find(&users).Error
+	err := postgresql.SelectAllFromDb(db, "desc", &users, query)
+	if err != nil {
+		return users, err
+	}
 
 	if err != nil {
 		return users, err

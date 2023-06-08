@@ -93,7 +93,7 @@ func (c *Country) CreateCountry(db *gorm.DB) error {
 func (c *Country) GetSelectedCountries(db *gorm.DB) ([]Country, error) {
 	var countries []Country
 	selectedCountries := []string{"Ghana", "Nigeria", "Zambia", "Egypt", "Kenya"}
-	err := db.Order("id desc").Where("name IN ?", selectedCountries).Find(&countries).Error
+	err := postgresql.SelectAllFromDb(db, "desc", &countries, "name IN (?) ", selectedCountries)
 	if err != nil {
 		return countries, err
 	}
