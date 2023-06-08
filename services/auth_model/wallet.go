@@ -67,3 +67,21 @@ func GetWalletByAccountIDAndCurrencyService(db postgresql.Databases, accountID i
 	return wallet, http.StatusOK, nil
 
 }
+
+func GetWalletsByAccountIDAndCurrenciesService(db postgresql.Databases, accountID int, currencies []string) (map[string]models.WalletBalance, int, error) {
+	var (
+		wallet            = models.WalletBalance{AccountID: accountID}
+		walletBalancesMap = map[string]models.WalletBalance{}
+	)
+
+	walletBalances, err := wallet.GetWalletBalancesByAccountIDAndCurrencies(db.Auth, currencies)
+	if err != nil {
+		return walletBalancesMap, http.StatusInternalServerError, err
+	}
+
+	for _, w := range walletBalances {
+		walletBalancesMap[w.Currency] = w
+	}
+
+	return walletBalancesMap, http.StatusOK, nil
+}

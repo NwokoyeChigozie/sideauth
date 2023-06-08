@@ -113,6 +113,52 @@ func (base *Controller) GetWalletByAccountIDAndCurrency(c *gin.Context) {
 
 }
 
+func (base *Controller) GetWalletsByAccountIDAndCurrencies(c *gin.Context) {
+	var (
+		accountIDString = c.Param("account_id")
+		req             models.GetWalletsRequest
+	)
+
+	err := c.ShouldBind(&req)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Failed to parse request body", err, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	err = base.Validator.Struct(&req)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Validation failed", utility.ValidationResponse(err, base.Validator), nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	err = postgresql.ValidateRequest(req)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", err.Error(), err, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	accountID, err := strconv.Atoi(accountIDString)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "invalid account id", err, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	walletBalances, code, err := auth_model.GetWalletsByAccountIDAndCurrenciesService(base.Db, accountID, req.Currencies)
+	if err != nil {
+		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
+		c.JSON(code, rd)
+		return
+	}
+
+	rd := utility.BuildSuccessResponse(http.StatusOK, "successful", walletBalances)
+	c.JSON(http.StatusOK, rd)
+
+}
+
 func (base *Controller) CreateWalletHistory(c *gin.Context) {
 	var (
 		req models.CreateWalletHistoryRequest
