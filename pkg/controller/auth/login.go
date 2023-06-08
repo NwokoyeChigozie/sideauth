@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"fmt"
 	"github.com/vesicash/auth-ms/pkg/repository/storage/postgresql"
 	"net/http"
 	"strconv"
@@ -118,7 +117,7 @@ func (base *Controller) GetAccessToken(c *gin.Context) {
 
 }
 
-func (base *Controller) EnableMor(c *gin.Context) {
+func (base *Controller) ToggleMorStatus(c *gin.Context) {
 	var (
 		request models.EnableMORReq
 	)
@@ -137,13 +136,6 @@ func (base *Controller) EnableMor(c *gin.Context) {
 		return
 	}
 
-	if models.MyIdentity.AccountID != request.AccountID {
-		err := fmt.Errorf("not authorized to create mor settings for this user")
-		rd := utility.BuildErrorResponse(http.StatusUnauthorized, "error", err.Error(), err, nil)
-		c.JSON(http.StatusUnauthorized, rd)
-		return
-	}
-
 	err = postgresql.ValidateRequest(request)
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", err.Error(), err, nil)
@@ -151,7 +143,7 @@ func (base *Controller) EnableMor(c *gin.Context) {
 		return
 	}
 
-	_, code, err := auth.UpdateUserMorSettings(base.Db, request)
+	_, code, err := auth.UpdateUserMorSettings(base.Db, request, models.MyIdentity.AccountID)
 	if err != nil {
 		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
 		c.JSON(code, rd)
@@ -171,6 +163,38 @@ func (base *Controller) RevokeTokenHandler(c *gin.Context) {
 	}
 
 	rd := utility.BuildSuccessResponse(http.StatusOK, "Business access token has been revoked", nil)
+	c.JSON(http.StatusOK, rd)
+
+}
+
+func (base *Controller) GetUsers(c *gin.Context) {
+	var (
+		searchParam       = c.Query("search")
+		isMorEnabledParam = c.Query("is_mor_enabled")
+	)
+
+	users, code, err := auth.GetUserService(base.Db, searchParam, isMorEnabledParam)
+	if err != nil {
+		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
+		c.JSON(code, rd)
+		return
+	}
+
+	rd := utility.BuildSuccessResponse(http.StatusOK, "Users retrieved", users)
+	c.JSON(http.StatusOK, rd)
+
+}
+
+func (base *Controller) ListSelectedCountries(c *gin.Context) {
+
+	countries, code, err := auth.ListSelectedCountriesService(base.Db)
+	if err != nil {
+		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
+		c.JSON(code, rd)
+		return
+	}
+
+	rd := utility.BuildSuccessResponse(http.StatusOK, "Countries retrieved", countries)
 	c.JSON(http.StatusOK, rd)
 
 }
