@@ -68,8 +68,8 @@ func Security() gin.HandlerFunc {
 		// // X-Permitted-Cross-Domain-Policies
 		// c.Writer.Header().Add("X-Permitted-Cross-Domain-Policies", "none")
 
-		// // Referrer-Policy
-		// c.Writer.Header().Add("Referrer-Policy", "no-referrer")
+		// Referrer-Policy
+		c.Writer.Header().Add("Referrer-Policy", "no-referrer")
 
 		// Feature-Policy
 		c.Writer.Header().Add("Feature-Policy", "microphone 'none'; camera 'none'")
