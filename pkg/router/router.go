@@ -25,7 +25,7 @@ func Setup(logger *utility.Logger, validator *validator.Validate, db postgresql.
 	r.SetTrustedProxies(config.GetConfig().Server.TrustedProxies)
 	// r.Use(middleware.PrometheusMiddleware())
 	// r.Use(middleware.Security())
-	// r.Use(middleware.Throttle())
+	r.Use(middleware.Throttle())
 	r.Use(middleware.Logger())
 	r.Use(gin.Recovery())
 	r.Use(middleware.CORS())
