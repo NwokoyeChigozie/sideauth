@@ -2,13 +2,13 @@ package auth
 
 import (
 	"fmt"
-	"net/http"
-	"strings"
-
+	"github.com/gin-gonic/gin"
 	"github.com/vesicash/auth-ms/internal/config"
 	"github.com/vesicash/auth-ms/internal/models"
 	"github.com/vesicash/auth-ms/pkg/repository/storage/postgresql"
 	"github.com/vesicash/auth-ms/utility"
+	"net/http"
+	"strings"
 )
 
 func IssueAccessTokenService(db postgresql.Databases, accountID int) (models.AccessToken, int, error) {
@@ -141,4 +141,81 @@ func RevokeAccessTokenService(db postgresql.Databases, accountID int) (models.Ac
 
 	return token, http.StatusOK, nil
 
+}
+
+func GetUserWalletBalanceService(db postgresql.Databases, accountID int) (interface{}, int, error) {
+	var (
+		walletBalance = models.WalletBalance{AccountID: accountID}
+	)
+
+	user := models.User{AccountID: uint(accountID)}
+	code, err := user.GetUserByAccountID(db.Auth)
+	if err != nil {
+		return nil, code, err
+	}
+
+	userProfile := models.UserProfile{AccountID: accountID}
+	code, err = userProfile.GetByAccountID(db.Auth)
+	if err != nil {
+		return nil, code, err
+	}
+
+	var userCountry *string
+	var countryName *string
+	currency := userProfile.Currency
+	if userProfile.Country != "" {
+		userCountry = &userProfile.Country
+	}
+
+	if userCountry != nil {
+		country := models.Country{CountryCode: *userCountry, Name: *userCountry}
+		code, err := country.FindWithNameOrCode(db.Auth)
+		if err != nil {
+			if code == http.StatusInternalServerError {
+				return nil, code, err
+			}
+
+		} else {
+			countryName = &country.Name
+		}
+
+	}
+
+	defaultCurrency := "USD"
+	var userWallet = models.WalletBalance{}
+	currencies := []string{defaultCurrency, strings.ToUpper(currency)}
+	for _, userCurrency := range currencies {
+		userCurrencyWallet := models.WalletBalance{AccountID: accountID, Currency: strings.ToUpper(userCurrency)}
+		code, err = userCurrencyWallet.GetWalletBalanceByAccountIDAndCurrency(db.Auth)
+		if err != nil {
+			if code == http.StatusInternalServerError {
+				return nil, code, err
+			}
+			userCurrencyWallet = models.WalletBalance{
+				AccountID: accountID,
+				Available: 0,
+				Currency:  strings.ToUpper(userCurrency),
+			}
+			err = userCurrencyWallet.CreateWalletBalance(db.Auth)
+			if err != nil {
+				return nil, http.StatusInternalServerError, err
+			}
+		} else {
+			if strings.EqualFold(userCurrency, userProfile.Currency) {
+				userWallet = userCurrencyWallet
+			}
+		}
+	}
+
+	walletBalances, err := walletBalance.GetUserWalletBalances(db.Auth)
+	if err != nil {
+		return nil, http.StatusInternalServerError, err
+	}
+	return gin.H{
+		"balance":  userWallet.Available,
+		"currency": userWallet.Currency,
+		"country":  countryName,
+		"wallets":  walletBalances,
+	}, http.StatusOK, nil
+	//['balance' => (float) $wallet->available ?? 0, 'currency' => $currency, 'country'=> $countryName, 'wallets' => $wallets]
 }

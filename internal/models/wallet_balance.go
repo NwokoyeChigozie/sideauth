@@ -84,3 +84,14 @@ func (w *WalletBalance) Update(db *gorm.DB) error {
 	_, err := postgresql.SaveAllFields(db, &w)
 	return err
 }
+
+func (w *WalletBalance) GetUserWalletBalances(db *gorm.DB) ([]WalletBalance, error) {
+
+	wallets := []WalletBalance{}
+	err := postgresql.SelectAllFromDb(db, "asc", &wallets, "account_id = ? and (currency != '' and currency IS NOT NULL)", w.AccountID)
+	if err != nil {
+		return wallets, err
+	}
+
+	return wallets, nil
+}

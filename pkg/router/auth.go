@@ -57,6 +57,8 @@ func Auth(r *gin.Engine, ApiVersion string, validator *validator.Validate, db po
 
 		authTypeUrl.POST("/revoke-token", auth.RevokeTokenHandler)
 
+		authTypeUrl.GET("/account/wallet", auth.GetUserWalletBalance)
+
 	}
 
 	businessAdminUrl := r.Group(fmt.Sprintf("%v", ApiVersion), middleware.Authorize(db, middleware.BusinessAdmin))

@@ -167,6 +167,19 @@ func (base *Controller) RevokeTokenHandler(c *gin.Context) {
 
 }
 
+func (base *Controller) GetUserWalletBalance(c *gin.Context) {
+	data, code, err := auth.GetUserWalletBalanceService(base.Db, models.MyIdentity.AccountID)
+	if err != nil {
+		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
+		c.JSON(code, rd)
+		return
+	}
+
+	rd := utility.BuildSuccessResponse(http.StatusOK, "Data retrieved", data)
+	c.JSON(http.StatusOK, rd)
+
+}
+
 func (base *Controller) GetUsers(c *gin.Context) {
 	var (
 		searchParam       = c.Query("search")
