@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strconv"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -23,7 +24,8 @@ func Setup() *utility.Logger {
 	logger := utility.NewLogger()
 	config := config.Setup(logger, "../../app")
 	db := postgresql.ConnectToDatabases(logger, config.TestDatabases)
-	if config.TestDatabases.Migrate {
+	shouldMigrate, _ := strconv.ParseBool(config.TestDatabases.Migrate)
+	if shouldMigrate {
 		migrations.RunAllMigrations(db)
 	}
 	return logger

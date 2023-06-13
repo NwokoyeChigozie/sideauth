@@ -29,6 +29,7 @@ func Auth(r *gin.Engine, ApiVersion string, validator *validator.Validate, db po
 		authUrl.POST("/reset-password/change-password", auth.UpdatePasswordWithToken)
 
 		authUrl.POST("/contact-us", auth.ContactUs)
+		authUrl.GET("/business-types", auth.GetBusinessTypes)
 
 	}
 
