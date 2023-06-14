@@ -87,7 +87,7 @@ func (base *Controller) BulkSignup(c *gin.Context) {
 	}
 
 	if vErrs != "" {
-		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", err.Error(), err, nil)
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", vErrs, err, nil)
 		c.JSON(http.StatusBadRequest, rd)
 		return
 	}
