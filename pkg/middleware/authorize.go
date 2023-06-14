@@ -160,7 +160,7 @@ func (at AuthorizationType) ValidateAppType(c *gin.Context, db postgresql.Databa
 	if appKey == "" {
 		return "missing app key", false
 	}
-
+	fmt.Println("KEYS: ", appKey, config.Key)
 	if appKey != config.Key {
 		return "invalid app key", false
 	}

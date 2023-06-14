@@ -8,3 +8,4 @@ Docker-compose.yml
 prometheus.yml
 grafana.yaml
 tmp/
+.vscode

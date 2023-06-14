@@ -2,7 +2,6 @@ package auth
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/vesicash/auth-ms/internal/models"
@@ -75,24 +74,24 @@ func (base *Controller) BulkSignup(c *gin.Context) {
 		return
 	}
 
-	vErrs := ""
-	reqData := []models.CreateUserRequestModel{}
+	// vErrs := ""
+	// reqData := []models.CreateUserRequestModel{}
 
-	for i, d := range req.Bulk {
-		vData, err := auth.ValidateSignupRequest(d, base.Db)
-		if err != nil {
-			vErrs += " user " + strconv.Itoa(i+1) + "errors {" + err.Error() + "}"
-		}
-		reqData = append(reqData, vData)
-	}
+	// for i, d := range req.Bulk {
+	// 	vData, err := auth.ValidateSignupRequest(d, base.Db)
+	// 	if err != nil {
+	// 		vErrs += " user " + strconv.Itoa(i+1) + "errors {" + err.Error() + "}"
+	// 	}
+	// 	reqData = append(reqData, vData)
+	// }
 
-	if vErrs != "" {
-		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", vErrs, err, nil)
-		c.JSON(http.StatusBadRequest, rd)
-		return
-	}
+	// if vErrs != "" {
+	// 	rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", vErrs, err, nil)
+	// 	c.JSON(http.StatusBadRequest, rd)
+	// 	return
+	// }
 
-	data, code, err := auth.BulkSignupService(base.Logger, reqData, base.Db)
+	data, code, err := auth.BulkSignupService(base.Logger, req.Bulk, base.Db)
 	if err != nil {
 		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
 		c.JSON(code, rd)
