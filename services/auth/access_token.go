@@ -2,13 +2,14 @@ package auth
 
 import (
 	"fmt"
+	"net/http"
+	"strings"
+
 	"github.com/gin-gonic/gin"
 	"github.com/vesicash/auth-ms/internal/config"
 	"github.com/vesicash/auth-ms/internal/models"
 	"github.com/vesicash/auth-ms/pkg/repository/storage/postgresql"
 	"github.com/vesicash/auth-ms/utility"
-	"net/http"
-	"strings"
 )
 
 func IssueAccessTokenService(db postgresql.Databases, accountID int) (models.AccessToken, int, error) {
@@ -200,10 +201,9 @@ func GetUserWalletBalanceService(db postgresql.Databases, accountID int) (interf
 			if err != nil {
 				return nil, http.StatusInternalServerError, err
 			}
-		} else {
-			if strings.EqualFold(userCurrency, userProfile.Currency) {
-				userWallet = userCurrencyWallet
-			}
+		}
+		if strings.EqualFold(userCurrency, userProfile.Currency) {
+			userWallet = userCurrencyWallet
 		}
 	}
 
@@ -217,5 +217,5 @@ func GetUserWalletBalanceService(db postgresql.Databases, accountID int) (interf
 		"country":  countryName,
 		"wallets":  walletBalances,
 	}, http.StatusOK, nil
-	//['balance' => (float) $wallet->available ?? 0, 'currency' => $currency, 'country'=> $countryName, 'wallets' => $wallets]
+
 }
