@@ -16,6 +16,11 @@ import (
 	"gorm.io/gorm"
 )
 
+var (
+	errEmailInUse error = fmt.Errorf("email address is already in use")
+	errPhoneInUse error = fmt.Errorf("phone number is already in use")
+)
+
 func ValidateSignupRequest(req models.CreateUserRequestModel, dbs postgresql.Databases) (models.CreateUserRequestModel, error) {
 	if req.PhoneNumber == "" && req.EmailAddress == "" {
 		return req, fmt.Errorf("Please provide at-least one input for either e-mail address or phone number.")
@@ -30,7 +35,7 @@ func ValidateSignupRequest(req models.CreateUserRequestModel, dbs postgresql.Dat
 		}
 		_, SErr := postgresql.SelectOneFromDb(dbs.Auth, &user, "email_address = ?", req.EmailAddress)
 		if SErr == nil {
-			return req, fmt.Errorf("email address is already in use")
+			return req, errEmailInUse
 		}
 	}
 
@@ -39,7 +44,7 @@ func ValidateSignupRequest(req models.CreateUserRequestModel, dbs postgresql.Dat
 		req.PhoneNumber = phone
 		_, SErr := postgresql.SelectOneFromDb(dbs.Auth, &user, "phone_number = ?", req.PhoneNumber)
 		if SErr == nil {
-			return req, fmt.Errorf("phone number is already in use")
+			return req, errPhoneInUse
 		}
 	}
 
@@ -128,6 +133,24 @@ func SignupService(logger *utility.Logger, req models.CreateUserRequestModel, db
 		AccountID: int(user.AccountID),
 	}
 
+	defaultCurrency := DefaultCurrency
+	userCurrency := strings.ToUpper(userProfile.Currency)
+	currencies := []string{
+		strings.ToUpper(defaultCurrency),
+		fmt.Sprintf("ESCROW_%s", strings.ToUpper(defaultCurrency)),
+		userCurrency,
+		fmt.Sprintf("ESCROW_%s", userCurrency),
+	}
+
+	for _, c := range currencies {
+		wallet := models.WalletBalance{
+			AccountID: int(user.AccountID),
+			Available: 0,
+			Currency:  c,
+		}
+		wallet.CreateWalletBalance(db.Auth)
+	}
+
 	err = userCredential.CreateUsersCredential(db.Auth)
 	if err != nil {
 		return nil, http.StatusInternalServerError, err
@@ -204,7 +227,47 @@ func SignupService(logger *utility.Logger, req models.CreateUserRequestModel, db
 
 func BulkSignupService(logger *utility.Logger, req []models.CreateUserRequestModel, db postgresql.Databases) ([]*models.User, int, error) {
 	newUsers := []*models.User{}
+	errors := []string{}
 	for _, sData := range req {
+		_, err := ValidateSignupRequest(sData, db)
+		if err != nil {
+			if err != errEmailInUse && err != errPhoneInUse {
+				errors = append(errors, err.Error())
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return nil, http.StatusBadRequest, fmt.Errorf(strings.Join(errors, " ,"))
+	}
+
+	for _, sData := range req {
+		sData, err := ValidateSignupRequest(sData, db)
+		if err == errEmailInUse {
+			user := models.User{
+				EmailAddress: sData.EmailAddress,
+			}
+			code, err := user.GetUserByUsernameEmailOrPhone(db.Auth)
+			if err != nil {
+				return newUsers, code, err
+			}
+
+			newUsers = append(newUsers, &user)
+			continue
+		}
+		if err == errPhoneInUse {
+			user := models.User{
+				PhoneNumber: sData.PhoneNumber,
+			}
+			code, err := user.GetUserByUsernameEmailOrPhone(db.Auth)
+			if err != nil {
+				return newUsers, code, err
+			}
+
+			newUsers = append(newUsers, &user)
+			continue
+		}
+
 		newUser, _, err := SignupService(logger, sData, db)
 		if err != nil {
 			logger.Error("bulk signup", err)
