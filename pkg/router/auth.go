@@ -62,7 +62,7 @@ func Auth(r *gin.Engine, ApiVersion string, validator *validator.Validate, db po
 
 	}
 
-	businessAdminUrl := r.Group(fmt.Sprintf("%v", ApiVersion), middleware.Authorize(db, middleware.BusinessAdmin))
+	businessAdminUrl := r.Group(fmt.Sprintf("%v", ApiVersion), middleware.Authorize(db, middleware.BusinessAdmin, middleware.AppType))
 	{
 		businessAdminUrl.GET("/users/get", auth.GetUsers)
 
