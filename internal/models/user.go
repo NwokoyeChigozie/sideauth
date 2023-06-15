@@ -182,7 +182,7 @@ func (u *User) GetUsers(db *gorm.DB, searchParam string, isMorEnabled *bool) ([]
 	query := ""
 
 	if searchParam != "" {
-		query = addQuery(query, fmt.Sprintf("(email_address ILIKE '%v' OR firstname ILIKE '%v' OR lastname ILIKE '%v')", "%"+searchParam+"%", "%"+searchParam+"%", "%"+searchParam+"%"), "OR")
+		query = addQuery(query, fmt.Sprintf("(email_address ILIKE '%v' OR firstname ILIKE '%v' OR lastname ILIKE '%v' OR account_id ILIKE '%v' OR phone_number ILIKE '%v')", "%"+searchParam+"%", "%"+searchParam+"%", "%"+searchParam+"%", "%"+searchParam+"%", "%"+searchParam+"%"), "OR")
 	}
 
 	if isMorEnabled != nil {
