@@ -82,7 +82,8 @@ type GetUserModel struct {
 }
 
 type EnableMORReq struct {
-	Status *bool `json:"status" validate:"required"`
+	AccountID int   `json:"account_id" pgvalidate:"exists=auth$users$account_id"`
+	Status    *bool `json:"status" validate:"required"`
 }
 
 type BulkCreateUserRequestModel struct {

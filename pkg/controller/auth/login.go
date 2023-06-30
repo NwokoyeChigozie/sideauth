@@ -1,10 +1,11 @@
 package auth
 
 import (
-	"github.com/vesicash/auth-ms/pkg/repository/storage/postgresql"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/vesicash/auth-ms/pkg/repository/storage/postgresql"
 
 	"github.com/gin-gonic/gin"
 	"github.com/vesicash/auth-ms/internal/models"
@@ -119,31 +120,31 @@ func (base *Controller) GetAccessToken(c *gin.Context) {
 
 func (base *Controller) ToggleMorStatus(c *gin.Context) {
 	var (
-		request models.EnableMORReq
+		req models.EnableMORReq
 	)
 
-	err := c.ShouldBind(&request)
+	err := c.ShouldBind(&req)
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Failed to parse request body", err, nil)
 		c.JSON(http.StatusBadRequest, rd)
 		return
 	}
 
-	err = base.Validator.Struct(&request)
+	err = base.Validator.Struct(&req)
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Validation failed", utility.ValidationResponse(err, base.Validator), nil)
 		c.JSON(http.StatusBadRequest, rd)
 		return
 	}
 
-	err = postgresql.ValidateRequest(request)
+	err = postgresql.ValidateRequest(req)
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", err.Error(), err, nil)
 		c.JSON(http.StatusBadRequest, rd)
 		return
 	}
 
-	_, code, err := auth.UpdateUserMorSettings(base.Db, request, models.MyIdentity.AccountID)
+	_, code, err := auth.UpdateUserMorSettings(base.Db, req, req.AccountID)
 	if err != nil {
 		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
 		c.JSON(code, rd)
