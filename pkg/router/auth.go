@@ -62,7 +62,7 @@ func Auth(r *gin.Engine, ApiVersion string, validator *validator.Validate, db po
 
 	businessAdminUrl := r.Group(fmt.Sprintf("%v", ApiVersion), middleware.Authorize(db, middleware.BusinessAdmin, middleware.AppType))
 	{
-		authTypeUrl.POST("/toggle-mor-status", auth.ToggleMorStatus)
+		businessAdminUrl.POST("/toggle-mor-status", auth.ToggleMorStatus)
 		businessAdminUrl.GET("/users/get", auth.GetUsers)
 
 		businessAdminUrl.GET("/countries/mor", auth.ListSelectedCountries)
